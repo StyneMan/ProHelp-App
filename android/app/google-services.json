@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "964741321159",
+    "project_id": "prohelp-95c57",
+    "storage_bucket": "prohelp-95c57.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:964741321159:android:9c9b587f839cace138c9e2",
+        "android_client_info": {
+          "package_name": "com.prohelp.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "964741321159-c0hcfbf27c9v5mub4vadpau1o5rerqqe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.prohelp.app",
+            "certificate_hash": "18841580a4c2bb85b5e2d2db08c0656e38d7e38d"
+          }
+        },
+        {
+          "client_id": "964741321159-oqbch9v7eih4nukf3luf31ddf1t18dfl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDI9kp0ds3SH7aNqGR_YNcmG22HskPtwiw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "964741321159-oqbch9v7eih4nukf3luf31ddf1t18dfl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
