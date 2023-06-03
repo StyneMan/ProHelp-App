@@ -22,8 +22,6 @@ class Messages extends StatelessWidget {
   final _controller = Get.find<StateController>();
   final _searchController = TextEditingController();
 
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,28 +39,15 @@ class Messages extends StatelessWidget {
               width: 16.0,
             ),
             ClipOval(
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 1.5,
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Image.network(
-                    manager.getUser()['bio']['image'] ?? "",
-                    errorBuilder: (context, error, stackTrace) => const Icon(
-                        CupertinoIcons.person_alt,
-                        size: 21,
-                        color: Colors.white),
-                    width: 24,
-                    height: 24,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              child: Image.network(
+                manager.getUser()['bio']['image'] ?? "",
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                    CupertinoIcons.person_alt,
+                    size: 21,
+                    color: Colors.white),
+                width: 36,
+                height: 36,
+                fit: BoxFit.cover,
               ),
             ),
             const SizedBox(
@@ -101,11 +86,21 @@ class Messages extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: _controller.myChats.isEmpty || _controller.myChats.value.isEmpty
             ? Center(
-                child: TextInter(
-                  text:
-                      "Not chats found. Connect with ${manager.getUser()['accountType'] == "recruiter" ? "professionals" : "job recruiters"} and start chatting!",
-                  fontSize: 16,
-                  align: TextAlign.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/images/empty.png'),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 48.0),
+                      child: TextInter(
+                        text:
+                            "Not chats found. Connect with ${manager.getUser()['accountType'] == "recruiter" ? "professionals" : "job recruiters"} and start chatting!",
+                        fontSize: 16,
+                        align: TextAlign.center,
+                      ),
+                    ),
+                  ],
                 ),
               )
             : Column(

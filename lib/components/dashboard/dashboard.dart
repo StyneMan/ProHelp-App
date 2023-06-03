@@ -173,17 +173,22 @@ class _DashboardState extends State<Dashboard> {
 
       // _controller.userData.value = widget.manager.getUser();
 
-      if (widget.manager.getUser()['accountType'] != "freelancer") {
-        APIService()
-            .getFreelancers(_token, widget.manager.getUser()['email'])
-            .then((value) {
-          debugPrint("STATE GET FREELANCERS >>> ${value.body}");
-          Map<String, dynamic> data = jsonDecode(value.body);
-          _controller.freelancers.value = data['data'];
-        }).catchError((onError) {
-          debugPrint("STATE GET freelancer ERROR >>> $onError");
-        });
+      // if (widget.manager.getUser()['accountType'] != "freelancer") {
+      APIService()
+          .getFreelancers(_token, widget.manager.getUser()['email'])
+          .then((value) {
+        debugPrint("STATE GET FREELANCERS >>> ${value.body}");
+        Map<String, dynamic> data = jsonDecode(value.body);
+        _controller.freelancers.value = data['data'];
+      }).catchError((onError) {
+        debugPrint("STATE GET freelancer ERROR >>> $onError");
+        if (onError.toString().contains("rk is unreachable")) {
+        _controller.hasInternetAccess.value = false;
       }
+      });
+
+      // }
+
       _controller.myChats.value = [];
 
       final chatResp = await APIService().getUsersChats(
@@ -191,13 +196,16 @@ class _DashboardState extends State<Dashboard> {
         email: userMap['email'],
         userId: userMap['_id'],
       );
-      debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
+      // debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
       if (chatResp.statusCode == 200) {
         Map<String, dynamic> chatMap = jsonDecode(chatResp.body);
         _controller.myChats.value = chatMap['data'];
       }
     } catch (e) {
       debugPrint(e.toString());
+      if (e.toString().contains("rk is unreachable")) {
+        _controller.hasInternetAccess.value = false;
+      }
     }
   }
 
@@ -214,7 +222,7 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     super.initState();
     _initDialog();
-    debugPrint("CURR USER STATE >> ${_controller.userData.value}");
+    // debugPrint("CURR USER STATE >> ${_controller.userData.value}");
   }
 
   void _onItemTapped(int index) {
@@ -278,7 +286,7 @@ class _DashboardState extends State<Dashboard> {
                           "assets/images/pros_icon.svg",
                           color: Colors.grey,
                         ),
-                        label: 'Pros',
+                        label: 'Explore',
                         activeIcon: SvgPicture.asset(
                           "assets/images/pros_icon.svg",
                           color: Constants.primaryColor,

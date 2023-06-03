@@ -16,6 +16,7 @@ class SocketManager {
       "transports": ["websocket"],
       "autoConnect": false
     });
+
     
     socket.connect();
   }

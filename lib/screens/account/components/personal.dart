@@ -10,7 +10,9 @@ import 'package:prohelp_app/components/dialog/custom_dialog.dart';
 import 'package:prohelp_app/components/inputfield/lineddatefield.dart';
 import 'package:prohelp_app/components/inputfield/lineddropdown2.dart';
 import 'package:prohelp_app/components/inputfield/llinedtextfield.dart';
+import 'package:prohelp_app/components/inputfield/state_lineddropdown.dart';
 import 'package:prohelp_app/components/text_components.dart';
+import 'package:prohelp_app/data/state/statesAndCities.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
@@ -34,8 +36,17 @@ class _PersonalState extends State<Personal> {
   final _phoneController = TextEditingController();
   final _ageController = TextEditingController();
   final _addressController = TextEditingController();
+  final _zipController = TextEditingController();
   final _ninController = TextEditingController();
+
+  List<String> _cities = [];
+
   String _selectedGender = "";
+  String _selectedCity = "";
+  String _selectedState = "";
+  String _selectedCountry = "Nigeria";
+  String _selectedProfession = "Select profession";
+
   String? _genderLabel;
   bool _shouldEdit = false;
 
@@ -43,14 +54,51 @@ class _PersonalState extends State<Personal> {
   final _formKey = GlobalKey<FormState>();
   final _controller = Get.find<StateController>();
 
-  onSelected(val) {
+  _onSelected(val) {
     setState(() {
       _selectedGender = val;
       _shouldEdit = true;
     });
   }
 
-  onDateSelected(val) {
+  _onCitySelected(val) {
+    setState(() {
+      _selectedCity = val;
+      _shouldEdit = true;
+    });
+  }
+
+  _onStateSelected(val) {
+    setState(() {
+      _shouldEdit = true;
+    });
+
+    setState(() {
+      _cities = [];
+    });
+    _onCitySelected("Select city");
+    _selectedState = val;
+    var selector = stateCities.where((element) => element['state'] == val);
+    setState(() {
+      _cities = selector.first['cities'] as List<String>;
+    });
+  }
+
+  _onCountrySelected(val) {
+    setState(() {
+      _selectedCountry = val;
+      _shouldEdit = true;
+    });
+  }
+
+  _onProfessionSelected(val) {
+    setState(() {
+      _selectedProfession = val;
+      _shouldEdit = true;
+    });
+  }
+
+  _onDateSelected(val) {
     setState(() {
       _ageController.text = val;
       _shouldEdit = true;
@@ -70,7 +118,7 @@ class _PersonalState extends State<Personal> {
       _phoneController.text = _controller.userData.value['bio']['phone'] ??
           widget.manager.getUser()['bio']['phone'] ??
           "Not set";
-      _addressController.text = _controller.userData.value['bio']['address']
+      _addressController.text = _controller.userData.value['address']['street']
               .toString()
               .capitalize ??
           widget.manager.getUser()['bio']['address'].toString().capitalize ??
@@ -87,6 +135,21 @@ class _PersonalState extends State<Personal> {
           _controller.userData.value['bio']['gender'].toString().capitalize ??
               widget.manager.getUser()['bio']['gender'].toString().capitalize ??
               "Gender";
+      _selectedCity = _controller.userData.value['address']['city']
+              .toString()
+              .capitalize ??
+          widget.manager.getUser()['address']['city'].toString().capitalize ??
+          "Select city";
+      _selectedState = _controller.userData.value['address']['state']
+              .toString()
+              .capitalize ??
+          widget.manager.getUser()['address']['state'].toString().capitalize ??
+          "Select state";
+
+      _selectedProfession =
+          _controller.userData.value['profession'].toString().capitalize ??
+              widget.manager.getUser()['profession'].toString().capitalize ??
+              "Select profession";
       _shouldEdit = _controller.croppedPic.value.isNotEmpty;
     });
 
@@ -168,11 +231,17 @@ class _PersonalState extends State<Personal> {
           ...widget.manager.getUser()['bio'],
           "fullname": _nameController.text.toLowerCase(),
           "phone": _phoneController.text,
-          "address": _addressController.text,
           "dob": _ageController.text,
           "nin": _ninController.text,
-        }
+        },
+        "address": {
+          "street": _addressController.text.toLowerCase(),
+          "state": _selectedState.toLowerCase(),
+          "country": _selectedCountry.toLowerCase(),
+          "city": _selectedCity.toLowerCase(),
+        },
       };
+
       try {
         final _prefs = await SharedPreferences.getInstance();
         var _token = _prefs.getString("accessToken") ?? "";
@@ -195,9 +264,13 @@ class _PersonalState extends State<Personal> {
           setState(() {
             _nameController.text = map['data']['bio']['fullname'];
             _phoneController.text = map['data']['bio']['phone'];
-            _addressController.text = map['data']['bio']['address'];
+            _addressController.text = map['data']['address']['street'];
             _ageController.text = map['data']['bio']['dob'];
             _ninController.text = map['data']['bio']['nin'];
+            _selectedCity = "${map['data']['address']['city']}".capitalize!;
+            _selectedState = "${map['data']['address']['state']}".capitalize!;
+            _selectedCountry =
+                "${map['data']['address']['country']}".capitalize!;
             _shouldEdit = false;
           });
 
@@ -226,10 +299,15 @@ class _PersonalState extends State<Personal> {
             ...widget.manager.getUser()['bio'],
             "fullname": _nameController.text.toLowerCase(),
             "phone": _phoneController.text,
-            "address": _addressController.text,
             "dob": _ageController.text,
             "nin": _ninController.text,
             "image": url,
+          },
+          "address": {
+            "street": _addressController.text.toLowerCase(),
+            "state": _selectedState.toLowerCase(),
+            "country": _selectedCountry.toLowerCase(),
+            "city": _selectedCity.toLowerCase(),
           }
         };
         final _prefs = await SharedPreferences.getInstance();
@@ -253,7 +331,7 @@ class _PersonalState extends State<Personal> {
           setState(() {
             _nameController.text = map['data']['bio']['fullname'];
             _phoneController.text = map['data']['bio']['phone'];
-            _addressController.text = map['data']['bio']['address'];
+            _addressController.text = map['data']['address']['street'];
             _ageController.text = map['data']['bio']['dob'];
             _ninController.text = map['data']['bio']['nin'];
             _shouldEdit = false;
@@ -348,7 +426,7 @@ class _PersonalState extends State<Personal> {
           ),
           LinedDateField(
             label: "Age",
-            onDateSelected: onDateSelected,
+            onDateSelected: _onDateSelected,
             controller: _ageController,
             inputType: TextInputType.datetime,
           ),
@@ -361,7 +439,7 @@ class _PersonalState extends State<Personal> {
           LinedDropdown2(
             label: "$_genderLabel",
             title: "Gender",
-            onSelected: onSelected,
+            onSelected: _onSelected,
             items: const ["Male", "Female"],
           ),
           const Divider(
@@ -370,8 +448,21 @@ class _PersonalState extends State<Personal> {
           const SizedBox(
             height: 6.0,
           ),
+          LinedDropdown2(
+            isEnabled: false,
+            label: _selectedProfession,
+            title: "Profession",
+            onSelected: _onProfessionSelected,
+            items: const ["Programming", "Catering", "Driving", "Baking"],
+          ),
+          const Divider(
+            color: Constants.accentColor,
+          ),
+          const SizedBox(
+            height: 6.0,
+          ),
           LinedTextField(
-            label: "Address",
+            label: "Street",
             onChanged: (val) {
               setState(() {
                 _shouldEdit = true;
@@ -380,8 +471,67 @@ class _PersonalState extends State<Personal> {
             controller: _addressController,
             validator: (value) {
               if (value.toString().isEmpty || value == null) {
-                return "Address is required";
+                return "Street address is required";
               }
+              return null;
+            },
+            inputType: TextInputType.text,
+            capitalization: TextCapitalization.words,
+          ),
+          const Divider(
+            color: Constants.accentColor,
+          ),
+          const SizedBox(
+            height: 6.0,
+          ),
+          LinedDropdownState(
+              label: _selectedState,
+              title: "State",
+              onSelected: _onStateSelected,
+              items: stateCities),
+          const Divider(
+            color: Constants.accentColor,
+          ),
+          const SizedBox(
+            height: 6.0,
+          ),
+          LinedDropdown2(
+            label: _selectedCity,
+            title: "City",
+            onSelected: _onCitySelected,
+            items: _cities,
+          ),
+          const Divider(
+            color: Constants.accentColor,
+          ),
+          const SizedBox(
+            height: 6.0,
+          ),
+          LinedDropdown2(
+            label: _selectedCountry,
+            title: "Country",
+            onSelected: _onCountrySelected,
+            items: const ["Nigeria"],
+          ),
+          const Divider(
+            color: Constants.accentColor,
+          ),
+          const SizedBox(
+            height: 6.0,
+          ),
+          LinedTextField(
+            label: "Zip Code",
+            isEnabled: false,
+            onChanged: (val) {
+              setState(() {
+                _shouldEdit = true;
+              });
+            },
+            controller: _zipController,
+            validator: (value) {
+              // if (value.toString().isEmpty || value == null) {
+              //   return "Zip code is required";
+              // }
               return null;
             },
             inputType: TextInputType.text,
@@ -402,9 +552,9 @@ class _PersonalState extends State<Personal> {
             },
             controller: _ninController,
             validator: (value) {
-              if (value.toString().isEmpty || value == null) {
-                return "ID number is required";
-              }
+              // if (value.toString().isEmpty || value == null) {
+              //   return "ID number is required";
+              // }
               return null;
             },
             inputType: TextInputType.number,
@@ -418,7 +568,7 @@ class _PersonalState extends State<Personal> {
           ),
           Obx(
             () => RoundedButton(
-              isLoading: _controller.isLoading.value, 
+              isLoading: _controller.isLoading.value,
               bgColor: Constants.primaryColor,
               child: const TextInter(text: "SAVE CHANGES", fontSize: 16),
               borderColor: Colors.transparent,

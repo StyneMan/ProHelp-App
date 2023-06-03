@@ -230,8 +230,7 @@ class _UserProfileState extends State<MyProfile> {
                                   width:
                                       MediaQuery.of(context).size.width * 0.48,
                                   child: TextPoppins(
-                                    text: widget.manager.getUser()['bio']
-                                        ['address'],
+                                    text: "${widget.manager.getUser()['address']['city']} ${widget.manager.getUser()['address']['state']}, ${widget.manager.getUser()['address']['country']}".capitalize,
                                     fontSize: 13,
                                     color: Colors.black54,
                                   ),

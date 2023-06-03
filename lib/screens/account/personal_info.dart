@@ -271,15 +271,15 @@ class _PersonalInfoState extends State<PersonalInfo>
                                 tabs: [
                                   Tab(
                                     child: TextPoppins(
-                                        text: "Personal", fontSize: 16),
+                                        text: "Personal", fontSize: 13),
                                   ),
                                   Tab(
                                     child:
-                                        TextPoppins(text: "Bank", fontSize: 16),
+                                        TextPoppins(text: "Bank", fontSize: 13),
                                   ),
                                   Tab(
                                     child: TextPoppins(
-                                        text: "Guarantor", fontSize: 16),
+                                        text: "Guarantor", fontSize: 13),
                                   ),
                                 ],
                               ),

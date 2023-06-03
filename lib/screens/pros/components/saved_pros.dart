@@ -23,8 +23,18 @@ class SavedProfessionals extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             width: double.infinity,
             height: double.infinity,
-            child: const Center(
-              child: Text("Not data found"),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset('assets/images/empty.png'),
+                  const Text(
+                    "No saved professionals found",
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
           )
         : FutureBuilder<http.Response>(
@@ -55,9 +65,21 @@ class SavedProfessionals extends StatelessWidget {
               }
 
               if (!snapshot.hasData) {
-                return const Center(
-                  child: Text(
-                    "No data found.",
+                return SizedBox(
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: Center(
+                    child: Column(
+                       mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset('assets/images/empty.png'),
+                        const Text(
+                          "No saved professionals found",
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }

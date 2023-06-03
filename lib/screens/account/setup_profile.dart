@@ -87,6 +87,13 @@ class SetupProfile extends StatelessWidget {
         "address": _step1Payload['address'].toString().toLowerCase(),
         "dob": _step1Payload['dob'],
       },
+      "address": {
+        "street": _step1Payload['address'].toString().toLowerCase(),
+        "city": _step1Payload['city'],
+        "country": _step1Payload['country'].toString().toLowerCase(),
+        "state": _step1Payload['state'].toString().toLowerCase(),
+      },
+      "profession": _step1Payload['profession'].toString().toLowerCase(),
       "guarantor": {
         "name": _step2Payload['nokName'].toString().toLowerCase(),
         "address": _step2Payload['nokAddress'].toString().toLowerCase(),
@@ -194,6 +201,10 @@ class SetupProfile extends StatelessWidget {
     _controller.name.value = _step1Payload['fullname'];
     _controller.address.value = _step1Payload['address'];
     _controller.dob.value = _step1Payload['dob'];
+    _controller.state.value = _step1Payload['state'];
+    _controller.country.value = _step1Payload['country'];
+    _controller.profession.value = _step1Payload['profession'];
+    _controller.city.value = _step1Payload['city'];
     _controller.phone.value =
         _step1Payload['phone'].toString().startsWith("+234")
             ? "0${_step1Payload['phone'].toString().substring(4)}"
@@ -320,13 +331,11 @@ class SetupProfile extends StatelessWidget {
                     onStepReached: (index) =>
                         _controller.currentProfileStep.value += index,
                   ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
                   Form(
                     key: _formKey,
                     child: Expanded(
                       child: ListView(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
                         shrinkWrap: true,
                         children: [
                           _controller.currentProfileStep.value == 0
@@ -385,6 +394,12 @@ class SetupProfile extends StatelessWidget {
                                       );
                                     } else {
                                       Constants.toast("Gender not selected!");
+                                    }
+
+                                    if (_step1Payload['city']
+                                        .toString()
+                                        .isEmpty) {
+                                      Constants.toast("City is not selected!");
                                     }
                                   } else if (_controller
                                           .currentProfileStep.value ==

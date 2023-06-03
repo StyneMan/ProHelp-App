@@ -94,15 +94,11 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   _checkConnection() {
-    for (var element in widget.manager.getUser()['connections']) {
+    for (var element in _controller.userData.value['connections']) {
       if (element == widget.data['_id']) {
+        debugPrint("TRUE");
         setState(() {
           _isConnected = true;
-        });
-        //Trigger hire here is true
-      } else {
-        setState(() {
-          _isConnected = false;
         });
       }
     }
@@ -141,7 +137,15 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   @override
+  void didChangeDependencies() {
+    // _checkConnection();
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // _checkConnection();
+
     return Scaffold(
       key: _scaffoldKey,
       endDrawer: CustomDrawer(
@@ -210,13 +214,13 @@ class _UserProfileState extends State<UserProfile> {
                           child: Image.network(
                             widget.data['bio']['image'],
                             fit: BoxFit.cover,
-                            width: Constants.avatarRadius +52,
-                            height: Constants.avatarRadius +52 ,
+                            width: Constants.avatarRadius + 36,
+                            height: Constants.avatarRadius + 36,
                             errorBuilder: (context, error, stackTrace) =>
                                 SvgPicture.asset(
                               "assets/images/personal_icon.svg",
-                              width: Constants.avatarRadius + 60,
-                              height: Constants.avatarRadius + 60,
+                              width: Constants.avatarRadius + 40,
+                              height: Constants.avatarRadius + 40,
                             ),
                           ),
                         ),
@@ -354,83 +358,86 @@ class _UserProfileState extends State<UserProfile> {
                     const EdgeInsets.symmetric(horizontal: 16.0, vertical: 1.0),
                 child: Column(
                   children: [
-                    Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        TextPoppins(
-                          text: "${widget.data['bio']['address']} ".capitalize,
-                          fontSize: 13,
-                          color: Colors.black54,
-                        ),
-                        const SizedBox(
-                          width: 5.0,
-                        ),
-                        const Icon(
-                          Icons.circle,
-                          size: 6,
-                          color: Colors.black87,
-                        ),
-                        const SizedBox(
-                          width: 5.0,
-                        ),
-                        TextPoppins(
-                          text:
-                              " ${widget.data['connections']?.length} Connections",
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Constants.primaryColor,
-                        ),
-                        const SizedBox(
-                          width: 6.0,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Get.to(
-                              ManageConnections(
-                                caller: "guest",
-                                data: widget.data,
-                                connections: widget.data['connections'],
-                                manager: widget.manager,
+                    widget.data['accountType'] == "recruiter"
+                        ? const SizedBox()
+                        : Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              TextPoppins(
+                                text:
+                                    "${widget.data['address']['state']}, ${widget.data['address']['country']}"
+                                        .capitalize,
+                                fontSize: 13,
+                                color: Colors.black54,
                               ),
-                              transition: Transition.cupertino,
-                            );
-                          },
-                          child: const Text(
-                            "See more",
-                            style: TextStyle(
-                              fontSize: 13,
-                              decoration: TextDecoration.underline,
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.w500,
-                              color: Constants.primaryColor,
-                            ),
+                              const SizedBox(
+                                width: 5.0,
+                              ),
+                              const Icon(
+                                Icons.circle,
+                                size: 6,
+                                color: Colors.black87,
+                              ),
+                              const SizedBox(
+                                width: 5.0,
+                              ),
+                              TextPoppins(
+                                text:
+                                    " ${widget.data['connections']?.length} Connections",
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: Constants.primaryColor,
+                              ),
+                              const SizedBox(
+                                width: 6.0,
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Get.to(
+                                    ManageConnections(
+                                      caller: "guest",
+                                      data: widget.data,
+                                      connections: widget.data['connections'],
+                                      manager: widget.manager,
+                                    ),
+                                    transition: Transition.cupertino,
+                                  );
+                                },
+                                child: const Text(
+                                  "See more",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    decoration: TextDecoration.underline,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.w500,
+                                    color: Constants.primaryColor,
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
-                        )
-                      ],
-                    ),
                     const SizedBox(
                       height: 8.0,
                     ),
                     Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          for (var e = 0;
-                              e < widget.data['skills']?.length;
-                              e++)
-                            Container(
-                              padding: const EdgeInsets.all(2.0),
-                              margin: const EdgeInsets.all(1.5),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
-                              child: TextPoppins(
-                                text: widget.data['skills'][e]['name'],
-                                fontSize: 12,
-                              ),
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        for (var e = 0; e < widget.data['skills']?.length; e++)
+                          Container(
+                            padding: const EdgeInsets.all(2.0),
+                            margin: const EdgeInsets.all(1.5),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(4.0),
                             ),
-                        ]),
+                            child: TextPoppins(
+                              text: widget.data['skills'][e]['name'],
+                              fontSize: 12,
+                            ),
+                          ),
+                      ],
+                    ),
                     const SizedBox(
                       height: 8.0,
                     ),
@@ -624,36 +631,38 @@ class _UserProfileState extends State<UserProfile> {
                     const SizedBox(
                       height: 16.0,
                     ),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 0.75,
-                        ),
-                        borderRadius: BorderRadius.circular(16.0),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextPoppins(
-                            text: "About",
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
+                    widget.data['accountType'] == "recruiter"
+                        ? const SizedBox()
+                        : Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.grey,
+                                width: 0.75,
+                              ),
+                              borderRadius: BorderRadius.circular(16.0),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextPoppins(
+                                  text: "About",
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                const SizedBox(
+                                  height: 4.0,
+                                ),
+                                TextPoppins(
+                                  text: widget.data['bio']['about'],
+                                  fontSize: 12,
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(
-                            height: 4.0,
-                          ),
-                          TextPoppins(
-                            text: widget.data['bio']['about'],
-                            fontSize: 12,
-                          ),
-                        ],
-                      ),
-                    ),
                     widget.data['accountType'].toString().toLowerCase() ==
                             "recruiter"
                         ? const SizedBox()

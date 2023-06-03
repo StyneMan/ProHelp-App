@@ -332,4 +332,190 @@ class APIService {
       throw Exception('Failed to fetch data from the backend');
     }
   }
+
+  Future<http.Response> postJob(
+      {var accessToken, var email, var payload}) async {
+    return await client.post(
+      Uri.parse('${Constants.baseURL}/api/job/post/$email'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+      body: jsonEncode(payload),
+    );
+  }
+
+  Future<http.Response> getAllJobs({var accessToken, var email}) async {
+    return await client.get(
+      Uri.parse('${Constants.baseURL}/api/job/all/$email'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+    );
+  }
+
+  Future<http.Response> getUserJobs(
+      {var accessToken, var email, var userId}) async {
+    return await client.get(
+      Uri.parse('${Constants.baseURL}/api/job/byUser/$email?userId=$userId'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+    );
+  }
+
+  Future<List<dynamic>> getJobsByUserIdStreamed(
+      {var accessToken, var email, var userId}) async {
+    final response = await client.get(
+      Uri.parse('${Constants.baseURL}/api/job/byUser/$email?userId=$userId'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+    );
+    if (response.statusCode == 200) {
+      debugPrint("MY JOBS DATA >> ${response.body}");
+      Map<String, dynamic> map = jsonDecode(response.body);
+      return map['data'] as List<dynamic>;
+    } else {
+      throw Exception('Failed to fetch data from the backend');
+    }
+  }
+
+  Future<http.Response> deleteJob(
+      {var accessToken, var email, var jobId}) async {
+    return await client.put(
+      Uri.parse('${Constants.baseURL}/api/job/delete/$email?jobId=$jobId'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+    );
+  }
+
+  Future<http.Response> updateJob(
+      {var accessToken, var email, var jobId, var payload}) async {
+    return await client.put(
+      Uri.parse('${Constants.baseURL}/api/job/update/$email?jobId=$jobId'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+      body: jsonEncode(payload),
+    );
+  }
+
+  Future<http.Response> saveJob(
+      Map body, String accessToken, String email) async {
+    return await client.put(
+      Uri.parse('${Constants.baseURL}/api/job/save/$email'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+      body: jsonEncode(body),
+    );
+  }
+
+  Future<http.Response> applyJob(
+    Map body,
+    String accessToken,
+    String email,
+    var jobId,
+  ) async {
+    return await client.post(
+      Uri.parse('${Constants.baseURL}/api/job/apply/$email?jobId=$jobId'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+      body: jsonEncode(body),
+    );
+  }
+
+  Future<http.Response> getSavedJobs(
+      {var accessToken, var email, var userId}) async {
+    return await client.get(
+      Uri.parse('${Constants.baseURL}/api/job/savedJobs/$email'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+    );
+  }
+
+  Future<http.Response> getJobApplications(
+      {var accessToken, var email, var jobId}) async {
+    return await client.get(
+      Uri.parse(
+          '${Constants.baseURL}/api/job/applications/$email?jobId=$jobId'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+    );
+  }
+
+  Future<List<dynamic>> getJobApplicationsStreamed(
+      {var accessToken, var email, var jobId}) async {
+    final response = await client.get(
+      Uri.parse(
+          '${Constants.baseURL}/api/job/applications/$email?jobId=$jobId'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+    );
+    if (response.statusCode == 200) {
+      debugPrint("MY JOB APPLICATIONS DATA >> ${response.body}");
+      Map<String, dynamic> map = jsonDecode(response.body);
+      return map['data'] as List<dynamic>;
+    } else {
+      throw Exception('Failed to fetch data from the backend');
+    }
+  }
+
+  Future<http.Response> getRecommendedJobs(
+      {var accessToken, var email, var userId}) async {
+    return await client.get(
+      Uri.parse(
+          '${Constants.baseURL}/api/job/recommended/$email?userId=$userId'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+    );
+  }
+
+  Future<http.Response> acceptJobApplication(
+    Map body,
+    String accessToken,
+    String email,
+  ) async {
+    return await client.put(
+      Uri.parse('${Constants.baseURL}/api/job/applications/accept/$email'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+      body: jsonEncode(body),
+    );
+  }
+
+   Future<http.Response> topupWallet(
+    Map body,
+    String accessToken,
+    String email,
+  ) async {
+    return await client.put(
+      Uri.parse('${Constants.baseURL}/api/wallet/topup/$email'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+      body: jsonEncode(body),
+    );
+  }
 }

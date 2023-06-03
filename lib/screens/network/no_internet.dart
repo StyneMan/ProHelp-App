@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:get/get.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/main.dart';
@@ -30,14 +31,16 @@ class _NoInternetState extends State<NoInternet> {
       });
 
       _controller.setLoading(false);
+      _controller.hasInternetAccess.value = true;
       //Now go to where necessary from here...
       Future.delayed(const Duration(milliseconds: 50), () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MyApp(),
-          ),
-        );
+        Get.off(MyApp(), transition: Transition.cupertino);
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => MyApp(),
+        //   ),
+        // );
       });
     } on SocketException catch (e) {
       _controller.setLoading(false);

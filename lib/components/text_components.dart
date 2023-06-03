@@ -6,6 +6,7 @@ class TextPoppins extends StatelessWidget {
   late final Color? color;
   late final TextAlign? align;
   late final FontWeight? fontWeight;
+  late final FontStyle? fontStyle;
   late final bool? softWrap;
 
   TextPoppins({
@@ -13,6 +14,7 @@ class TextPoppins extends StatelessWidget {
     this.color,
     required this.fontSize,
     this.fontWeight,
+    this.fontStyle,
     this.align,
     this.softWrap,
   });
@@ -28,6 +30,7 @@ class TextPoppins extends StatelessWidget {
       style: TextStyle(
         color: color,
         fontSize: fontSize,
+        fontStyle: fontStyle,
         fontFamily: fontFamily,
         fontWeight: fontWeight,
       ),

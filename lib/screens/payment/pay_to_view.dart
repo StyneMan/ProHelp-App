@@ -33,10 +33,12 @@ enum CardType {
 class PayToView extends StatefulWidget {
   var data;
   final PreferenceManager manager;
+  final String type;
   PayToView({
     Key? key,
     required this.manager,
     required this.data,
+    required this.type,
   }) : super(key: key);
 
   @override
@@ -56,7 +58,7 @@ class _PayToViewState extends State<PayToView> {
   final _formKey = GlobalKey<FormState>();
 
   bool _saveCard = false;
-  int _amountToPay = 5000;
+  // int _amountToPay = 5000;
 
   @override
   void initState() {
@@ -190,7 +192,7 @@ class _PayToViewState extends State<PayToView> {
                                   width: 4.0,
                                 ),
                                 TextPoppins(
-                                  text: "$_amountToPay",
+                                  text: "${widget.data['amount']}",
                                   fontSize: 21,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -322,7 +324,7 @@ class _PayToViewState extends State<PayToView> {
                             paddingY: 16.0,
                             bgColor: Constants.primaryColor,
                             child: Text(
-                              "Pay ${Constants.nairaSign(context).currencySymbol}${Constants.formatMoney(_amountToPay)}",
+                              "Pay ${Constants.nairaSign(context).currencySymbol}${Constants.formatMoney(widget.data['amount'])}",
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.white,
@@ -331,16 +333,9 @@ class _PayToViewState extends State<PayToView> {
                             borderColor: Colors.transparent,
                             foreColor: Colors.black,
                             onPressed: () {
-                              // Constants.toast("Testing ...");
                               if (_formKey.currentState!.validate()) {
-                                // Constants.toast("Testing ...");
                                 _controller.setLoading(true);
-                                _addConnection();
-                                // Future.delayed(const Duration(seconds: 3), () {
-                                //   // _controller.setLoading(false);
-                                //   // Get.to(PaymentSuccess(data: widget.data));
-                                // });
-                                // _chargeCard(DateTime.now().toIso8601String());
+                                _chargeCard();
                               }
                             },
                             variant: "Filled",
@@ -374,9 +369,14 @@ class _PayToViewState extends State<PayToView> {
     );
   }
 
-  _chargeCard(String accessCode) async {
+  _getAccessCode() {
+    return "${widget.manager.getUser()['_id']}" +
+        DateTime.now().toIso8601String();
+  }
+
+  _chargeCard() async {
     var charge = Charge()
-      ..accessCode = accessCode
+      ..accessCode = _getAccessCode()
       ..card = _getCardFromUI();
 
     try {
@@ -384,34 +384,35 @@ class _PayToViewState extends State<PayToView> {
       debugPrint(
           "CHARGE RESPONSE >> ${response.message} , ${response.reference}, ${response.status}");
 
-      _addConnection();
+      // if (response.status) {
+        _fundWallet(response.reference, response.status, response.message);
+      // } else {
+        // _controller.setLoading(false);
+        // Constants.toast(response.message);
+      // }
     } catch (e) {
       debugPrint("PAYMENT ERROR >> $e");
     }
-    // Use the response
   }
 
-  _addConnection() async {
+  _fundWallet(ref, status, summary) async {
     Map _payload = {
-      "guestId": "${widget.data['_id']}",
-      "guestName": "${widget.data['bio']['fullname']}",
-      "userId": "${widget.manager.getUser()['_id']}",
+      "amount": widget.data['amount'],
+      "reference": ref,
+      "summary": "Fund wallet: $summary",
+      "userId": widget.manager.getUser()['_id'],
+      "type": "fund_wallet",
+      "status": "$status",
     };
 
     try {
-      final _resp = await APIService().saveConnection(_payload,
-          widget.manager.getAccessToken(), widget.manager.getUser()['email']);
+      final res = await APIService().topupWallet(
+        _payload,
+        widget.manager.getAccessToken(),
+        widget.manager.getUser()['email'],
+      );
 
-      debugPrint("CONNECTION RESPONSE >> ${_resp.body}");
-      _controller.setLoading(false);
-      if (_resp.statusCode == 200) {
-        Map<String, dynamic> map = jsonDecode(_resp.body);
-        Constants.toast(map['message']);
-
-        _controller.userData.value = map['data'];
-        String userStr = jsonEncode(map['data']);
-        widget.manager.setUserData(userStr);
-
+      if (res.statusCode == 200) {
         _controller.onInit();
 
         Get.to(
@@ -421,9 +422,11 @@ class _PayToViewState extends State<PayToView> {
           ),
         );
       }
-    } catch (e) {
+
       _controller.setLoading(false);
+    } catch (e) {
       debugPrint(e.toString());
+      _controller.setLoading(false);
     }
   }
 }

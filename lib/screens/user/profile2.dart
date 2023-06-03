@@ -104,10 +104,6 @@ class _UserProfile2State extends State<UserProfile2> {
         setState(() {
           _isConnected = true;
         });
-      } else {
-        setState(() {
-          _isConnected = false;
-        });
       }
     }
   }
@@ -455,7 +451,7 @@ class _UserProfile2State extends State<UserProfile2> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             TextPoppins(
-                              text: "${map['data']['bio']['address']} ",
+                              text: "${map['data']['address']['state']},  ${map['data']['address']['country']}".capitalize,
                               fontSize: 13,
                               color: Colors.black54,
                             ),

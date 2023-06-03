@@ -4,5 +4,10 @@ List<String> relationships = const [
   'Cousin',
   'Nephew',
   'Niece',
-  'Friend'
+  'Friend',
+  'Spouse',
+  'Colleage',
+  'Mentor',
+  'Grandparent',
+  'Grandchild'
 ];

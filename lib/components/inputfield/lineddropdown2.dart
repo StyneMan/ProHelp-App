@@ -7,13 +7,15 @@ class LinedDropdown2 extends StatefulWidget {
   final String label, title;
   final InitCallback onSelected;
   final List<String> items;
-  
+  final bool isEnabled;
+
   const LinedDropdown2({
     Key? key,
     required this.label,
     required this.title,
     required this.onSelected,
     required this.items,
+    this.isEnabled = true,
   }) : super(key: key);
 
   @override
@@ -36,13 +38,13 @@ class _LinedDropdownState extends State<LinedDropdown2> {
             color: const Color(0xFF9CA5C5),
           ),
           Expanded(
-              child: Container(
-                width: 100,
-                color: Colors.transparent,
-              ),
+            child: Container(
+              width: 100,
+              color: Colors.transparent,
             ),
+          ),
           SizedBox(
-           width: MediaQuery.of(context).size.width * 0.56,
+            width: MediaQuery.of(context).size.width * 0.56,
             child: DropdownButton(
               hint: TextInter(
                 text: widget.label,
@@ -66,16 +68,18 @@ class _LinedDropdownState extends State<LinedDropdown2> {
                 );
               }).toList(),
               value: selectVal,
-              onChanged: (newValue) async {
-                widget.onSelected(
-                  newValue as String,
-                );
-                setState(
-                  () {
-                    selectVal = newValue;
-                  },
-                );
-              },
+              onChanged: !widget.isEnabled
+                  ? null
+                  : (newValue) async {
+                      widget.onSelected(
+                        newValue as String,
+                      );
+                      setState(
+                        () {
+                          selectVal = newValue;
+                        },
+                      );
+                    },
               icon: const Icon(Icons.keyboard_arrow_down_rounded),
               iconSize: 30,
               isExpanded: true,

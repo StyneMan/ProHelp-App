@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:get/instance_manager.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:prohelp_app/components/drawer/custom_drawer.dart';
 import 'package:prohelp_app/components/text_components.dart';
@@ -11,6 +12,7 @@ import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/account/about.dart';
+import 'package:prohelp_app/screens/account/components/wallet.dart';
 import 'package:prohelp_app/screens/account/personal_info.dart';
 import 'package:prohelp_app/screens/account/security.dart';
 import 'package:prohelp_app/screens/account/support.dart';
@@ -41,26 +43,15 @@ class Account extends StatelessWidget {
               width: 16.0,
             ),
             ClipOval(
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 1.5,
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Image.network(
-                    manager.getUser()['bio']['image'] ?? "",
-                    errorBuilder: (context, error, stackTrace) =>
-                       const Icon(CupertinoIcons.person_alt, size: 21, color: Colors.white),
-                    width: 24,
-                    height: 24,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              child: Image.network(
+                manager.getUser()['bio']['image'] ?? "",
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                    CupertinoIcons.person_alt,
+                    size: 21,
+                    color: Colors.white),
+                width: 36,
+                height: 36,
+                fit: BoxFit.cover,
               ),
             ),
             const SizedBox(
@@ -326,57 +317,90 @@ class Account extends StatelessWidget {
                 const SizedBox(
                   height: 10.0,
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      PageTransition(
-                        type: PageTransitionType.size,
-                        alignment: Alignment.bottomCenter,
-                        child: AboutMe(
-                          manager: manager,
+                manager.getUser()['accountType'] != "freelancer"
+                    ? TextButton(
+                        onPressed: () {
+                          Get.to(
+                            MyWallet(
+                              manager: manager,
+                            ),
+                            transition: Transition.cupertino,
+                          );
+                          // showBarModalBottomSheet(
+                          //   expand: true,
+                          //   context: context,
+                          //   useRootNavigator: true,
+                          //   backgroundColor: Colors.white,
+                          //   topControl: ClipOval(
+                          //     child: GestureDetector(
+                          //       onTap: () {
+                          //         Navigator.of(context).pop();
+                          //       },
+                          //       child: Container(
+                          //         width: 32,
+                          //         height: 32,
+                          //         decoration: BoxDecoration(
+                          //           color: Colors.white,
+                          //           borderRadius: BorderRadius.circular(
+                          //             16,
+                          //           ),
+                          //         ),
+                          //         child: const Center(
+                          //           child: Icon(
+                          //             Icons.close,
+                          //             size: 24,
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ),
+                          //   builder: (context) => SizedBox(
+                          //     // height: MediaQuery.of(context).size.height * 0.75,
+                          //     child:
+                          //   ),
+                          // );
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                    "assets/images/personal_icon.svg"),
+                                const SizedBox(
+                                  width: 16.0,
+                                ),
+                                TextPoppins(
+                                  text: "My Wallet",
+                                  fontSize: 13,
+                                  color: Colors.black87,
+                                )
+                              ],
+                            ),
+                            const SizedBox(
+                              width: 10.0,
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Color(0xFFB1B5C5),
+                            ),
+                          ],
                         ),
-                      ),
-                    );
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset("assets/images/personal_icon.svg"),
-                          const SizedBox(
-                            width: 16.0,
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.all(16.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4.0),
+                            side: const BorderSide(
+                              color: Color(0xFFB1B5C5),
+                              width: 1.0,
+                            ),
                           ),
-                          TextPoppins(
-                            text: "About me",
-                            fontSize: 13,
-                            color: Colors.black87,
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        width: 10.0,
-                      ),
-                      const Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: Color(0xFFB1B5C5),
-                      ),
-                    ],
-                  ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.all(16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4.0),
-                      side: const BorderSide(
-                        color: Color(0xFFB1B5C5),
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                ),
+                        ),
+                      )
+                    : const SizedBox(),
               ],
             ),
           ),

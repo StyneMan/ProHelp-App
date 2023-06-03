@@ -439,21 +439,7 @@ class _ManageDocumentsState extends State<ManageDocuments> {
       FlutterDownloader.loadTasks();
       FlutterDownloader.open(taskId: "$taskId");
 
-      // var response = await http.get(Uri.parse(url));
-      // if (response.statusCode == 200) { ron064@obibike.net
-      //   Directory? directory = Platform.isAndroid
-      //       ? await getExternalStorageDirectory()
-      //       : await getTemporaryDirectory();
-
-      //   String? storageDirectory = directory?.path;
-
-      //   File file = File("$storageDirectory");
-      //   await file.writeAsBytes(response.bodyBytes);
-      //   Constants.toast("File saved to $storageDirectory");
-      //   print('File downloaded successfully.');
-      // } else {
-      //   print('DOWNLOAD ERR CODE ::: ${response.statusCode}');
-      // }
+     
     } catch (e) {
       print('DOWNLOAD ERROR >>: $e');
     }

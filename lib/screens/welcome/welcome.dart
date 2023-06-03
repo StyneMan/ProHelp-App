@@ -63,7 +63,7 @@ class _WelcomeState extends State<Welcome> {
                       PageTransition(
                         type: PageTransitionType.size,
                         alignment: Alignment.bottomCenter,
-                        child: AccountType(),
+                        child: const  AccountType(),
                       ),
                     );
                   },

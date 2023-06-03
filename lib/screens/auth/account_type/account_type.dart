@@ -125,6 +125,18 @@ class _AccountTypeState extends State<AccountType> {
                             onPressed: () {
                               _controller.accountType.value = "Boy";
 
+                              // Navigator.of(context).push(
+                              //   PageTransition(
+                              //     type: PageTransitionType.size,
+                              //     alignment: Alignment.bottomCenter,
+                              //     child: SetupProfile(
+                              //       email: "cretict@gmail.com",
+                              //       manager: _manager!,
+                              //       name: "Stan Man",
+                              //     ),
+                              //   ),
+                              // );
+
                               if (widget.isSocial!) {
                                 Navigator.of(context).push(
                                   PageTransition(

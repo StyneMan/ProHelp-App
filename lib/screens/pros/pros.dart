@@ -88,9 +88,7 @@ class _ProsState extends State<Pros> with SingleTickerProviderStateMixin {
           ],
         ),
         title: TextPoppins(
-          text: widget.manager.getUser()['accountType'] != "recruiter"
-              ? "Recruiters".toUpperCase()
-              : "Professionals".toUpperCase(),
+          text: "Professionals".toUpperCase(),
           fontSize: 18,
           fontWeight: FontWeight.w500,
           color: Constants.secondaryColor,
@@ -152,72 +150,7 @@ class _ProsState extends State<Pros> with SingleTickerProviderStateMixin {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child:
-              // FutureBuilder<http.Response>(
-              //     future: APIService().getFreelancers(
-              //         widget.manager.getAccessToken(),
-              //         widget.manager.getUser()['email']),
-              //     builder: (context, snapshot) {
-              //       // if (snapshot.connectionState == ConnectionState.waiting) {
-              //   return ListView(
-              //     children: [
-              //       Row(
-              //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //         crossAxisAlignment: CrossAxisAlignment.center,
-              //         children: const [
-              //           Expanded(
-              //             child: SizedBox(
-              //               height: 60,
-              //               child: BannerShimmer(),
-              //             ),
-              //           ),
-              //           Expanded(
-              //             child: SizedBox(
-              //               height: 60,
-              //               child: BannerShimmer(),
-              //             ),
-              //           ),
-              //           Expanded(
-              //             child: SizedBox(
-              //               height: 60,
-              //               child: BannerShimmer(),
-              //             ),
-              //           ),
-              //         ],
-              //       ),
-              //       const SizedBox(height: 21.0,),
-              //       ListView.separated(
-              //         shrinkWrap: true,
-              //         itemCount: 3,
-              //         separatorBuilder: (BuildContext context, int index) {
-              //           return const SizedBox(height: 32.0);
-              //         },
-              //         itemBuilder: (BuildContext context, int index) {
-              //           return const ProsShimmer();
-              //         },
-              //       ),
-              //     ],
-              //   );
-              // }
-              // if (snapshot.hasError) {
-              //   // Future.delayed(const Duration(seconds: 3), () {
-              //   //   _controller.setLoading(false);
-              //   // });
-              //   return const Center(
-              //     child: Text(
-              //       "An error occured\nCheck your internet connection!",
-              //     ),
-              //   );
-              // }
-
-              // final data = snapshot.data;
-              // Map<String, dynamic> map = jsonDecode(data!.body);
-              // Future.delayed(const Duration(seconds: 3), () {
-              //   // _controller.setLoading(false);
-              //   _controller.freelancers.value = map['data'];
-              // });
-
-              Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -242,18 +175,18 @@ class _ProsState extends State<Pros> with SingleTickerProviderStateMixin {
                         controller: tabController,
                         tabs: [
                           Tab(
-                            child: TextPoppins(text: "All", fontSize: 16),
+                            child: TextPoppins(text: "All", fontSize: 13),
                           ),
                           Tab(
-                            child: TextPoppins(text: "Saved", fontSize: 16),
+                            child: TextPoppins(text: "Following", fontSize: 13),
                           ),
                           Tab(
                             child: TextPoppins(
                                 text: widget.manager.getUser()['accountType'] !=
                                         "recruiter"
-                                    ? "Engaged"
+                                    ? "Connection"
                                     : "Hired",
-                                fontSize: 16),
+                                fontSize: 13),
                           ),
                         ],
                       ),
@@ -281,9 +214,6 @@ class _ProsState extends State<Pros> with SingleTickerProviderStateMixin {
                 ),
               )
             ],
-            // );
-            // })
-            // ,
           ),
         ),
       ),

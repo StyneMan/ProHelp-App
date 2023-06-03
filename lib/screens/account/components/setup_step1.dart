@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:prohelp_app/components/inputfield/city_dropdown.dart';
 import 'package:prohelp_app/components/inputfield/customdropdown.dart';
 import 'package:prohelp_app/components/inputfield/datefield.dart';
+import 'package:prohelp_app/components/inputfield/dob_datefield.dart';
+import 'package:prohelp_app/components/inputfield/state_dropdown.dart';
 import 'package:prohelp_app/components/inputfield/textfield.dart';
+import 'package:prohelp_app/data/state/statesAndCities.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 
 typedef void InitCallback(Map data);
@@ -30,16 +34,26 @@ class _SetupStep1State extends State<SetupStep1> {
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
   final _dateController = TextEditingController();
+  // final _zipCodeController = TextEditingController();
+  // final _professionController = TextEditingController();
 
   final _controller = Get.find<StateController>();
 
   String _selectedGender = "Male";
   String _encodedDate = "";
 
+  String _selectedState = "Abia";
+  String _selectedCity = "Aba";
+  String _selectedCountry = "Nigeria";
+  String _selectedProfession = "";
+
+  List<String> _cities = [];
+
   _init() {
     setState(() {
       _emailController.text = widget.email;
-      _nameController.text = "${widget.name}";
+      _nameController.text =
+          "${widget.name?.toLowerCase() == 'null' ? "" : widget.name}";
     });
   }
 
@@ -54,7 +68,109 @@ class _SetupStep1State extends State<SetupStep1> {
             : "+234${_phoneController.text}",
         "address": _addressController.text,
         "gender": val,
-        "dob": _dateController.text
+        "dob": _dateController.text,
+        "state": _selectedState,
+        "country": _selectedCountry,
+        "profession": _selectedProfession,
+        "city": _selectedCity.contains("Select") ? "" : _selectedCity,
+      },
+    );
+  }
+
+  void _onStateSelected(String val) {
+    setState(() {
+      _cities = [];
+    });
+    _onCitySelected("Select city");
+    _selectedState = val;
+    var selector = stateCities.where((element) => element['state'] == val);
+    setState(() {
+      _cities = selector.first['cities'] as List<String>;
+    });
+
+    widget.onStep1Completed(
+      {
+        "fullname": _nameController.text,
+        "email": _emailController.text,
+        "phone": _phoneController.text.startsWith("0")
+            ? "+234${_phoneController.text.substring(1)}"
+            : "+234${_phoneController.text}",
+        "address": _addressController.text,
+        "gender": _selectedGender,
+        "dob": _dateController.text,
+        "state": val,
+        "country": _selectedCountry,
+        "profession": _selectedProfession,
+        "city": _selectedCity.contains("Select") ? "" : _selectedCity,
+      },
+    );
+  }
+
+  void _onCitySelected(String val) {
+    setState(() {
+      _selectedCity = val;
+    });
+
+    widget.onStep1Completed(
+      {
+        "fullname": _nameController.text,
+        "email": _emailController.text,
+        "phone": _phoneController.text.startsWith("0")
+            ? "+234${_phoneController.text.substring(1)}"
+            : "+234${_phoneController.text}",
+        "address": _addressController.text,
+        "gender": _selectedGender,
+        "dob": _dateController.text,
+        "state": _selectedState,
+        "country": _selectedCountry,
+        "profession": _selectedProfession,
+        "city": val,
+      },
+    );
+  }
+
+  void _onCountrySelected(String val) {
+    setState(() {
+      _selectedCountry = val;
+    });
+
+    widget.onStep1Completed(
+      {
+        "fullname": _nameController.text,
+        "email": _emailController.text,
+        "phone": _phoneController.text.startsWith("0")
+            ? "+234${_phoneController.text.substring(1)}"
+            : "+234${_phoneController.text}",
+        "address": _addressController.text,
+        "gender": _selectedGender,
+        "dob": _dateController.text,
+        "state": _selectedState,
+        "country": val,
+        "profession": _selectedProfession,
+        "city": _selectedCity.contains("Select") ? "" : _selectedCity,
+      },
+    );
+  }
+
+  void _onProfessionSelected(String val) {
+    setState(() {
+      _selectedProfession = val;
+    });
+
+    widget.onStep1Completed(
+      {
+        "fullname": _nameController.text,
+        "email": _emailController.text,
+        "phone": _phoneController.text.startsWith("0")
+            ? "+234${_phoneController.text.substring(1)}"
+            : "+234${_phoneController.text}",
+        "address": _addressController.text,
+        "gender": _selectedGender,
+        "dob": _dateController.text,
+        "state": _selectedState,
+        "country": _selectedCountry,
+        "profession": val,
+        "city": _selectedCity.contains("Select") ? "" : _selectedCity,
       },
     );
   }
@@ -67,6 +183,10 @@ class _SetupStep1State extends State<SetupStep1> {
     _dateController.text = _controller.dob.value;
     _selectedGender = _controller.gender.value;
     _phoneController.text = _controller.phone.value;
+    _selectedCity = _controller.city.value;
+    _selectedCountry = _controller.country.value;
+    _selectedProfession = _controller.profession.value;
+    _selectedState = _controller.state.value;
 
     super.initState();
   }
@@ -80,6 +200,10 @@ class _SetupStep1State extends State<SetupStep1> {
     _phoneController.text = _controller.phone.value;
     _dateController.text = _controller.dob.value;
     _selectedGender = _controller.gender.value;
+    _selectedCity = _controller.city.value;
+    _selectedCountry = _controller.country.value;
+    _selectedProfession = _controller.profession.value;
+    _selectedState = _controller.state.value;
     super.didChangeDependencies();
   }
 
@@ -95,7 +219,11 @@ class _SetupStep1State extends State<SetupStep1> {
             : "+234${_phoneController.text}",
         "address": _addressController.text,
         "gender": _selectedGender,
-        "dob": _encodedDate
+        "dob": _encodedDate,
+        "state": _selectedState,
+        "country": _selectedCountry,
+        "profession": _selectedProfession,
+        "city": _selectedCity.contains("Select") ? "" : _selectedCity,
       },
     );
   }
@@ -121,7 +249,11 @@ class _SetupStep1State extends State<SetupStep1> {
                     : "+234${_phoneController.text}",
                 "address": _addressController.text,
                 "gender": _selectedGender,
-                "dob": _dateController.text
+                "dob": _dateController.text,
+                "state": _selectedState,
+                "country": _selectedCountry,
+                "profession": _selectedProfession,
+                "city": _selectedCity.contains("Select") ? "" : _selectedCity,
               },
             );
           },
@@ -136,7 +268,7 @@ class _SetupStep1State extends State<SetupStep1> {
           capitalization: TextCapitalization.words,
         ),
         const SizedBox(
-          height: 21.0,
+          height: 16.0,
         ),
         CustomTextField(
           hintText: "Email",
@@ -151,7 +283,11 @@ class _SetupStep1State extends State<SetupStep1> {
                     : "+234${_phoneController.text}",
                 "address": _addressController.text,
                 "gender": _selectedGender,
-                "dob": _dateController.text
+                "dob": _dateController.text,
+                "state": _selectedState,
+                "country": _selectedCountry,
+                "profession": _selectedProfession,
+                "city": _selectedCity.contains("Select") ? "" : _selectedCity,
               },
             );
           },
@@ -169,7 +305,7 @@ class _SetupStep1State extends State<SetupStep1> {
           inputType: TextInputType.emailAddress,
         ),
         const SizedBox(
-          height: 21.0,
+          height: 16.0,
         ),
         CustomTextField(
           hintText: "Phone",
@@ -183,7 +319,11 @@ class _SetupStep1State extends State<SetupStep1> {
                     : "+234$val",
                 "address": _addressController.text,
                 "gender": _selectedGender,
-                "dob": _dateController.text
+                "dob": _dateController.text,
+                "state": _selectedState,
+                "country": _selectedCountry,
+                "profession": _selectedProfession,
+                "city": _selectedCity.contains("Select") ? "" : _selectedCity,
               },
             );
           },
@@ -202,6 +342,38 @@ class _SetupStep1State extends State<SetupStep1> {
         const SizedBox(
           height: 16.0,
         ),
+        CustomDropdown(
+          onSelected: _onSelected,
+          hint: "Select gender",
+          items: const ['Male', 'Female'],
+        ),
+        const SizedBox(
+          height: 16.0,
+        ),
+        CustomDropdown(
+          onSelected: _onCountrySelected,
+          hint: "Country",
+          items: const ['Nigeria'],
+        ),
+        const SizedBox(
+          height: 16.0,
+        ),
+        StateCustomDropdown(
+          onSelected: _onStateSelected,
+          hint: "Select state",
+          items: stateCities,
+        ),
+        const SizedBox(
+          height: 16.0,
+        ),
+        CityCustomDropdown(
+          onSelected: _onCitySelected,
+          hint: _selectedCity,
+          items: _cities,
+        ),
+        const SizedBox(
+          height: 16.0,
+        ),
         CustomTextField(
           hintText: "Address",
           onChanged: (val) {
@@ -214,7 +386,11 @@ class _SetupStep1State extends State<SetupStep1> {
                     : "+234${_phoneController.text}",
                 "address": val,
                 "gender": _selectedGender,
-                "dob": _dateController.text
+                "dob": _dateController.text,
+                "state": _selectedState,
+                "country": _selectedCountry,
+                "profession": _selectedProfession,
+                "city": _selectedCity.contains("Select") ? "" : _selectedCity,
               },
             );
           },
@@ -228,17 +404,50 @@ class _SetupStep1State extends State<SetupStep1> {
           inputType: TextInputType.text,
         ),
         const SizedBox(
-          height: 21.0,
+          height: 16.0,
         ),
+        // CustomTextField(
+        //   hintText: "Zip Code",
+        //   onChanged: (val) {
+        //     widget.onStep1Completed(
+        //       {
+        //         "fullname": _nameController.text,
+        //         "email": _emailController.text,
+        //         "phone": _phoneController.text.startsWith("0")
+        //             ? "+234${_phoneController.text.substring(1)}"
+        //             : "+234${_phoneController.text}",
+        //         "zipCode": val,
+        //         'address': _addressController.text,
+        //         "gender": _selectedGender,
+        //         "dob": _dateController.text,
+        //         "state": _selectedState,
+        //         "country": _selectedCountry,
+        //         "profession": _selectedProfession,
+        //         "city": _selectedCity.contains("Select ") ? "" : _selectedCity
+        //       },
+        //     );
+        //   },
+        //   controller: _zipCodeController,
+        //   validator: (value) {
+        //     // if (value == null || value.isEmpty) {
+        //     //   return 'Please enter your zip code';
+        //     // }
+        //     return null;
+        //   },
+        //   inputType: TextInputType.number,
+        // ),
+        // const SizedBox(
+        //   height: 16.0,
+        // ),
         CustomDropdown(
-          onSelected: _onSelected,
-          hint: "Select gender",
-          items: const ['Male', 'Female'],
+          onSelected: _onProfessionSelected,
+          hint: "Profession",
+          items: const ["Programming", "Catering", "Driving", "Baking"],
         ),
         const SizedBox(
           height: 21.0,
         ),
-        CustomDateField(
+        CustomDoBDateField(
           hintText: "Date of birth",
           onDateSelected: _onDateSelected,
           controller: _dateController,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/instance_manager.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/pros/components/professional_card.dart';
@@ -18,24 +17,34 @@ class AllProfessionals extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(
       () => (_controller.freelancers.isEmpty && _controller.recruiters.isEmpty)
-          ? const Center(
-              child: Text("No data found"),
+          ? SizedBox(
+              width: double.infinity,
+              height: double.infinity,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/images/empty.png'),
+                    const Text(
+                      "No professionals found",
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
             )
           : ListView.separated(
               shrinkWrap: true,
               itemBuilder: (context, i) => ProfessionalsCard(
-                data: manager.getUser()['accountType'] == "recruiter"
-                    ? _controller.freelancers.value[i]
-                    : _controller.recruiters.value[i],
+                data: _controller.freelancers.value[i],
                 manager: manager,
                 index: i,
               ),
               separatorBuilder: (context, i) => const SizedBox(
                 height: 16.0,
               ),
-              itemCount: manager.getUser()['accountType'] == "recruiter"
-                  ? (_controller.freelancers.length)
-                  : (_controller.recruiters.length),
+              itemCount: _controller.freelancers.length,
             ),
     );
   }

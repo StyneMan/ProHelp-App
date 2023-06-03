@@ -4,12 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:prohelp_app/components/inputfield/chatfield.dart';
-import 'package:prohelp_app/components/inputfield/textfield.dart';
 import 'package:prohelp_app/components/shimmer/banner_shimmer.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
+import 'package:prohelp_app/helper/socket/socket_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/user/profile2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -109,11 +109,60 @@ class _ChatPageState extends State<ChatPage> {
         : widget.data['initiator']['email'];
   }
 
+  _markAsRead() {
+    final socket = SocketManager().socket;
+    if (socket.disconnected) {
+      socket.connect();
+      socket.emit('isRead', {
+        'reader': widget.manager.getUser()['_id'],
+        'readerName': widget.manager.getUser()['bio']['fullname'],
+        'otherUser': _getOtherUserId(),
+        'chatId': widget.caller == "profile"
+            ? widget.data['chatId']
+            : widget.data['_id'],
+      });
+    } else {
+      socket.emit('isRead', {
+        'reader': widget.manager.getUser()['_id'],
+        'readerName': widget.manager.getUser()['bio']['fullname'],
+        'otherUser': _getOtherUserId(),
+        'chatId': widget.caller == "profile"
+            ? widget.data['chatId']
+            : widget.data['_id'],
+      });
+    }
+
+    //Already on the chat page
+    socket.on('new-message', (data) {
+      if (data['senderId'] != widget.manager.getUser()['_id']) {
+        socket.emit('isRead', {
+          'reader': widget.manager.getUser()['_id'],
+          'readerName': widget.manager.getUser()['bio']['fullname'],
+          'otherUser': _getOtherUserId(),
+          'chatId': widget.caller == "profile"
+              ? widget.data['chatId']
+              : widget.data['_id'],
+        });
+      }
+    });
+
+    socket.on('message-read', (data) {
+      debugPrint("IS READ NOTICE ===>>>, $data");
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     _init();
     _focusNode.addListener(_scrollToBottom);
+
+    _markAsRead();
+
+    Future.delayed(const Duration(seconds: 3), () {
+      debugPrint(
+          "CHAT PAGE ROUTE NAME >> ${ModalRoute.of(context)?.settings.name}");
+    });
   }
 
   void _scrollToBottom() {
@@ -138,8 +187,7 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(
-        "CURRENT ROUTE NAME >> ${ModalRoute.of(context)?.settings.name}");
+    _markAsRead();
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -311,16 +359,24 @@ class _ChatPageState extends State<ChatPage> {
               }
             },
             itemBuilder: (BuildContext bc) {
-              return [
-                const PopupMenuItem(
-                  child: Text("User profile"),
-                  value: 0,
-                ),
-                const PopupMenuItem(
-                  child: Text("Clear chat"),
-                  value: 1,
-                ),
-              ];
+              return widget.data['initiator']['id'] ==
+                      widget.manager.getUser()['_id']
+                  ? [
+                      const PopupMenuItem(
+                        child: Text("User profile"),
+                        value: 0,
+                      ),
+                      const PopupMenuItem(
+                        child: Text("Clear conversation"),
+                        value: 1,
+                      ),
+                    ]
+                  : [
+                      const PopupMenuItem(
+                        child: Text("User profile"),
+                        value: 0,
+                      ),
+                    ];
             },
           ),
         ],

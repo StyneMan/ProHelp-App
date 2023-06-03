@@ -158,7 +158,7 @@ class _SetupStep2State extends State<SetupStep2> {
           inputType: TextInputType.phone,
         ),
         const SizedBox(
-          height: 21.0,
+          height: 16.0,
         ),
         CustomTextField(
           hintText: "Guarantor Address",

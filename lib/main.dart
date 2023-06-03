@@ -198,9 +198,29 @@ class _MyAppState extends State<MyApp> {
       );
 
       socket.on(
+        "job-posted",
+        (data) {
+          debugPrint("JOB POSTED NOW!! >> $data");
+          _controller.onInit();
+        },
+      );
+
+      socket.on(
+        "job-application",
+        (data) {
+          // debugPrint("DATA FROM JOB APPLICATION >> $data");
+          if (data['job']['recruiter']['id'] == _userMap['_id']) {
+            //UPDate here
+            // debugPrint("TIRGGER HERE -->>");
+            _controller.onInit();
+          }
+        },
+      );
+
+      socket.on(
         "new-message",
         (data) {
-          debugPrint("DATA FROM MESSAGE >> ${jsonEncode(data)}");
+          debugPrint("DATA FROM MESSAGE >> ${(data)}");
           Map<String, dynamic> map = jsonDecode(jsonEncode(data));
           final senderId = map['senderId'];
           if (senderId != _userMap['_id']) {

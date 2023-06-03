@@ -44,67 +44,68 @@ class _BankState extends State<Bank> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: ListView(
-        children: [
-          LinedTextField(
-            label: "Account Name",
-            onChanged: (val) {},
-            controller: _accNameController,
-            validator: (value) {
-              if (value.toString().isEmpty || value == null) {
-                return "Account name is required";
-              }
-              return null;
-            },
-            inputType: TextInputType.name,
-            capitalization: TextCapitalization.words,
-          ),
-          const Divider(
-            color: Constants.accentColor,
-          ),
-          const SizedBox(
-            height: 10.0,
-          ),
-          LinedTextField(
-            label: "Account Number",
-            onChanged: (val) {},
-            controller: _accNumController,
-            validator: (value) {
-              if (value.toString().isEmpty || value == null) {
-                return "Account number is required";
-              }
-              return null;
-            },
-            inputType: TextInputType.number,
-            capitalization: TextCapitalization.none,
-          ),
-          const Divider(
-            color: Constants.accentColor,
-          ),
-          const SizedBox(
-            height: 10.0,
-          ),
-          LinedDropdown(
-            label: "Bank Name",
-            onSelected: onBankSelected,
-            items: banks,
-          ),
-          const Divider(
-            color: Constants.accentColor,
-          ),
-          const SizedBox(
-            height: 21.0,
-          ),
-          RoundedButton(
-            bgColor: Constants.primaryColor,
-            child: const TextInter(text: "SAVE CHANGES", fontSize: 16),
-            borderColor: Colors.transparent,
-            foreColor: Colors.white,
-            onPressed: () {},
-            variant: "Filled",
-          ),
-        ],
-      ),
+      child: const SizedBox(),
+      // child: ListView(
+      //   children: [
+      //     LinedTextField(
+      //       label: "Account Name",
+      //       onChanged: (val) {},
+      //       controller: _accNameController,
+      //       validator: (value) {
+      //         if (value.toString().isEmpty || value == null) {
+      //           return "Account name is required";
+      //         }
+      //         return null;
+      //       },
+      //       inputType: TextInputType.name,
+      //       capitalization: TextCapitalization.words,
+      //     ),
+      //     const Divider(
+      //       color: Constants.accentColor,
+      //     ),
+      //     const SizedBox(
+      //       height: 10.0,
+      //     ),
+      //     LinedTextField(
+      //       label: "Account Number",
+      //       onChanged: (val) {},
+      //       controller: _accNumController,
+      //       validator: (value) {
+      //         if (value.toString().isEmpty || value == null) {
+      //           return "Account number is required";
+      //         }
+      //         return null;
+      //       },
+      //       inputType: TextInputType.number,
+      //       capitalization: TextCapitalization.none,
+      //     ),
+      //     const Divider(
+      //       color: Constants.accentColor,
+      //     ),
+      //     const SizedBox(
+      //       height: 10.0,
+      //     ),
+      //     LinedDropdown(
+      //       label: "Bank Name",
+      //       onSelected: onBankSelected,
+      //       items: banks,
+      //     ),
+      //     const Divider(
+      //       color: Constants.accentColor,
+      //     ),
+      //     const SizedBox(
+      //       height: 21.0,
+      //     ),
+      //     RoundedButton(
+      //       bgColor: Constants.primaryColor,
+      //       child: const TextInter(text: "SAVE CHANGES", fontSize: 16),
+      //       borderColor: Colors.transparent,
+      //       foreColor: Colors.white,
+      //       onPressed: () {},
+      //       variant: "Filled",
+      //     ),
+      //   ],
+      // ),
     );
   }
 }

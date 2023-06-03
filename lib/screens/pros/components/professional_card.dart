@@ -11,6 +11,7 @@ import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
+import 'package:prohelp_app/screens/user/my_profile.dart';
 import 'package:prohelp_app/screens/user/profile.dart';
 
 class ProfessionalsCard extends StatefulWidget {
@@ -33,7 +34,7 @@ class ProfessionalsCard extends StatefulWidget {
 class _ProfessionalsCardState extends State<ProfessionalsCard> {
   final _controller = Get.find<StateController>();
 
-  bool _isLiked = false, triggerHire = false;
+  bool _isLiked = false, triggerHire = false, _isConnected = false;
   double? _rating = 0.0;
 
   _likeUser() async {
@@ -84,19 +85,22 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
     }
   }
 
-  // _calcuateRating() {
-  //   for (var element in widget.manager.getUser()['ratings']) {
-  //     setState(() {
-  //       _rating = element['rating'];
-  //     });
-  //   }
-  // }
+  _checkConnection() {
+    for (var element in widget.manager.getUser()['connections']) {
+      if (element == widget.data['_id']) {
+        debugPrint("TRUE");
+        setState(() {
+          _isConnected = true;
+        });
+      }
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _checkLiked();
-    // _calcuateRating();
+    _checkConnection();
   }
 
   @override
@@ -129,29 +133,29 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 4.0,
-                    ),
-                    widget.data['accountType'] == "recruiter"
-                        ? const SizedBox()
-                        : Wrap(
-                            children: [
-                              SizedBox(
-                                width: 65,
-                                child: TextPoppins(
-                                  text: "${widget.data['bio']['address']}"
-                                              .length >
-                                          16
-                                      ? "${widget.data['bio']['address']}"
-                                              .substring(0, 14) +
-                                          "..."
-                                      : "${widget.data['bio']['address']}",
-                                  fontSize: 13,
-                                  color: Constants.primaryColor,
-                                ),
-                              ),
-                            ],
-                          ),
+                    // const SizedBox(
+                    //   height: 4.0,
+                    // ),
+                    // widget.data['accountType'] == "recruiter"
+                    //     ? const SizedBox()
+                    //     : Wrap(
+                    //         children: [
+                    //           SizedBox(
+                    //             width: 65,
+                    //             child: TextPoppins(
+                    //               text: "${widget.data['bio']['address']}"
+                    //                           .length >
+                    //                       16
+                    //                   ? "${widget.data['bio']['address']}"
+                    //                           .substring(0, 14) +
+                    //                       "..."
+                    //                   : "${widget.data['bio']['address']}",
+                    //               fontSize: 13,
+                    //               color: Constants.primaryColor,
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       ),
                   ],
                 ),
                 const SizedBox(
@@ -186,32 +190,53 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                           //       ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 8.0,
-                      ),
+                      // const SizedBox(
+                      //   height: 8.0,
+                      // ),
+                      // // widget.data['accountType'] == "recruiter"
+                      //     ? const SizedBox()
+                      //     : SizedBox(
+                      //         width: MediaQuery.of(context).size.width * 0.5,
+                      //         child: Wrap(
+                      //           children: [
+                      //             TextPoppins(
+                      //               text: "${widget.data['bio']['about']}"
+                      //                           .length >
+                      //                       50
+                      //                   ? "${widget.data['bio']['about']}"
+                      //                           .substring(0, 50) +
+                      //                       "..."
+                      //                   : "${widget.data['bio']['about']}",
+                      //               fontSize: 12,
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ),
+                      // widget.data['accountType'] == "recruiter"
+                      //     ? const SizedBox()
+                      //     : const SizedBox(
+                      //         height: 8.0,
+                      //       ),
                       widget.data['accountType'] == "recruiter"
                           ? const SizedBox()
-                          : SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.5,
-                              child: Wrap(
-                                children: [
-                                  TextPoppins(
-                                    text: "${widget.data['bio']['about']}"
-                                                .length >
-                                            50
-                                        ? "${widget.data['bio']['about']}"
-                                                .substring(0, 50) +
-                                            "..."
-                                        : "${widget.data['bio']['about']}",
-                                    fontSize: 12,
-                                  ),
-                                ],
-                              ),
+                          : TextPoppins(
+                              text: "${widget.data['profession']}",
+                              fontSize: 14,
                             ),
-                      widget.data['accountType'] == "recruiter"
+                      widget.data['accountType'] != "recruiter"
                           ? const SizedBox()
-                          : const SizedBox(
-                              height: 8.0,
+                          : Wrap(
+                              children: [
+                                SizedBox(
+                                  child: TextPoppins(
+                                    text:
+                                        "${widget.data['address']['city']} ${widget.data['address']['state']}, ${widget.data['address']['country']}"
+                                            .capitalize,
+                                    fontSize: 13,
+                                    color: Constants.primaryColor,
+                                  ),
+                                ),
+                              ],
                             ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -221,7 +246,8 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                             initialRating:
                                 "${widget.data['rating']}".contains(".")
                                     ? widget.data['rating']
-                                    : (widget.data['rating'] ?? 0).toDouble() ?? 0.0,
+                                    : (widget.data['rating'] ?? 0).toDouble() ??
+                                        0.0,
                             minRating: 1,
                             direction: Axis.horizontal,
                             allowHalfRating: true,
@@ -248,20 +274,7 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4.0),
-                      widget.data['accountType'] != "recruiter"
-                          ? const SizedBox()
-                          : Wrap(
-                              children: [
-                                SizedBox(
-                                  child: TextPoppins(
-                                    text: "${widget.data['bio']['address']}",
-                                    fontSize: 13,
-                                    color: Constants.primaryColor,
-                                  ),
-                                ),
-                              ],
-                            ),
+                      // const SizedBox(height: 4.0),
                     ],
                   ),
                 ),
@@ -320,11 +333,16 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => UserProfile(
-                            manager: widget.manager,
-                            triggerHire: triggerHire,
-                            data: widget.data,
-                          ),
+                          builder: (context) => widget.data['_id'] ==
+                                  widget.manager.getUser()['_id']
+                              ? MyProfile(
+                                  manager: widget.manager,
+                                )
+                              : UserProfile(
+                                  manager: widget.manager,
+                                  triggerHire: triggerHire,
+                                  data: widget.data,
+                                ),
                         ),
                       );
                     },
@@ -336,7 +354,8 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                     : const SizedBox(
                         width: 8.0,
                       ),
-                widget.data['accountType'] == "recruiter"
+                widget.data['accountType'] == "recruiter" ||
+                        widget.manager.getUser()['accountType'] != "recruiter"
                     ? const SizedBox()
                     : Expanded(
                         flex: 2,
@@ -359,11 +378,16 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => UserProfile(
-                                    manager: widget.manager,
-                                    triggerHire: triggerHire,
-                                    data: widget.data,
-                                  ),
+                                  builder: (context) => widget.data['_id'] ==
+                                          widget.manager.getUser()['_id']
+                                      ? MyProfile(
+                                          manager: widget.manager,
+                                        )
+                                      : UserProfile(
+                                          manager: widget.manager,
+                                          triggerHire: triggerHire,
+                                          data: widget.data,
+                                        ),
                                 ),
                               );
                             });

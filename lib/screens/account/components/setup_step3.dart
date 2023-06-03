@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:prohelp_app/components/inputfield/customdropdown.dart';
 import 'package:prohelp_app/components/inputfield/datefield.dart';
 import 'package:prohelp_app/components/inputfield/llinedtextfield.dart';
 import 'package:prohelp_app/components/inputfield/textfield.dart';
@@ -24,7 +25,6 @@ class SetupStep3 extends StatefulWidget {
 
 class _SetupStep3State extends State<SetupStep3> {
   final _schoolController = TextEditingController();
-  final _degreeController = TextEditingController();
   final _fieldStudyController = TextEditingController();
   final _dateGraduatedController = TextEditingController();
 
@@ -36,7 +36,7 @@ class _SetupStep3State extends State<SetupStep3> {
 
   final _controller = Get.find<StateController>();
 
-  // String _selectedGender = "Male";
+  String _selectedDegree = "Bachelor";
   String _encodedDate = "";
 
   // List<PlatformFile>? _pickedFiles = [];
@@ -44,7 +44,7 @@ class _SetupStep3State extends State<SetupStep3> {
   @override
   void initState() {
     _schoolController.text = _controller.school.value;
-    _degreeController.text = _controller.degree.value;
+    _selectedDegree = _controller.degree.value;
     _fieldStudyController.text = _controller.fieldStudy.value;
     _dateGraduatedController.text = _controller.dateGraduated.value;
 
@@ -54,7 +54,7 @@ class _SetupStep3State extends State<SetupStep3> {
   @override
   void didChangeDependencies() {
     _schoolController.text = _controller.school.value;
-    _degreeController.text = _controller.degree.value;
+    _selectedDegree = _controller.degree.value;
     _fieldStudyController.text = _controller.fieldStudy.value;
     _dateGraduatedController.text = _controller.dateGraduated.value;
 
@@ -67,9 +67,24 @@ class _SetupStep3State extends State<SetupStep3> {
     widget.onStep3Completed(
       {
         "school": _schoolController.text,
-        "degree": _degreeController.text,
+        "degree": _selectedDegree,
         "fieldStudy": _fieldStudyController.text,
         "dateGraduated": val
+      },
+    );
+  }
+
+  void _onDegreeSelected(String val) {
+    setState(() {
+      _selectedDegree = val;
+    });
+
+    widget.onStep3Completed(
+      {
+        "school": _schoolController.text,
+        "degree": val,
+        "fieldStudy": _fieldStudyController.text,
+        "dateGraduated": _dateGraduatedController.text
       },
     );
   }
@@ -84,7 +99,7 @@ class _SetupStep3State extends State<SetupStep3> {
             widget.onStep3Completed(
               {
                 "school": val,
-                "degree": _degreeController.text,
+                "degree": _selectedDegree,
                 "fieldStudy": _fieldStudyController.text,
                 "dateGraduated": _dateGraduatedController.text
               },
@@ -103,39 +118,29 @@ class _SetupStep3State extends State<SetupStep3> {
         const SizedBox(
           height: 21.0,
         ),
-        CustomTextField(
-          hintText: "Degree",
-          onChanged: (val) {
-            widget.onStep3Completed(
-              {
-                "school": _schoolController.text,
-                "degree": val,
-                "fieldStudy": _fieldStudyController.text,
-                "dateGraduated": _dateGraduatedController.text
-              },
-            );
-          },
-          controller: _degreeController,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Degree of study is required!';
-            }
-
-            return null;
-          },
-          inputType: TextInputType.text,
-          capitalization: TextCapitalization.words,
+        CustomDropdown(
+          onSelected: _onDegreeSelected,
+          hint: "Degree",
+          items: const [
+            "O'level",
+            "ND/OND",
+            "HND",
+            "Bachelor",
+            "Masters",
+            "PhD"
+          ],
         ),
+
         const SizedBox(
           height: 21.0,
         ),
         CustomTextField(
-          hintText: "Field of Study",
+          hintText: "Course of study",
           onChanged: (val) {
             widget.onStep3Completed(
               {
                 "school": _schoolController.text,
-                "degree": _degreeController.text,
+                "degree": _selectedDegree,
                 "fieldStudy": val,
                 "dateGraduated": _dateGraduatedController.text
               },
@@ -155,7 +160,7 @@ class _SetupStep3State extends State<SetupStep3> {
           height: 21.0,
         ),
         CustomDateField(
-          hintText: "Date Graduated",
+          hintText: "Date graduated",
           onDateSelected: _onDateSelected,
           controller: _dateGraduatedController,
         ),

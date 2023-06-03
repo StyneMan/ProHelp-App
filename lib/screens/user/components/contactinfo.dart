@@ -1,10 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
+import 'package:prohelp_app/helper/service/api_service.dart';
+import 'package:prohelp_app/helper/state/state_manager.dart';
+import 'package:prohelp_app/screens/account/components/wallet.dart';
 import 'package:prohelp_app/screens/payment/pay_to_view.dart';
 
 class ContactInfoContent extends StatelessWidget {
@@ -25,11 +32,44 @@ class ContactInfoContent extends StatelessWidget {
     return part1 + "xxxxx" + part2;
   }
 
+  final _controller = Get.find<StateController>();
+
   _obscureEmail(String email) {
     var rem = email.split("@")[1];
     var secon1 = rem.split(".")[0];
 
     return "xxxxxx@" + secon1 + ".xxx";
+  }
+
+  _addConnection() async {
+    Map _payload = {
+      "guestId": "${guestData['_id']}",
+      "guestName": "${guestData['bio']['fullname']}",
+      "userId": "${manager.getUser()['_id']}",
+    };
+
+    try {
+      final _resp = await APIService().saveConnection(
+          _payload, manager.getAccessToken(), manager.getUser()['email']);
+
+      debugPrint("CONNECTION RESPONSE >> ${_resp.body}");
+      _controller.setLoading(false);
+      if (_resp.statusCode == 200) {
+        Map<String, dynamic> map = jsonDecode(_resp.body);
+        Constants.toast(map['message']);
+
+        _controller.userData.value = map['data'];
+        String userStr = jsonEncode(map['data']);
+        manager.setUserData(userStr);
+
+        _controller.onInit();
+
+        Get.back();
+      }
+    } catch (e) {
+      _controller.setLoading(false);
+      debugPrint(e.toString());
+    }
   }
 
   @override
@@ -127,13 +167,174 @@ class ContactInfoContent extends StatelessWidget {
                       borderColor: Constants.primaryColor,
                       foreColor: Constants.primaryColor,
                       onPressed: () {
-                        Navigator.of(context).push(
-                          PageTransition(
-                            type: PageTransitionType.size,
-                            alignment: Alignment.bottomCenter,
-                            child: PayToView(
-                              manager: manager,
-                              data: guestData,
+                        Navigator.pop(context);
+                        showBarModalBottomSheet(
+                          expand: false,
+                          context: context,
+                          useRootNavigator: true,
+                          backgroundColor: Colors.white,
+                          topControl: ClipOval(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(
+                                    16,
+                                  ),
+                                ),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.close,
+                                    size: 24,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          builder: (context) => SizedBox(
+                            height: 256,
+                            width: MediaQuery.of(context).size.height * 0.84,
+                            child: Container(
+                              color: Colors.white,
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  TextPoppins(
+                                    text: "Info",
+                                    fontSize: 21,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  const SizedBox(
+                                    height: 16.0,
+                                  ),
+                                  _controller.userData.value['wallet']
+                                              ['balance'] >
+                                          200
+                                      ? Column(
+                                          children: [
+                                            TextPoppins(
+                                              text:
+                                                  "You will be charged 200 coins from your wallet for this connection. \nDo you wish to proceed?",
+                                              fontSize: 16,
+                                            ),
+                                            const SizedBox(
+                                              height: 16.0,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Expanded(
+                                                  child: RoundedButton(
+                                                    bgColor: Colors.transparent,
+                                                    child: const TextInter(
+                                                        text: "Cancel",
+                                                        fontSize: 16),
+                                                    borderColor:
+                                                        Constants.primaryColor,
+                                                    foreColor:
+                                                        Constants.primaryColor,
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    variant: "Outlined",
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 16.0),
+                                                Expanded(
+                                                  child: RoundedButton(
+                                                    bgColor:
+                                                        Constants.primaryColor,
+                                                    child: const TextInter(
+                                                      text: "Proceed",
+                                                      fontSize: 16,
+                                                    ),
+                                                    borderColor:
+                                                        Colors.transparent,
+                                                    foreColor: Colors.white,
+                                                    onPressed: () {
+                                                      // Navigator.pop(context);
+                                                      //Now connect user here
+                                                      _addConnection();
+                                                    },
+                                                    variant: "Filled",
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        )
+                                      : Column(
+                                          children: [
+                                            TextPoppins(
+                                              text:
+                                                  "You are out of coins. You need a minimum of 200 coins on your wallet for this connection. \n Do you wish to topup your wallet?",
+                                              fontSize: 16,
+                                            ),
+                                            const SizedBox(
+                                              height: 16.0,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Expanded(
+                                                  child: RoundedButton(
+                                                    bgColor: Colors.transparent,
+                                                    child: const TextInter(
+                                                        text: "Cancel",
+                                                        fontSize: 16),
+                                                    borderColor:
+                                                        Constants.primaryColor,
+                                                    foreColor:
+                                                        Constants.primaryColor,
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    variant: "Outlined",
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 16.0),
+                                                Expanded(
+                                                  child: RoundedButton(
+                                                    bgColor:
+                                                        Constants.primaryColor,
+                                                    child: const TextInter(
+                                                        text: "Topup wallet",
+                                                        fontSize: 16),
+                                                    borderColor:
+                                                        Colors.transparent,
+                                                    foreColor: Colors.white,
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      Get.to(
+                                                        MyWallet(
+                                                          manager: manager,
+                                                        ),
+                                                        transition: Transition
+                                                            .cupertino,
+                                                      );
+                                                    },
+                                                    variant: "Filled",
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        )
+                                ],
+                              ),
                             ),
                           ),
                         );

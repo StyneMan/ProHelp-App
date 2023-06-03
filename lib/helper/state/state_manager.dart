@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -38,6 +37,7 @@ class StateController extends GetxController {
   var shouldExitExpEdu = false.obs;
 
   var productsData = "".obs;
+
   // var onboardingIndex = 0.obs;
 
   var userData = {}.obs;
@@ -48,6 +48,30 @@ class StateController extends GetxController {
   var currentConversation = [].obs;
   var isConversationLoading = true.obs;
   var myChats = [].obs;
+  var myJobs = [].obs;
+  var savedJobs = [].obs;
+  var allJobs = [].obs;
+
+  // ****** ALL Clearable Jobs Data ******
+  var jobQuestions = [].obs;
+  var jobRequirements = [].obs;
+  var currentJobStep = 0.obs;
+  var jobTitle = "".obs;
+  var jobCompany = "".obs;
+  var jobType = "".obs;
+  var workplaceType = "".obs;
+  var jobState = "".obs;
+  var jobCity = "".obs;
+  var jobCountry = "".obs;
+  var jobDescription = "".obs;
+  var jobMinQualification = "".obs;
+
+  // ****** ALL Clearable Job Application Data ******
+  // var resumee;
+  var applicantScreeningAnswers = [].obs;
+  var currentApplicationStep = 0.obs;
+  var applicationEmail = "".obs;
+  var applicationPhone = "".obs;
 
   // ****** ALL Clearable State Data ******
   var pickedDocuments = [].obs;
@@ -63,7 +87,11 @@ class StateController extends GetxController {
   var phone = "".obs;
   var address = "".obs;
   var gender = "".obs;
+  var state = "".obs;
   var dob = "".obs;
+  var city = "".obs;
+  var country = "".obs;
+  var profession = "".obs;
 
   // ****** PROFILE SETUP STEP TWO *******
   var nokName = "".obs;
@@ -86,23 +114,7 @@ class StateController extends GetxController {
   RxString dbItem = 'Awaiting data'.obs;
 
   _init() async {
-    // print("FROM STATE CONTROLLER ::::");
-    try {
-      // await FirebaseFirestore.instance
-      //     .collection("users")
-      //     .doc(currentUser?.uid)
-      //     .get()
-      //     .then((value) {
-      //   if (value.exists) {
-      //     setUserData(value.data());
-      //     if (value.get('plan')?.isNotEmpty) {
-      //       setShowPlan(false);
-      //     } else {
-      //       setShowPlan(true);
-      //     }
-      //   }
-      // });
-    } catch (e) {
+    try {} catch (e) {
       debugPrint(e.toString());
     }
   }
@@ -115,37 +127,62 @@ class StateController extends GetxController {
     var user = _prefs.getString("user") ?? "";
     var _token = _prefs.getString("accessToken") ?? "";
     Map<String, dynamic> map = jsonDecode(user);
-    // debugPrint("US EMIA >> ${map['email']}");
+    // debugDebugPrintdebugPrint("US EMIA >> ${map['email']}");
 
     _init();
 
     if (_token.isNotEmpty) {
       //Get User Profile
       APIService().getProfile(_token, map['email']).then((value) {
-        // debugPrint("STATE GET PROFILE >>> ${value.body}");
+        // debugDebugPrintdebugPrint("STATE GET PROFILE >>> ${value.body}");
         Map<String, dynamic> data = jsonDecode(value.body);
         userData.value = data['data'];
         _prefs.setString("user", jsonEncode(data['data']));
+
+        //Update preference here
       }).catchError((onError) {
         debugPrint("STATE GET PROFILE ERROR >>> $onError");
+        if (onError.toString().contains("rk is unreachable")) {
+          hasInternetAccess.value = false;
+        }
       });
 
-      if (map['accountType'] != "freelancer") {
-        APIService().getFreelancers(_token, map['email']).then((value) {
-          debugPrint("STATE GET FREELANCERS >>> ${value.body}");
-          Map<String, dynamic> data = jsonDecode(value.body);
-          freelancers.value = data['data'];
-        }).catchError((onError) {
-          debugPrint("STATE GET freelancer ERROR >>> $onError");
-        });
-      } else {
-        APIService().getRecruiters(_token, map['email']).then((value) {
-          debugPrint("STATE GET RECRUITERS >>> ${value.body}");
-          Map<String, dynamic> data = jsonDecode(value.body);
-          recruiters.value = data['data'];
-        }).catchError((onError) {
-          debugPrint("STATE GET RECRUITERS ERROR >>> $onError");
-        });
+      // if (map['accountType'] != "freelancer") {
+      APIService().getFreelancers(_token, map['email']).then((value) {
+        debugPrint("STATE GET FREELANCERS >>> ${value.body}");
+        Map<String, dynamic> data = jsonDecode(value.body);
+        freelancers.value = data['data'];
+      }).catchError((onError) {
+        if (onError.toString().contains("rk is unreachable")) {
+          hasInternetAccess.value = false;
+        }
+        debugPrint("STATE GET freelancer ERROR >>> $onError");
+      });
+
+      APIService()
+          .getAllJobs(accessToken: _token, email: map['email'])
+          .then((value) {
+        debugPrint("STATE GET JOBS >>> ${value.body}");
+        Map<String, dynamic> data = jsonDecode(value.body);
+        allJobs.value = data['docs'];
+      }).catchError((onError) {
+        debugPrint("STATE GET jobs ERROR >>> $onError");
+        if (onError.toString().contains("rk is unreachable")) {
+          hasInternetAccess.value = false;
+        }
+      });
+      // myJobs.value = [];
+
+      final myJobsResp = await APIService().getUserJobs(
+        accessToken: _token,
+        email: map['email'],
+        userId: map['_id'],
+      );
+      debugPrint("MY JOBS RESPONSE >> ${myJobsResp.body}");
+
+      if (myJobsResp.statusCode == 200) {
+        Map<String, dynamic> jobMap = jsonDecode(myJobsResp.body);
+        myJobs.value = jobMap['data'];
       }
     }
   }
@@ -182,6 +219,27 @@ class StateController extends GetxController {
     }
   }
 
+  clearJobsData() {
+    jobCity.value = "";
+    jobState.value = "";
+    jobCountry.value = "";
+    jobTitle.value = "";
+    jobType.value = "";
+    jobCompany.value = "";
+    jobDescription.value = "";
+    workplaceType.value = "";
+    jobQuestions.value = [];
+    jobRequirements.value = [];
+    jobMinQualification.value = "";
+    currentJobStep.value = 0;
+  }
+
+  clearApplicationData() {
+    applicationEmail.value = "";
+    applicationPhone.value = "";
+    currentApplicationStep.value = 0;
+  }
+
   clearTempProfile() {
     dateGraduated.value = "";
     fieldStudy.value = "";
@@ -198,6 +256,10 @@ class StateController extends GetxController {
     phone.value = "";
     email.value = "";
     name.value = "";
+    profession.value = "";
+    city.value = "";
+    state.value = "";
+    country.value = "";
     registrationPhone.value = "";
     registrationEmail.value = "";
     currentProfileStep.value = 0;
@@ -218,18 +280,15 @@ class StateController extends GetxController {
           .doc("${currentUser?.uid}")
           .get()
           .then((documentSnapshot) {
-        // print("DATA::DATA:: ${documentSnapshot.data()!['cart']!}");
-        // print("DATY::DATY: ${documentSnapshot.data()}");
-        //  List<CartModel> _list = CartModel.fromJson(jsonEncode("${documentSnapshot.data()!['cart']}")).toList();
         documentSnapshot.data()!['cart'].forEach((v) {
           if ((data['id']) == v['productId']) {
-            print('Added');
+            debugPrint('Added');
             _res = true;
           } else {
-            print('Not Yet Added');
+            debugPrint('Not Yet Added');
             _res = false;
           }
-          // print("VELO: ${v['price']}");
+          // debugPrint("VELO: ${v['price']}");
           // cart!.add(CartModel.fromJson(v));
         });
       });
@@ -265,7 +324,7 @@ class StateController extends GetxController {
     });
 
     return cartItems?.forEach((element) async {
-      // print("Hi..>>..");
+      // debugPrint("Hi..>>..");
       await FirebaseFirestore.instance
           .collection("users")
           .doc("$userId")

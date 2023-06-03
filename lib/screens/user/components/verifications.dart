@@ -25,7 +25,7 @@ class _VerificationsContentState extends State<VerificationsContent> {
   ReceivePort _port = ReceivePort();
 
   int _progress = 0, currIndex = 0;
-  bool _isComplete = true;
+  bool _isComplete = true; 
   List<Map> rowMaps = [];
   List<Map> downloadsListMaps = [];
 

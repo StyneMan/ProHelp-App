@@ -5,10 +5,14 @@ import 'package:get/get.dart';
 import 'package:loading_overlay_pro/loading_overlay_pro.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
+import 'package:prohelp_app/components/inputfield/city_dropdown.dart';
 import 'package:prohelp_app/components/inputfield/customdropdown.dart';
 import 'package:prohelp_app/components/inputfield/datefield.dart';
+import 'package:prohelp_app/components/inputfield/dob_datefield.dart';
+import 'package:prohelp_app/components/inputfield/state_dropdown.dart';
 import 'package:prohelp_app/components/inputfield/textfield.dart';
 import 'package:prohelp_app/components/text_components.dart';
+import 'package:prohelp_app/data/state/statesAndCities.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
@@ -39,13 +43,19 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
+  final _zipCodeController = TextEditingController();
   final _dateController = TextEditingController();
 
   final _controller = Get.find<StateController>();
   final _formKey = GlobalKey<FormState>();
 
   String _selectedGender = "Male";
+  String _selectedState = "Abia";
+  String _selectedCity = "Select City";
+  String _selectedCountry = "Nigeria";
   String _encodedDate = "";
+
+  List<String> _cities = [];
 
   final socket = SocketManager().socket;
 
@@ -53,10 +63,35 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
     _selectedGender = val;
   }
 
+  void _onStateSelected(String val) {
+    setState(() {
+      _cities = [];
+    });
+    _onCitySelected("Select city");
+    _selectedState = val;
+    var selector = stateCities.where((element) => element['state'] == val);
+    setState(() {
+      _cities = selector.first['cities'] as List<String>;
+    });
+  }
+
+  void _onCitySelected(String val) {
+    setState(() {
+      _selectedCity = val;
+    });
+  }
+
+  void _onCountrySelected(String val) {
+    setState(() {
+      _selectedCountry = val;
+    });
+  }
+
   _init() {
     setState(() {
       _emailController.text = widget.email;
-      _nameController.text = "${widget.name}";
+      _nameController.text =
+          "${widget.name?.toLowerCase() == 'null' ? "" : widget.name}";
     });
   }
 
@@ -85,8 +120,14 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
         "fullname": _nameController.text.toString().toLowerCase(),
         "phone": _phoneController.text,
         "gender": _selectedGender.toString().toLowerCase(),
-        "address": _addressController.text.toString().toLowerCase(),
         "dob": _dateController.text,
+      },
+      "address": {
+        "state": _selectedState.toLowerCase(),
+        "country": _selectedCountry.toLowerCase(),
+        "city": _selectedCity.toLowerCase(),
+        "zipCode": _zipCodeController.text.toLowerCase(),
+        "street": _addressController.text.toLowerCase()
       },
       "hasProfile": true,
     };
@@ -180,7 +221,7 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
                     capitalization: TextCapitalization.words,
                   ),
                   const SizedBox(
-                    height: 21.0,
+                    height: 16.0,
                   ),
                   CustomTextField(
                     hintText: "Email",
@@ -200,7 +241,7 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
                     inputType: TextInputType.emailAddress,
                   ),
                   const SizedBox(
-                    height: 21.0,
+                    height: 16.0,
                   ),
                   CustomTextField(
                     hintText: "Phone",
@@ -220,6 +261,38 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
                   const SizedBox(
                     height: 16.0,
                   ),
+                  CustomDropdown(
+                    onSelected: _onSelected,
+                    hint: "Gender",
+                    items: const ['Male', 'Female'],
+                  ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  CustomDropdown(
+                    onSelected: _onCountrySelected,
+                    hint: "Country",
+                    items: const ['Nigeria'],
+                  ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  StateCustomDropdown(
+                    onSelected: _onStateSelected,
+                    hint: "Select state",
+                    items: stateCities,
+                  ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  CityCustomDropdown(
+                    onSelected: _onCitySelected,
+                    hint: _selectedCity,
+                    items: _cities,
+                  ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
                   CustomTextField(
                     hintText: "Address",
                     onChanged: (val) {},
@@ -232,18 +305,25 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
                     },
                     inputType: TextInputType.text,
                   ),
+                  // const SizedBox(
+                  //   height: 16.0,
+                  // ),
+                  // CustomTextField(
+                  //   hintText: "Zip Code",
+                  //   onChanged: (val) {},
+                  //   controller: _zipCodeController,
+                  //   validator: (value) {
+                  //     // if (value == null || value.isEmpty) {
+                  //     //   return 'Please enter your zip code';
+                  //     // }
+                  //     return null;
+                  //   },
+                  //   inputType: TextInputType.number,
+                  // ),
                   const SizedBox(
-                    height: 21.0,
+                    height: 16.0,
                   ),
-                  CustomDropdown(
-                    onSelected: _onSelected,
-                    hint: "Select gender",
-                    items: const ['Male', 'Female'],
-                  ),
-                  const SizedBox(
-                    height: 21.0,
-                  ),
-                  CustomDateField(
+                  CustomDoBDateField(
                     hintText: "Date of birth",
                     onDateSelected: _onDateSelected,
                     controller: _dateController,

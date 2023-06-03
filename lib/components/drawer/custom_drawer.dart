@@ -83,14 +83,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
           ),
         ),
         DrawerModel(
-          icon: Icons.info_outline,
-          title: 'About us',
-          isAction: true,
-          url: "https://google.com"
-          // widget: Categories(
-          //   manager: widget.manager,
-          // ),
-        ),
+            icon: Icons.info_outline,
+            title: 'About us',
+            isAction: true,
+            url: "https://google.com"
+            // widget: Categories(
+            //   manager: widget.manager,
+            // ),
+            ),
         // DrawerModel(
         //   icon: CupertinoIcons.money_dollar_circle,
         //   title: 'Earnings',
@@ -112,7 +112,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
   _logout() async {
     _controller.setLoading(true);
     try {
-      final res = await APIService().logout(widget.manager.getAccessToken(), widget.manager.getUser()['email']);
+      final res = await APIService().logout(
+          widget.manager.getAccessToken(), widget.manager.getUser()['email']);
       debugPrint("LOGOUT RESP :: ${res.body}");
       _controller.setLoading(false);
 
@@ -120,6 +121,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         Map<String, dynamic> map = jsonDecode(res.body);
         Constants.toast(map['message']);
         widget.manager.setIsLoggedIn(false);
+        widget.manager.clearProfile();
 
         Get.offAll(const Welcome());
 
@@ -188,9 +190,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       ),
                       child: Image.network(
                         "${widget.manager.getUser()['bio']['image']}",
-                        errorBuilder: (context, error, stackTrace) => const ClipOval(
-                          child: Icon(CupertinoIcons.person_alt_circle, size: 64, color: Colors.white)
-                        ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            const ClipOval(
+                                child: Icon(CupertinoIcons.person_alt_circle,
+                                    size: 64, color: Colors.white)),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -203,7 +206,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextPoppins(
-                        text: widget.manager.getUser()['bio']['fullname'].toString().capitalize ?? "",
+                        text: widget.manager
+                                .getUser()['bio']['fullname']
+                                .toString()
+                                .capitalize ??
+                            "",
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,

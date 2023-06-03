@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 
-typedef void InitCallback(String rawDate,String date);
+typedef void InitCallback(String rawDate, String date);
 
 class CustomDateField extends StatefulWidget {
   final String hintText;
@@ -74,12 +74,13 @@ class _CustomDateFieldState extends State<CustomDateField> {
       readOnly: true, //set it true, so that user will not able to edit text
       onTap: () async {
         DateTime? pickedDate = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(
-                1920), //DateTime.now() - not to allow to choose before today.
-            lastDate: DateTime(2101));
- 
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime(
+              1920), //DateTime.now() - not to allow to choose before today.
+          lastDate: DateTime(2101),
+        );
+
         if (pickedDate != null) {
           debugPrint(
               "$pickedDate"); //pickedDate output format => 2021-03-10 00:00:00.000
@@ -88,7 +89,7 @@ class _CustomDateFieldState extends State<CustomDateField> {
             formattedDate,
           ); //formatted date output using intl package =>  2021-03-16
           //you can implement different kind of Date Format here according to your requirement
-          widget.onDateSelected(pickedDate.toIso8601String() ,formattedDate);
+          widget.onDateSelected(pickedDate.toIso8601String(), formattedDate);
 
           // setState(() {
           //   widget.controller.text =

@@ -8,7 +8,7 @@ import 'package:prohelp_app/helper/socket/socket_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/messages/chat_page.dart';
 
-class MessageRow extends StatelessWidget {
+class MessageRow extends StatefulWidget {
   final PreferenceManager manager;
   var data;
   MessageRow({
@@ -17,48 +17,67 @@ class MessageRow extends StatelessWidget {
     required this.manager,
   }) : super(key: key);
 
+  @override
+  State<MessageRow> createState() => _MessageRowState();
+}
+
+class _MessageRowState extends State<MessageRow> {
   final _controller = Get.find<StateController>();
-  
+  var socket;
 
   _getOtherUserName() {
-    return manager.getUser()['_id'] == data['initiator']['id']
-        ? data['receiver']['name']
-        : data['initiator']['name'];
+    return widget.manager.getUser()['_id'] == widget.data['initiator']['id']
+        ? widget.data['receiver']['name']
+        : widget.data['initiator']['name'];
   }
 
   _getOtherUserPhoto() {
-    return manager.getUser()['_id'] == data['initiator']['id']
-        ? data['receiver']['photo']
-        : data['initiator']['photo'];
+    return widget.manager.getUser()['_id'] == widget.data['initiator']['id']
+        ? widget.data['receiver']['photo']
+        : widget.data['initiator']['photo'];
   }
 
   _getOtherUserId() {
-    return manager.getUser()['_id'] == data['initiator']['id']
-        ? data['receiver']['id']
-        : data['initiator']['id'];
+    return widget.manager.getUser()['_id'] == widget.data['initiator']['id']
+        ? widget.data['receiver']['id']
+        : widget.data['initiator']['id'];
   }
 
   _getOtherUserEmail() {
-    return manager.getUser()['_id'] == data['initiator']['id']
-        ? data['receiver']['email']
-        : data['initiator']['email'];
+    return widget.manager.getUser()['_id'] == widget.data['initiator']['id']
+        ? widget.data['receiver']['email']
+        : widget.data['initiator']['email'];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    socket = SocketManager().socket;
+    if (socket.disconnected) {
+      socket.connect();
+      socket.emit(
+        "subscribe",
+        {"room": widget.data['_id'], "otherUser": _getOtherUserId()},
+      );
+    } else {
+      socket.emit(
+        "subscribe",
+        {"room": widget.data['_id'], "otherUser": _getOtherUserId()},
+      );
+    }
   }
 
   @override
   build(BuildContext context) {
     return InkWell(
       onTap: () {
-        final socket = SocketManager().socket;
-
-        debugPrint("CHAT ID >> ${data['_id']}");
-        socket.emit("subscribe",
-            ({"room": data['_id'], "otherUser": _getOtherUserId()}));
+        debugPrint("CHAT ID >> ${widget.data['_id']}");
 
         Get.to(
           ChatPage(
-            manager: manager,
+            manager: widget.manager,
             caller: "messages",
-            data: data,
+            data: widget.data,
           ),
         );
       },
@@ -100,7 +119,7 @@ class MessageRow extends StatelessWidget {
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.6,
                     child: Text(
-                      "${data['recentMessage']}",
+                      "${widget.data['recentMessage']}",
                       style: const TextStyle(
                         fontSize: 13,
                       ),
@@ -113,7 +132,7 @@ class MessageRow extends StatelessWidget {
           const SizedBox(
             width: 10.0,
           ),
-          1 > 0
+          widget.data['unreadMsgs']?.length > 0
               ? ClipOval(
                   child: Container(
                     width: 20,
@@ -124,7 +143,7 @@ class MessageRow extends StatelessWidget {
                     ),
                     child: Center(
                       child: Text(
-                        "${1}",
+                        "${widget.data['unreadMsgs']?.length}",
                         style:
                             const TextStyle(color: Colors.white, fontSize: 11),
                       ),
