@@ -31,7 +31,9 @@ class Personal extends StatefulWidget {
 }
 
 class _PersonalState extends State<Personal> {
-  final _nameController = TextEditingController();
+  final _fnameController = TextEditingController();
+  final _mnameController = TextEditingController();
+  final _lnameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _ageController = TextEditingController();
@@ -110,10 +112,20 @@ class _PersonalState extends State<Personal> {
     super.initState();
 
     setState(() {
-      _nameController.text = _controller.userData.value['bio']['fullname']
+      _fnameController.text = _controller.userData.value['bio']['firstname']
               .toString()
               .capitalize ??
-          widget.manager.getUser()['bio']['fullname'].toString().capitalize ??
+          widget.manager.getUser()['bio']['firstname'].toString().capitalize ??
+          "Not set";
+          _mnameController.text = _controller.userData.value['bio']['middlename']
+              .toString()
+              .capitalize ??
+          widget.manager.getUser()['bio']['middlename'].toString().capitalize ??
+          "Not set";
+          _lnameController.text = _controller.userData.value['bio']['lastname']
+              .toString()
+              .capitalize ??
+          widget.manager.getUser()['bio']['lastname'].toString().capitalize ??
           "Not set";
       _phoneController.text = _controller.userData.value['bio']['phone'] ??
           widget.manager.getUser()['bio']['phone'] ??
@@ -229,7 +241,9 @@ class _PersonalState extends State<Personal> {
       Map _payload = {
         "bio": {
           ...widget.manager.getUser()['bio'],
-          "fullname": _nameController.text.toLowerCase(),
+          "firstname": _fnameController.text.toLowerCase(),
+          "middlename": _mnameController.text.toLowerCase(),
+          "lastname": _lnameController.text.toLowerCase(),
           "phone": _phoneController.text,
           "dob": _ageController.text,
           "nin": _ninController.text,
@@ -262,7 +276,9 @@ class _PersonalState extends State<Personal> {
           widget.manager.setUserData(userData);
 
           setState(() {
-            _nameController.text = map['data']['bio']['fullname'];
+            _fnameController.text = map['data']['bio']['firstname'];
+            _mnameController.text = map['data']['bio']['middlename'];
+            _lnameController.text = map['data']['bio']['lastname'];
             _phoneController.text = map['data']['bio']['phone'];
             _addressController.text = map['data']['address']['street'];
             _ageController.text = map['data']['bio']['dob'];
@@ -297,7 +313,9 @@ class _PersonalState extends State<Personal> {
         Map _payload = {
           "bio": {
             ...widget.manager.getUser()['bio'],
-            "fullname": _nameController.text.toLowerCase(),
+            "firstname": _fnameController.text.toLowerCase(),
+            "middlename": _mnameController.text.toLowerCase(),
+            "lastname": _lnameController.text.toLowerCase(),
             "phone": _phoneController.text,
             "dob": _ageController.text,
             "nin": _ninController.text,
@@ -329,7 +347,9 @@ class _PersonalState extends State<Personal> {
           widget.manager.setUserData(userData);
 
           setState(() {
-            _nameController.text = map['data']['bio']['fullname'];
+            _fnameController.text = map['data']['bio']['firstname'];
+            _mnameController.text = map['data']['bio']['middletname'];
+            _lnameController.text = map['data']['bio']['lastname'];
             _phoneController.text = map['data']['bio']['phone'];
             _addressController.text = map['data']['address']['street'];
             _ageController.text = map['data']['bio']['dob'];
@@ -359,16 +379,59 @@ class _PersonalState extends State<Personal> {
       child: ListView(
         children: [
           LinedTextField(
-            label: "Full Name",
+            label: "First Name",
             onChanged: (val) {
               setState(() {
                 _shouldEdit = true;
               });
             },
-            controller: _nameController,
+            controller: _fnameController,
             validator: (value) {
               if (value.toString().isEmpty || value == null) {
-                return "Full name is required";
+                return "First name is required";
+              }
+              return null;
+            },
+            inputType: TextInputType.name,
+            capitalization: TextCapitalization.words,
+          ),
+          const Divider(
+            color: Constants.accentColor,
+          ),
+          const SizedBox(
+            height: 10.0,
+          ),
+          LinedTextField(
+            label: "Middle Name",
+            onChanged: (val) {
+              setState(() {
+                _shouldEdit = true;
+              });
+            },
+            controller: _mnameController,
+            validator: (value) {
+              return null;
+            },
+            inputType: TextInputType.name,
+            capitalization: TextCapitalization.words,
+          ),
+          const Divider(
+            color: Constants.accentColor,
+          ),
+          const SizedBox(
+            height: 10.0,
+          ),
+          LinedTextField(
+            label: "Last Name",
+            onChanged: (val) {
+              setState(() {
+                _shouldEdit = true;
+              });
+            },
+            controller: _lnameController,
+            validator: (value) {
+              if (value.toString().isEmpty || value == null) {
+                return "Last name is required";
               }
               return null;
             },
@@ -512,30 +575,6 @@ class _PersonalState extends State<Personal> {
             title: "Country",
             onSelected: _onCountrySelected,
             items: const ["Nigeria"],
-          ),
-          const Divider(
-            color: Constants.accentColor,
-          ),
-          const SizedBox(
-            height: 6.0,
-          ),
-          LinedTextField(
-            label: "Zip Code",
-            isEnabled: false,
-            onChanged: (val) {
-              setState(() {
-                _shouldEdit = true;
-              });
-            },
-            controller: _zipController,
-            validator: (value) {
-              // if (value.toString().isEmpty || value == null) {
-              //   return "Zip code is required";
-              // }
-              return null;
-            },
-            inputType: TextInputType.text,
-            capitalization: TextCapitalization.words,
           ),
           const Divider(
             color: Constants.accentColor,

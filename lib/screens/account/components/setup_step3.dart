@@ -93,8 +93,26 @@ class _SetupStep3State extends State<SetupStep3> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        CustomDropdown(
+          onSelected: _onDegreeSelected,
+          hint: "Degree",
+          items: const [
+            'None',
+            'Elementary',
+            "O'level",
+            "ND/OND",
+            "HND",
+            "Bachelor",
+            "Masters",
+            "PhD"
+          ],
+        ),
+        const SizedBox(
+          height: 21.0,
+        ),
         CustomTextField(
           hintText: "School",
+          isEnabled: _selectedDegree == "None" ? false : true,
           onChanged: (val) {
             widget.onStep3Completed(
               {
@@ -107,8 +125,10 @@ class _SetupStep3State extends State<SetupStep3> {
           },
           controller: _schoolController,
           validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'School name is required!';
+            if (_selectedDegree != "None") {
+              if (value == null || value.isEmpty) {
+                return 'School name is required!';
+              }
             }
             return null;
           },
@@ -118,24 +138,13 @@ class _SetupStep3State extends State<SetupStep3> {
         const SizedBox(
           height: 21.0,
         ),
-        CustomDropdown(
-          onSelected: _onDegreeSelected,
-          hint: "Degree",
-          items: const [
-            "O'level",
-            "ND/OND",
-            "HND",
-            "Bachelor",
-            "Masters",
-            "PhD"
-          ],
-        ),
-
-        const SizedBox(
-          height: 21.0,
-        ),
         CustomTextField(
           hintText: "Course of study",
+          isEnabled: _selectedDegree == "None" ||
+                  _selectedDegree == "Elementary" ||
+                  _selectedDegree == "O'level"
+              ? false
+              : true,
           onChanged: (val) {
             widget.onStep3Completed(
               {
@@ -148,9 +157,12 @@ class _SetupStep3State extends State<SetupStep3> {
           },
           controller: _fieldStudyController,
           validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Field of study is required!';
+            if (_selectedDegree != "None" && _selectedDegree != "Elementary") {
+              if (value == null || value.isEmpty) {
+                return 'Field of study is required!';
+              }
             }
+
             return null;
           },
           inputType: TextInputType.text,
@@ -160,6 +172,7 @@ class _SetupStep3State extends State<SetupStep3> {
           height: 21.0,
         ),
         CustomDateField(
+          isEnabled: _selectedDegree == "None" ? false : true,
           hintText: "Date graduated",
           onDateSelected: _onDateSelected,
           controller: _dateGraduatedController,

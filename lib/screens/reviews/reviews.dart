@@ -176,6 +176,7 @@ class _ViewReviewsState extends State<ViewReviews> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                         Image.asset('assets/images/empty.png'),
                         const TextInter(text: "No reviews found", fontSize: 16),
                         widget.manager.getUser()['_id'] == widget.data['_id']
                             ? const SizedBox()

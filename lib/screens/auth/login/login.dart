@@ -62,7 +62,8 @@ class _LoginState extends State<Login> {
 
       Map<String, dynamic> map = jsonDecode(resp.body);
       _manager!.saveAccessToken(map['token']);
-      _controller.name.value = "${map['data']['bio']['fullname']}".capitalize!;
+      _controller.firstname.value = "${map['data']['bio']['fullname']}".split(" ")[0].capitalize!;
+      _controller.lastname.value = "${map['data']['bio']['fullname']}".split(" ")[1].capitalize!;
 
       if (map['message'].contains("Account created")) {
         //New account so now select user type recruiter or freelancer

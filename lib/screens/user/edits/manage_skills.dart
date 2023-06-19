@@ -76,7 +76,8 @@ class ManageSkills extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const TextInter(text: "No data found", fontSize: 16),
+                        Image.asset('assets/images/empty.png'),
+                        const TextInter(text: "No skills found", fontSize: 16),
                         TextButton.icon(
                           onPressed: () {
                             _controller.shouldAddSkills.value = true;

@@ -123,7 +123,7 @@ class _AccountSuccessState extends State<AccountSuccess> {
                     PageTransition(
                       type: PageTransitionType.size,
                       alignment: Alignment.bottomCenter,
-                      child: Dashboard(manager: _manager!),
+                      child: Dashboard(manager: _manager!, showProfile: true),
                     ),
                   );
                 },

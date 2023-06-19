@@ -91,6 +91,8 @@ class _PayToViewState extends State<PayToView> {
 
   @override
   Widget build(BuildContext context) {
+    _controller.setLoading(false);
+
     return Obx(
       () => LoadingOverlayPro(
         isLoading: _controller.isLoading.value,
@@ -370,14 +372,16 @@ class _PayToViewState extends State<PayToView> {
   }
 
   _getAccessCode() {
-    return "${widget.manager.getUser()['_id']}" +
+    return "${widget.manager.getUser()['email']}" +
         DateTime.now().toIso8601String();
   }
 
   _chargeCard() async {
     var charge = Charge()
-      ..accessCode = _getAccessCode()
-      ..card = _getCardFromUI();
+      ..card = _getCardFromUI()
+      ..amount = widget.data['amount'] * 100
+      ..email = "${widget.manager.getUser()['email']}"
+      ..reference = _getAccessCode();
 
     try {
       final response = await plugin.chargeCard(context, charge: charge);
@@ -385,10 +389,19 @@ class _PayToViewState extends State<PayToView> {
           "CHARGE RESPONSE >> ${response.message} , ${response.reference}, ${response.status}");
 
       // if (response.status) {
-        _fundWallet(response.reference, response.status, response.message);
+      _fundWallet(response.reference, response.status, response.message);
       // } else {
-        // _controller.setLoading(false);
-        // Constants.toast(response.message);
+      // _controller.setLoading(false);
+      // Constants.toast(response.message);
+      // Criminal record 
+      // gurantor
+      // Means of ID (nin, voter's card, drivers license, international passport)
+      // previous work address
+      // House address
+
+      // ............
+      // Disabilities
+      // ............
       // }
     } catch (e) {
       debugPrint("PAYMENT ERROR >> $e");
@@ -400,7 +413,7 @@ class _PayToViewState extends State<PayToView> {
       "amount": widget.data['amount'],
       "reference": ref,
       "summary": "Fund wallet: $summary",
-      "userId": widget.manager.getUser()['_id'],
+      "userId": widget.manager.getUser()['id'],
       "type": "fund_wallet",
       "status": "$status",
     };

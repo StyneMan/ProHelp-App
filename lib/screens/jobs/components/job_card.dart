@@ -11,6 +11,7 @@ import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
+import 'package:prohelp_app/screens/account/components/wallet.dart';
 import 'package:prohelp_app/screens/jobs/apply_job.dart';
 import 'package:prohelp_app/screens/jobs/viewjob.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -528,9 +529,10 @@ class _JobCardState extends State<JobCard> {
                 Expanded(
                   flex: 2,
                   child: CustomButton(
-                    bgColor: widget.data['jobStatus'] != "accepting" || _isApplied
-                        ? Colors.grey
-                        : Constants.primaryColor,
+                    bgColor:
+                        widget.data['jobStatus'] != "accepting" || _isApplied
+                            ? Colors.grey
+                            : Constants.primaryColor,
                     child: widget.data['recruiter']['id'] ==
                             widget.manager.getUser()['_id']
                         ? TextPoppins(
@@ -549,20 +551,34 @@ class _JobCardState extends State<JobCard> {
                           ),
                     borderColor: Colors.transparent,
                     foreColor: Constants.secondaryColor,
-                    onPressed: widget.data['jobStatus'] != "accepting" || _isApplied
+                    onPressed: widget.data['jobStatus'] != "accepting" ||
+                            _isApplied
                         ? null
                         : widget.data['recruiter']['id'] !=
                                 widget.manager.getUser()['_id']
-                            ? () {
-                                //Apply for job here
-                                Get.to(
-                                  ApplyJob(
-                                    manager: widget.manager,
-                                    data: widget.data,
-                                  ),
-                                  transition: Transition.cupertino,
-                                );
-                              }
+                            ? (_controller.userData.value['wallet']
+                                            ['balance'] ??
+                                        0) >=
+                                    200
+                                ? () {
+                                    //Apply for job here
+                                    Get.to(
+                                      ApplyJob(
+                                        manager: widget.manager,
+                                        data: widget.data,
+                                      ),
+                                      transition: Transition.cupertino,
+                                    );
+                                  }
+                                : () {
+                                    //Show out of coins alert here
+                                    Constants.toast(
+                                        "You are out of coins. Topup to continue posting and connecting!");
+                                    Get.to(
+                                      MyWallet(manager: widget.manager),
+                                      transition: Transition.cupertino,
+                                    );
+                                  }
                             : () {
                                 showBarModalBottomSheet(
                                   expand: false,

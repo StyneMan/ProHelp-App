@@ -160,8 +160,9 @@ class _ManageEducationState extends State<ManageEducation> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
-                        TextInter(
+                      children: [
+                        Image.asset('assets/images/empty.png'),
+                        const TextInter(
                           text: "No educational qualifications found",
                           fontSize: 16,
                           align: TextAlign.center,

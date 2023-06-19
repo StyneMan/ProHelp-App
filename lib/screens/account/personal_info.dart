@@ -16,7 +16,6 @@ import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/account/components/nok.dart';
 import 'package:prohelp_app/screens/account/components/personal.dart';
 
-import 'components/bank.dart';
 
 class PersonalInfo extends StatefulWidget {
   final PreferenceManager manager;
@@ -271,15 +270,19 @@ class _PersonalInfoState extends State<PersonalInfo>
                                 tabs: [
                                   Tab(
                                     child: TextPoppins(
-                                        text: "Personal", fontSize: 13),
+                                      text: "Personal",
+                                      fontSize: 13,
+                                    ),
                                   ),
-                                  Tab(
-                                    child:
-                                        TextPoppins(text: "Bank", fontSize: 13),
-                                  ),
+                                  // Tab(
+                                  //   child:
+                                  //       TextPoppins(text: "Bank", fontSize: 13),
+                                  // ),
                                   Tab(
                                     child: TextPoppins(
-                                        text: "Guarantor", fontSize: 13),
+                                      text: "Guarantor",
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -307,7 +310,7 @@ class _PersonalInfoState extends State<PersonalInfo>
                             Personal(
                               manager: widget.manager,
                             ),
-                            const Bank(),
+                            // const Bank(),
                             NOK(
                               manager: widget.manager,
                             ),

@@ -40,9 +40,9 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
   _likeUser() async {
     _controller.setLoading(true);
     Map _payload = {
-      "guestId": "${widget.data['_id']}",
+      "guestId": "${widget.data['id']}",
       "guestName": "${widget.data['bio']['fullname']}",
-      "userId": "${widget.manager.getUser()['_id']}",
+      "userId": "${widget.manager.getUser()['id']}",
     };
     try {
       final resp = await APIService().likeUser(_payload,
@@ -73,7 +73,7 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
 
   _checkLiked() {
     for (var element in widget.manager.getUser()['savedPros']) {
-      if (element == widget.data['_id']) {
+      if (element == widget.data['id']) {
         setState(() {
           _isLiked = true;
         });
@@ -87,7 +87,7 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
 
   _checkConnection() {
     for (var element in widget.manager.getUser()['connections']) {
-      if (element == widget.data['_id']) {
+      if (element == widget.data['id']) {
         debugPrint("TRUE");
         setState(() {
           _isConnected = true;
@@ -170,6 +170,13 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          const Icon(
+                            Icons.person_2,
+                            size: 18,
+                          ),
+                          const SizedBox(
+                            width: 4.0,
+                          ),
                           TextPoppins(
                             text:
                                 "${widget.data['bio']['fullname']}".capitalize,
@@ -179,61 +186,73 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                           const SizedBox(
                             width: 5.0,
                           ),
-                          // widget.data['isVerified']
-                          //     ? const Icon(
-                          //         CupertinoIcons.check_mark_circled,
-                          //         color: Colors.green,
-                          //       )
-                          //     : const Icon(
-                          //         CupertinoIcons.check_mark_circled,
-                          //         color: Colors.red,
-                          //       ),
                         ],
                       ),
-                      // const SizedBox(
-                      //   height: 8.0,
-                      // ),
-                      // // widget.data['accountType'] == "recruiter"
-                      //     ? const SizedBox()
-                      //     : SizedBox(
-                      //         width: MediaQuery.of(context).size.width * 0.5,
-                      //         child: Wrap(
-                      //           children: [
-                      //             TextPoppins(
-                      //               text: "${widget.data['bio']['about']}"
-                      //                           .length >
-                      //                       50
-                      //                   ? "${widget.data['bio']['about']}"
-                      //                           .substring(0, 50) +
-                      //                       "..."
-                      //                   : "${widget.data['bio']['about']}",
-                      //               fontSize: 12,
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       ),
-                      // widget.data['accountType'] == "recruiter"
-                      //     ? const SizedBox()
-                      //     : const SizedBox(
-                      //         height: 8.0,
-                      //       ),
                       widget.data['accountType'] == "recruiter"
                           ? const SizedBox()
-                          : TextPoppins(
-                              text: "${widget.data['profession']}",
-                              fontSize: 14,
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.card_travel,
+                                  size: 18,
+                                  color: Colors.grey,
+                                ),
+                                const SizedBox(
+                                  width: 4.0,
+                                ),
+                                TextPoppins(
+                                  text:
+                                      "${widget.data['profession']}".capitalize,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ],
                             ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.location_on_outlined,
+                            size: 18,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(
+                            width: 4.0,
+                          ),
+                          TextPoppins(
+                            text:
+                                "${widget.data['address']['city']}, ${widget.data['address']['state']}"
+                                    .capitalize,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ],
+                      ),
                       widget.data['accountType'] != "recruiter"
                           ? const SizedBox()
                           : Wrap(
                               children: [
                                 SizedBox(
-                                  child: TextPoppins(
-                                    text:
-                                        "${widget.data['address']['city']} ${widget.data['address']['state']}, ${widget.data['address']['country']}"
-                                            .capitalize,
-                                    fontSize: 13,
-                                    color: Constants.primaryColor,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      const Icon(Icons.location_on_outlined),
+                                      const SizedBox(
+                                        width: 4.0,
+                                      ),
+                                      TextPoppins(
+                                        text:
+                                            "${widget.data['address']['city']} ${widget.data['address']['state']}, ${widget.data['address']['country']}"
+                                                .capitalize,
+                                        fontSize: 13,
+                                        color: Constants.primaryColor,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
@@ -290,7 +309,7 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
             widget.data['accountType'] == "recruiter"
                 ? const SizedBox()
                 : const SizedBox(
-                    height: 10.0,
+                    height: 1.0,
                   ),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -333,8 +352,8 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => widget.data['_id'] ==
-                                  widget.manager.getUser()['_id']
+                          builder: (context) => widget.data['id'] ==
+                                  widget.manager.getUser()['id']
                               ? MyProfile(
                                   manager: widget.manager,
                                 )

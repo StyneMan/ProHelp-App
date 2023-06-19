@@ -184,7 +184,7 @@ class _MyAppState extends State<MyApp> {
       socket.onConnect((data) => print('Connected ID: ${data}'));
 
       if (_token.isNotEmpty) {
-        socket.emit('identity', _userMap['_id']);
+        socket.emit('identity', _userMap['id']);
       }
 
       socket.on(
@@ -195,6 +195,11 @@ class _MyAppState extends State<MyApp> {
       socket.on(
         "new-chat",
         (data) => debugPrint("DATA FROM CHAT >> $data"),
+      );
+
+      socket.on(
+        "isOnline",
+        (data) => debugPrint("DATA FROM  >> $data"),
       );
 
       socket.on(

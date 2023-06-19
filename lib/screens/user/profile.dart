@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
+import 'package:prohelp_app/helper/socket/socket_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/reviews/reviews.dart';
 import 'package:prohelp_app/screens/user/edits/manage_connections.dart';
@@ -48,9 +50,9 @@ class _UserProfileState extends State<UserProfile> {
   _likeUser() async {
     _controller.setLoading(true);
     Map _payload = {
-      "guestId": "${widget.data['_id']}",
+      "guestId": "${widget.data['id']}",
       "guestName": "${widget.data['bio']['fullname']}",
-      "userId": "${widget.manager.getUser()['_id']}",
+      "userId": "${widget.manager.getUser()['id']}",
     };
     try {
       final resp = await APIService().likeUser(_payload,
@@ -81,7 +83,7 @@ class _UserProfileState extends State<UserProfile> {
 
   _checkLiked() {
     for (var element in widget.manager.getUser()['savedPros']) {
-      if (element == widget.data['_id']) {
+      if (element == widget.data['id']) {
         setState(() {
           _isLiked = true;
         });
@@ -95,7 +97,7 @@ class _UserProfileState extends State<UserProfile> {
 
   _checkConnection() {
     for (var element in _controller.userData.value['connections']) {
-      if (element == widget.data['_id']) {
+      if (element == widget.data['id']) {
         debugPrint("TRUE");
         setState(() {
           _isConnected = true;
@@ -104,11 +106,18 @@ class _UserProfileState extends State<UserProfile> {
     }
   }
 
+  _checkOnlineStatus() {
+    final socket = SocketManager().socket;
+    socket.emit('checkOnline', _controller.userData.value['id']);
+  }
+
   @override
   void initState() {
+    _checkOnlineStatus();
     super.initState();
     _checkConnection();
     _checkLiked();
+
     Future.delayed(const Duration(milliseconds: 1200), () {
       if (widget.triggerHire) {
         showDialog(
@@ -214,8 +223,8 @@ class _UserProfileState extends State<UserProfile> {
                           child: Image.network(
                             widget.data['bio']['image'],
                             fit: BoxFit.cover,
-                            width: Constants.avatarRadius + 36,
-                            height: Constants.avatarRadius + 36,
+                            width: Constants.avatarRadius + 48,
+                            height: Constants.avatarRadius + 48,
                             errorBuilder: (context, error, stackTrace) =>
                                 SvgPicture.asset(
                               "assets/images/personal_icon.svg",
@@ -227,6 +236,20 @@ class _UserProfileState extends State<UserProfile> {
                       ),
                     ),
                   ),
+                  Positioned(
+                    bottom: -Constants.avatarRadius + 24,
+                    left: (Constants.avatarRadius * 2) - 10,
+                    child: ClipOval(
+                      child: Container(
+                        width: 18,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(9),
+                          color: Colors.green,
+                        ),
+                      ),
+                    ),
+                  )
                 ],
               ),
               Padding(
@@ -250,16 +273,22 @@ class _UserProfileState extends State<UserProfile> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Wrap(
-                                children: [
-                                  TextInter(
-                                    text: "${widget.data['bio']['fullname']}"
-                                        .capitalize,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ],
-                              ),
+                              // (_controller.userData
+                              //             .value['isDocumentVerified'] == Null ??
+                              //         false)
+                              8 == 8
+                                  ? TextPoppins(
+                                      text: "Not verified",
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Constants.golden,
+                                    )
+                                  : TextPoppins(
+                                      text: "Verified",
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.green,
+                                    ),
                               const SizedBox(
                                 width: 4.0,
                               ),
@@ -277,73 +306,6 @@ class _UserProfileState extends State<UserProfile> {
                               ),
                             ],
                           ),
-                          const SizedBox(
-                            height: 5.0,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  RatingBar.builder(
-                                    initialRating:
-                                        "${widget.data['rating']}".contains(".")
-                                            ? widget.data['rating']
-                                            : (widget.data['rating'] ?? 0)
-                                                    .toDouble() ??
-                                                0.0, //widget.data.rating,
-                                    minRating: 1,
-                                    direction: Axis.horizontal,
-                                    allowHalfRating: true,
-                                    ignoreGestures: true,
-                                    itemCount: 5,
-                                    itemSize: 21,
-                                    itemPadding: const EdgeInsets.symmetric(
-                                        horizontal: 0.0),
-                                    itemBuilder: (context, _) => const Icon(
-                                      Icons.star,
-                                      size: 18,
-                                      color: Colors.amber,
-                                    ),
-                                    onRatingUpdate: (rating) {
-                                      debugPrint("$rating");
-                                    },
-                                  ),
-                                  const SizedBox(
-                                    width: 4.0,
-                                  ),
-                                  TextPoppins(
-                                    text:
-                                        "(${widget.data['reviews']?.length} reviews)",
-                                    fontSize: 12,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                width: 4.0,
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  Get.to(
-                                    ViewReviews(
-                                      manager: widget.manager,
-                                      data: widget.data,
-                                    ),
-                                    transition: Transition.cupertino,
-                                  );
-                                },
-                                child: const Padding(
-                                  padding: EdgeInsets.all(4.0),
-                                  child: Icon(
-                                    CupertinoIcons.forward,
-                                  ),
-                                ),
-                              )
-                            ],
-                          )
                         ],
                       ),
                     ),
@@ -351,13 +313,88 @@ class _UserProfileState extends State<UserProfile> {
                 ),
               ),
               const SizedBox(
-                height: 8.0,
+                height: 21.0,
               ),
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16.0, vertical: 1.0),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    TextPoppins(
+                      text: "${widget.data['bio']['fullname']}".capitalize,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    TextPoppins(
+                      text: "${widget.data['profession']}".capitalize,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            RatingBar.builder(
+                              initialRating: "${widget.data['rating']}"
+                                      .contains(".")
+                                  ? widget.data['rating']
+                                  : (widget.data['rating'] ?? 0).toDouble() ??
+                                      0.0, //widget.data.rating,
+                              minRating: 1,
+                              direction: Axis.horizontal,
+                              allowHalfRating: true,
+                              ignoreGestures: true,
+                              itemCount: 5,
+                              itemSize: 21,
+                              itemPadding:
+                                  const EdgeInsets.symmetric(horizontal: 0.0),
+                              itemBuilder: (context, _) => const Icon(
+                                Icons.star,
+                                size: 18,
+                                color: Colors.amber,
+                              ),
+                              onRatingUpdate: (rating) {
+                                debugPrint("$rating");
+                              },
+                            ),
+                            const SizedBox(
+                              width: 4.0,
+                            ),
+                            TextPoppins(
+                              text:
+                                  "(${widget.data['reviews']?.length} reviews)",
+                              fontSize: 12,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 4.0,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Get.to(
+                              ViewReviews(
+                                manager: widget.manager,
+                                data: widget.data,
+                              ),
+                              transition: Transition.cupertino,
+                            );
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.all(4.0),
+                            child: Icon(
+                              CupertinoIcons.forward,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                     widget.data['accountType'] == "recruiter"
                         ? const SizedBox()
                         : Wrap(
@@ -372,11 +409,6 @@ class _UserProfileState extends State<UserProfile> {
                               ),
                               const SizedBox(
                                 width: 5.0,
-                              ),
-                              const Icon(
-                                Icons.circle,
-                                size: 6,
-                                color: Colors.black87,
                               ),
                               const SizedBox(
                                 width: 5.0,
@@ -690,7 +722,7 @@ class _UserProfileState extends State<UserProfile> {
             ],
           ),
           Positioned(
-            top: 48,
+            top: 36,
             left: 0,
             right: 0,
             child: Row(
@@ -705,9 +737,6 @@ class _UserProfileState extends State<UserProfile> {
                     CupertinoIcons.arrow_left_circle,
                     color: Colors.white,
                   ),
-                ),
-                const SizedBox(
-                  width: 16.0,
                 ),
                 IconButton(
                   onPressed: () {

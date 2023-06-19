@@ -20,10 +20,11 @@ class Constants {
   static const Color shimmerBaseColor = Color.fromARGB(255, 203, 203, 203);
   static const Color shimmerHighlightColor = Colors.white;
 
-  static const baseURL =
-      "http://192.168.123.183:8080"; //  "https://my-prohelp-server.vercel.app"  "https://pro-help-server.vercel.app";
+  static const baseURL = "https://my-prohelp-server.vercel.app";
+
   //"https://pro-help-api.vercel.app"; //"http://192.168.1.103:8080";
-  static String pstk = "pk_test_40f544aec0415695c9fae0ba0819ee5bebcb6a5e"; //"pk_test_043683268da92cd71e0d30f9d72396396f2dfb1f";
+  static String pstk = "pk_test_40f544aec0415695c9fae0ba0819ee5bebcb6a5e";
+  // "pk_test_40f544aec0415695c9fae0ba0819ee5bebcb6a5e"; //"pk_test_043683268da92cd71e0d30f9d72396396f2dfb1f";
 
   static String formatMoney(int amt) {
     MoneyFormatter fmf = MoneyFormatter(

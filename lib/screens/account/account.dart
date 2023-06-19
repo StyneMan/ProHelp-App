@@ -4,18 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:get/instance_manager.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:prohelp_app/components/drawer/custom_drawer.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
-import 'package:prohelp_app/screens/account/about.dart';
-import 'package:prohelp_app/screens/account/components/wallet.dart';
 import 'package:prohelp_app/screens/account/personal_info.dart';
 import 'package:prohelp_app/screens/account/security.dart';
+import 'package:prohelp_app/screens/account/setup_profile.dart';
 import 'package:prohelp_app/screens/account/support.dart';
+
+import 'components/wallet.dart';
+import 'verify_docs.dart';
 
 class Account extends StatelessWidget {
   final PreferenceManager manager;
@@ -25,6 +26,10 @@ class Account extends StatelessWidget {
   final _controller = Get.find<StateController>();
 
   final _user = FirebaseAuth.instance.currentUser;
+
+  _pluralize(int num) {
+    return num > 1 ? "s" : "";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,48 +111,54 @@ class Account extends StatelessWidget {
             ),
           ),
           const SizedBox(
-            height: 16.0,
+            height: 4.0,
           ),
           Center(
             child: Column(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(4.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: const Color(0xFF0F8E33),
-                  ),
-                  child: TextPoppins(
-                    text: "Account Approved",
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(
-                  height: 8.0,
-                ),
                 TextPoppins(
                   text: "${manager.getUser()['bio']['fullname']}".capitalize,
-                  fontSize: 22,
+                  fontSize: 21,
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
                 ),
                 const SizedBox(
-                  height: 4.0,
+                  height: 1.0,
                 ),
                 TextPoppins(
-                  text:
-                      manager.getUser()['accountType'].toString().toUpperCase(),
+                  text: manager.getUser()['accountType'] == "freelancer"
+                      ? "Professional".toUpperCase()
+                      : manager
+                          .getUser()['accountType']
+                          .toString()
+                          .toUpperCase(),
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: Constants.primaryColor,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // TextPoppins(
+                    //   text: "Balance:",
+                    //   fontSize: 16,
+                    //   fontWeight: FontWeight.w600,
+                    // ),
+                    Image.asset(
+                      "assets/images/coin_gold.png",
+                      width: 32,
+                    ),
+                    Text(
+                      " ${Constants.formatMoney(_controller.userData.value['wallet']['balance'])} coin${_pluralize(manager.getUser()['wallet']['balance'])}",
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
           const SizedBox(
-            height: 32,
+            height: 16,
           ),
           Padding(
             padding: const EdgeInsets.all(12.0),
@@ -317,13 +328,13 @@ class Account extends StatelessWidget {
                 const SizedBox(
                   height: 10.0,
                 ),
-                manager.getUser()['accountType'] != "freelancer"
-                    ? TextButton(
+                manager.getUser()['accountType'].toString().toLowerCase() ==
+                        "recruiter"
+                    ? const SizedBox()
+                    : TextButton(
                         onPressed: () {
                           Get.to(
-                            MyWallet(
-                              manager: manager,
-                            ),
+                            VerifyDocs(manager: manager),
                             transition: Transition.cupertino,
                           );
                           // showBarModalBottomSheet(
@@ -374,7 +385,7 @@ class Account extends StatelessWidget {
                                   width: 16.0,
                                 ),
                                 TextPoppins(
-                                  text: "My Wallet",
+                                  text: "Verify Documents",
                                   fontSize: 13,
                                   color: Colors.black87,
                                 )
@@ -399,8 +410,59 @@ class Account extends StatelessWidget {
                             ),
                           ),
                         ),
-                      )
-                    : const SizedBox(),
+                      ),
+                const SizedBox(
+                  height: 10.0,
+                ),
+                TextButton(
+                  onPressed: () {
+                    Get.to(
+                      // SetupProfile(manager: manager, email: 'ezege@gmail.com'),
+                      MyWallet(
+                        manager: manager,
+                      ),
+                      transition: Transition.cupertino,
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset("assets/images/personal_icon.svg"),
+                          const SizedBox(
+                            width: 16.0,
+                          ),
+                          TextPoppins(
+                            text: "My Wallet",
+                            fontSize: 13,
+                            color: Colors.black87,
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        width: 10.0,
+                      ),
+                      const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: Color(0xFFB1B5C5),
+                      ),
+                    ],
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.all(16.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4.0),
+                      side: const BorderSide(
+                        color: Color(0xFFB1B5C5),
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
+                )
               ],
             ),
           ),

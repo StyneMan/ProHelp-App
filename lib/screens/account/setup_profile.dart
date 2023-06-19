@@ -3,12 +3,18 @@ import 'dart:io';
 
 import 'package:easy_stepper/easy_stepper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 // import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:loading_overlay_pro/loading_overlay_pro.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:prohelp_app/components/button/custombutton.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
+import 'package:prohelp_app/components/dialog/info_dialog.dart';
+import 'package:prohelp_app/components/picker/img_picker.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
@@ -18,10 +24,13 @@ import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/account/components/setup_step1.dart';
 import 'package:prohelp_app/screens/account/components/setup_step2.dart';
 import 'package:prohelp_app/screens/account/components/setup_step3.dart';
+import 'package:prohelp_app/screens/account/components/setup_step4.dart';
 import 'package:prohelp_app/screens/auth/account_created/successscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SetupProfile extends StatelessWidget {
+import 'components/image_uploader.dart';
+
+class SetupProfile extends StatefulWidget {
   final bool? isSocial;
   final String email;
   final String? name;
@@ -34,66 +43,79 @@ class SetupProfile extends StatelessWidget {
     this.name,
   }) : super(key: key);
 
-  int _totalSteps = 3;
+  @override
+  State<SetupProfile> createState() => _SetupProfileState();
+}
+
+class _SetupProfileState extends State<SetupProfile> {
+  int _totalSteps = 4;
 
   final _controller = Get.find<StateController>();
   final _formKey = GlobalKey<FormState>();
-
   final _currentUser = FirebaseAuth.instance.currentUser;
 
   Map _step1Payload = {};
   Map _step2Payload = {};
   Map _step3Payload = {};
+  Map _step4Payload = {};
+
   List<String> _downloadURLs = [];
+  bool _isImagePicked = false;
+  String _croppedFile = "";
 
   final socket = SocketManager().socket;
 
-  // _uploadDocuments() async {
-  //   try {
-  //     // final appDocDir = await getApplicationDocumentsDirectory();
-  //     // final filePath = "${appDocDir.absolute}/path/to/mountains.jpg";
+  _onImageSelected(var file) {
+    setState(() {
+      _isImagePicked = true;
+      _croppedFile = file;
+    });
+    debugPrint("VALUIE::: :: $file");
+  }
 
-  //     // Upload file and metadata to the path 'images/mountains.jpg'
+  _uploadPhoto() async {
+    _controller.setLoading(true);
+    try {
+      final storageRef = FirebaseStorage.instance.ref();
+      final fileRef = storageRef
+          .child("photos")
+          .child("${widget.manager.getUser()['email']}");
+      final _resp = await fileRef.putFile(File(_controller.croppedPic.value));
+      final url = await _resp.ref.getDownloadURL();
 
-  //     for (var i = 0; i < _controller.pickedDocuments.length; i++) {
-  //       final file = File(_controller.pickedDocuments.elementAt(i).path);
-  //       final storageRef = FirebaseStorage.instance.ref();
+      await _saveProfile(context, url);
 
-  //       final uploadTask = storageRef
-  //           .child(
-  //               "Users/${_currentUser?.uid}/${_controller.pickedDocuments.elementAt(i).name}")
-  //           .putFile(file);
+      _controller.croppedPic.value = "";
+    } catch (e) {
+      debugPrint(e.toString());
+      _controller.setLoading(false);
+    }
+  }
 
-  //       uploadTask.then((p0) async {
-  //         final url = await p0.ref.getDownloadURL();
-
-  //         _downloadURLs.add(url);
-  //       });
-  //     }
-  //   } catch (e) {
-  //     _controller.setLoading(true);
-  //     debugPrint(e.toString());
-  //   }
-  // }
-
-  _saveProfile(context) async {
+  _saveProfile(context, url) async {
     _controller.setLoading(true);
     Map _payload = {
       "accountType": "freelancer",
       "bio": {
-        "fullname": _step1Payload['fullname'].toString().toLowerCase(),
+        "firstname": _step1Payload['firstname'].toString().toLowerCase(),
+        "lastname": _step1Payload['lastname'].toString().toLowerCase(),
+        "middlename": _step1Payload['middlename'].toString().toLowerCase(),
         "phone": _step1Payload['phone'],
         "gender": _step1Payload['gender'].toString().toLowerCase(),
         "address": _step1Payload['address'].toString().toLowerCase(),
         "dob": _step1Payload['dob'],
+        "image": url
       },
       "address": {
         "street": _step1Payload['address'].toString().toLowerCase(),
         "city": _step1Payload['city'],
-        "country": _step1Payload['country'].toString().toLowerCase(),
+        "country":
+            "nigeria", //_step1Payload['country'].toString().toLowerCase(),
         "state": _step1Payload['state'].toString().toLowerCase(),
       },
       "profession": _step1Payload['profession'].toString().toLowerCase(),
+      "experienceYears":
+          _step1Payload['experienceYears'].toString().toLowerCase(),
       "guarantor": {
         "name": _step2Payload['nokName'].toString().toLowerCase(),
         "address": _step2Payload['nokAddress'].toString().toLowerCase(),
@@ -112,6 +134,9 @@ class SetupProfile extends StatelessWidget {
           "stillSchooling": false
         },
       ],
+      "disability": _step4Payload['disability'] ?? "none",
+      "languagesSpoken": _controller.languagesSpoken.value,
+      "languagesWriteSpeak": _controller.languagesSpeakWrite.value,
     };
 
     try {
@@ -121,7 +146,7 @@ class SetupProfile extends StatelessWidget {
       final response = await APIService().updateProfile(
         accessToken: _token,
         body: _payload,
-        email: email,
+        email: widget.email,
       );
 
       debugPrint("PROFILE RESPONSE freelancer >> ${response.body}");
@@ -133,12 +158,12 @@ class SetupProfile extends StatelessWidget {
 
         //Nw save user's data to preference
         String userData = jsonEncode(map['data']);
-        manager.setUserData(userData);
-        manager.setIsLoggedIn(true);
+        widget.manager.setUserData(userData);
+        widget.manager.setIsLoggedIn(true);
         _controller.userData.value = map['data'];
         _controller.clearTempProfile();
 
-        socket.emit('identity', map['data']["_id"]);
+        socket.emit('identity', map['data']["id"]);
 
         //Fetch other data like freelancers, recruiters etc.
         _controller.onInit();
@@ -148,7 +173,7 @@ class SetupProfile extends StatelessWidget {
             type: PageTransitionType.size,
             alignment: Alignment.bottomCenter,
             child: AccountSuccess(
-              firstname: "${map["data"]["bio"]["fullname"]}".split(" ")[0],
+              firstname: "${map["data"]["bio"]["firstname"]}",
               accountType: "freelancer",
             ),
           ),
@@ -158,18 +183,7 @@ class SetupProfile extends StatelessWidget {
         Constants.toast(map['message']);
       }
 
-      // manager.setIsLoggedIn(true);
-      // _controller.setLoading(false);
-      // //Clear state
-      // _controller.clearTempProfile();
 
-      // Navigator.of(context).pushReplacement(
-      //   PageTransition(
-      //     type: PageTransitionType.size,
-      //     alignment: Alignment.bottomCenter,
-      //     child: const AccountSuccess(),
-      //   ),
-      // );
     } catch (e) {
       debugPrint(e.toString());
       Constants.toast(e.toString());
@@ -197,8 +211,16 @@ class SetupProfile extends StatelessWidget {
     // });
   }
 
+  _onStep4Completed(Map data) {
+    // setState(() {
+    _step4Payload = data;
+    // });
+  }
+
   _saveStep1ToState() {
-    _controller.name.value = _step1Payload['fullname'];
+    _controller.firstname.value = _step1Payload['firstname'];
+    _controller.middlename.value = _step1Payload['middlename'];
+    _controller.lastname.value = _step1Payload['lastname'];
     _controller.address.value = _step1Payload['address'];
     _controller.dob.value = _step1Payload['dob'];
     _controller.state.value = _step1Payload['state'];
@@ -224,10 +246,10 @@ class SetupProfile extends StatelessWidget {
   }
 
   _saveStep3ToState() {
-    _controller.school.value = _step3Payload['school'];
+    _controller.school.value = _step3Payload['school'] ?? "";
     _controller.degree.value = _step3Payload['degree'];
-    _controller.fieldStudy.value = _step3Payload['fieldStudy'];
-    _controller.dateGraduated.value = _step3Payload['dateGraduated'];
+    _controller.fieldStudy.value = _step3Payload['fieldStudy'] ?? "";
+    _controller.dateGraduated.value = _step3Payload['dateGraduated'] ?? "";
   }
 
   @override
@@ -263,11 +285,11 @@ class SetupProfile extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(
-                    height: 35.0,
+                    height: 24.0,
                   ),
                   EasyStepper(
                     activeStep: _controller.currentProfileStep.value,
-                    lineLength: MediaQuery.of(context).size.width * 0.36,
+                    lineLength: MediaQuery.of(context).size.width * 0.225,
                     defaultLineColor: Constants.accentColor,
                     borderThickness: 2,
                     // loadingAnimation: 'assets/loading_circle.json',
@@ -327,6 +349,20 @@ class SetupProfile extends StatelessWidget {
                         ),
                         title: '',
                       ),
+                      EasyStep(
+                        customStep: CircleAvatar(
+                          radius: 8,
+                          backgroundColor: Colors.white,
+                          child: CircleAvatar(
+                            radius: 7,
+                            backgroundColor:
+                                _controller.currentProfileStep.value >= 3
+                                    ? Constants.primaryColor
+                                    : Colors.grey.shade400,
+                          ),
+                        ),
+                        title: '',
+                      ),
                     ],
                     onStepReached: (index) =>
                         _controller.currentProfileStep.value += index,
@@ -340,17 +376,21 @@ class SetupProfile extends StatelessWidget {
                         children: [
                           _controller.currentProfileStep.value == 0
                               ? SetupStep1(
-                                  name: "$name",
-                                  email: email,
+                                  name: "${widget.name}",
+                                  email: widget.email,
                                   onStep1Completed: _onStep1Completed,
                                 )
                               : _controller.currentProfileStep.value == 1
                                   ? SetupStep2(
                                       onStep2Completed: _onStep2Completed,
                                     )
-                                  : SetupStep3(
-                                      onStep3Completed: _onStep3Completed,
-                                    ),
+                                  : _controller.currentProfileStep.value == 2
+                                      ? SetupStep3(
+                                          onStep3Completed: _onStep3Completed,
+                                        )
+                                      : SetupStep4(
+                                          onStep4Completed: _onStep4Completed,
+                                        ),
                           const SizedBox(
                             height: 16.0,
                           ),
@@ -362,7 +402,7 @@ class SetupProfile extends StatelessWidget {
                               children: [
                                 TextPoppins(
                                   text:
-                                      _controller.currentProfileStep.value == 2
+                                      _controller.currentProfileStep.value == 3
                                           ? "Submit".toUpperCase()
                                           : "Next".toUpperCase(),
                                   fontSize: 18,
@@ -380,7 +420,7 @@ class SetupProfile extends StatelessWidget {
                             foreColor: Colors.white,
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                if (_controller.currentProfileStep.value < 2) {
+                                if (_controller.currentProfileStep.value < 3) {
                                   if (_controller.currentProfileStep.value ==
                                       0) {
                                     if (_step1Payload['gender']
@@ -417,14 +457,233 @@ class SetupProfile extends StatelessWidget {
                                       Constants.toast(
                                           "Guarantor relationship not selected!");
                                     }
+                                  } else if (_controller
+                                          .currentProfileStep.value ==
+                                      2) {
+                                    _saveStep3ToState();
+
+                                    Future.delayed(
+                                      const Duration(milliseconds: 500),
+                                      () => _controller
+                                          .currentProfileStep.value += 1,
+                                    );
                                   }
                                 } else {
-                                  _saveStep3ToState();
-
-                                  Future.delayed(
-                                    const Duration(milliseconds: 500),
-                                    () => _saveProfile(context),
-                                  );
+                                  if (_controller
+                                      .languagesSpoken.value.isEmpty) {
+                                    Constants.toast(
+                                        "Language(s) you speak not added!");
+                                  } else if (_controller
+                                      .languagesSpeakWrite.value.isEmpty) {
+                                    Constants.toast(
+                                        "Language(s) you speak and write not added!");
+                                  } else {
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (context) {
+                                        return SizedBox(
+                                          height: 256,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.98,
+                                          child: InfoDialog(
+                                            body: Wrap(
+                                              children: [
+                                                Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        color: Constants
+                                                            .primaryColor,
+                                                        borderRadius:
+                                                            BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                            Constants.padding,
+                                                          ),
+                                                          topRight:
+                                                              Radius.circular(
+                                                            Constants.padding,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              16.0),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          const TextInter(
+                                                            text:
+                                                                "Add Profile Picture",
+                                                            fontSize: 16,
+                                                            color: Colors.white,
+                                                          ),
+                                                          InkWell(
+                                                            onTap: () =>
+                                                                Navigator.pop(
+                                                                    context),
+                                                            child: const Icon(
+                                                              Icons
+                                                                  .cancel_outlined,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 8.0),
+                                                    Wrap(
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(16.0),
+                                                          child: Column(
+                                                            children: [
+                                                              const ImageUploader(),
+                                                              const SizedBox(
+                                                                height: 24.0,
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  Expanded(
+                                                                    child:
+                                                                        CustomButton(
+                                                                      bgColor:
+                                                                          Colors
+                                                                              .transparent,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.center,
+                                                                        children: const [
+                                                                          TextInter(
+                                                                            text:
+                                                                                "Skip",
+                                                                            fontSize:
+                                                                                15,
+                                                                            color:
+                                                                                Constants.primaryColor,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      borderColor:
+                                                                          Constants
+                                                                              .primaryColor,
+                                                                      foreColor:
+                                                                          Constants
+                                                                              .primaryColor,
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                        Future
+                                                                            .delayed(
+                                                                          const Duration(
+                                                                              milliseconds: 500),
+                                                                          () =>
+                                                                              _saveProfile(
+                                                                            context,
+                                                                            "",
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                      variant:
+                                                                          "Outlined",
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 16.0,
+                                                                  ),
+                                                                  Expanded(
+                                                                    child:
+                                                                        CustomButton(
+                                                                      bgColor:
+                                                                          Constants
+                                                                              .primaryColor,
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.center,
+                                                                        children: const [
+                                                                          TextInter(
+                                                                            text:
+                                                                                "Continue",
+                                                                            fontSize:
+                                                                                15,
+                                                                            color:
+                                                                                Colors.white,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      borderColor:
+                                                                          Colors
+                                                                              .transparent,
+                                                                      foreColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                        if (_controller
+                                                                            .croppedPic
+                                                                            .value
+                                                                            .isNotEmpty) {
+                                                                          _uploadPhoto();
+                                                                        } else {
+                                                                          Constants.toast(
+                                                                              "You must select a picture to continue");
+                                                                        }
+                                                                      },
+                                                                      variant:
+                                                                          "Filled",
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }
                                 }
                               }
                             },

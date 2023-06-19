@@ -211,7 +211,7 @@ class _ViewJobState extends State<ViewJob> {
                         width: 16.0,
                       ),
                       widget.data['applicants']?.length > 0 &&
-                              widget.manager.getUser()['_id'] ==
+                              widget.manager.getUser()['id'] ==
                                   widget.data['recruiter']['id']
                           ? InkWell(
                               onTap: () {
@@ -325,7 +325,7 @@ class _ViewJobState extends State<ViewJob> {
                   ),
                 ),
               const SizedBox(height: 21.0),
-              widget.data['recruiter']['id'] == widget.manager.getUser()['_id']
+              widget.data['recruiter']['id'] == widget.manager.getUser()['id']
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -448,7 +448,7 @@ class _ViewJobState extends State<ViewJob> {
     _controller.setLoading(true);
     Map _payload = {
       "jobId": "${widget.data['id']}",
-      "userId": "${widget.manager.getUser()['_id']}",
+      "userId": "${widget.manager.getUser()['id']}",
     };
     try {
       final resp = await APIService().saveJob(_payload,

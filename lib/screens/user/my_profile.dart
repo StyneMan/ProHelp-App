@@ -110,16 +110,30 @@ class _UserProfileState extends State<MyProfile> {
                             child: Image.network(
                               widget.manager.getUser()['bio']['image'],
                               fit: BoxFit.cover,
-                              width: Constants.avatarRadius + 24,
-                              height: Constants.avatarRadius + 24,
+                              width: Constants.avatarRadius + 48,
+                              height: Constants.avatarRadius + 48,
                               errorBuilder: (context, url, error) =>
                                   SvgPicture.asset(
                                 "assets/images/personal.svg",
                                 fit: BoxFit.cover,
-                                width: Constants.avatarRadius + 24,
-                                height: Constants.avatarRadius + 24,
+                                width: Constants.avatarRadius + 40,
+                                height: Constants.avatarRadius + 40,
                               ),
                             ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: -Constants.avatarRadius + 24,
+                      left: (Constants.avatarRadius * 2) - 10,
+                      child: ClipOval(
+                        child: Container(
+                          width: 18,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(9),
+                            color: Colors.green,
                           ),
                         ),
                       ),
@@ -142,65 +156,39 @@ class _UserProfileState extends State<MyProfile> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: 4.0),
+                            const SizedBox(height: 6.0),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                TextInter(
-                                  text:
-                                      "${widget.manager.getUser()['bio']['fullname']}"
-                                          .capitalize,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                const SizedBox(
-                                  width: 5.0,
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                RatingBar.builder(
-                                  initialRating:
-                                      "${widget.manager.getUser()['rating']}"
-                                              .contains(".")
-                                          ? widget.manager.getUser()['rating']
-                                          : (widget.manager.getUser()[
-                                                          'rating'] ??
-                                                      0)
-                                                  .toDouble() ??
-                                              0.0,
-                                  // ['rating'] ?? 0.0,
-                                  minRating: 1,
-                                  direction: Axis.horizontal,
-                                  allowHalfRating: true,
-                                  ignoreGestures: true,
-                                  itemCount: 5,
-                                  itemSize: 21,
-                                  itemPadding: const EdgeInsets.symmetric(
-                                      horizontal: 0.0),
-                                  itemBuilder: (context, _) => const Icon(
-                                    Icons.star,
-                                    size: 18,
-                                    color: Colors.amber,
-                                  ),
-                                  onRatingUpdate: (rating) {
-                                    debugPrint("$rating");
-                                  },
-                                ),
+                                // (_controller.userData
+                                //             .value['isDocumentVerified'] == Null ??
+                                //         false)
+                                8 == 8
+                                    ? TextPoppins(
+                                        text: "Not verified",
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Constants.golden,
+                                      )
+                                    : TextPoppins(
+                                        text: "Verified",
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.green,
+                                      ),
                                 const SizedBox(
                                   width: 4.0,
                                 ),
-                                TextPoppins(
-                                  text:
-                                      "(${widget.manager.getUser()['reviews']?.length} reviews)",
-                                  fontSize: 12,
+                                const IconButton(
+                                  onPressed: null,
+                                  icon: Padding(
+                                    padding: EdgeInsets.all(1.2),
+                                    child: SizedBox(),
+                                  ),
                                 ),
                               ],
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -208,7 +196,7 @@ class _UserProfileState extends State<MyProfile> {
                   ),
                 ),
                 const SizedBox(
-                  height: 16.0,
+                  height: 8.0,
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -216,7 +204,61 @@ class _UserProfileState extends State<MyProfile> {
                     vertical: 1.0,
                   ),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      TextPoppins(
+                        text: "${widget.manager.getUser()['bio']['fullname']}"
+                            .capitalize,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      TextPoppins(
+                        text: "${widget.manager.getUser()['profession']}"
+                            .capitalize,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          RatingBar.builder(
+                            initialRating:
+                                "${widget.manager.getUser()['rating']}"
+                                        .contains(".")
+                                    ? widget.manager.getUser()['rating']
+                                    : (widget.manager.getUser()['rating'] ?? 0)
+                                            .toDouble() ??
+                                        0.0,
+                            // ['rating'] ?? 0.0,
+                            minRating: 1,
+                            direction: Axis.horizontal,
+                            allowHalfRating: true,
+                            ignoreGestures: true,
+                            itemCount: 5,
+                            itemSize: 21,
+                            itemPadding:
+                                const EdgeInsets.symmetric(horizontal: 0.0),
+                            itemBuilder: (context, _) => const Icon(
+                              Icons.star,
+                              size: 18,
+                              color: Colors.amber,
+                            ),
+                            onRatingUpdate: (rating) {
+                              debugPrint("$rating");
+                            },
+                          ),
+                          const SizedBox(
+                            width: 4.0,
+                          ),
+                          TextPoppins(
+                            text:
+                                "(${widget.manager.getUser()['reviews']?.length} reviews)",
+                            fontSize: 12,
+                          ),
+                        ],
+                      ),
                       widget.manager.getUser()['accountType'] == "recruiter"
                           ? const SizedBox()
                           : Row(
@@ -227,10 +269,10 @@ class _UserProfileState extends State<MyProfile> {
                                   width: 5.0,
                                 ),
                                 SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.48,
                                   child: TextPoppins(
-                                    text: "${widget.manager.getUser()['address']['city']} ${widget.manager.getUser()['address']['state']}, ${widget.manager.getUser()['address']['country']}".capitalize,
+                                    text:
+                                        "${widget.manager.getUser()['address']['city']} ${widget.manager.getUser()['address']['state']}, ${widget.manager.getUser()['address']['country']}"
+                                            .capitalize,
                                     fontSize: 13,
                                     color: Colors.black54,
                                   ),
@@ -255,9 +297,6 @@ class _UserProfileState extends State<MyProfile> {
                                 ),
                               ],
                             ),
-                      const SizedBox(
-                        height: 8.0,
-                      ),
                       widget.manager.getUser()['accountType'] == "recruiter"
                           ? const SizedBox()
                           : Row(
@@ -599,7 +638,7 @@ class _UserProfileState extends State<MyProfile> {
             ),
           ),
           Positioned(
-            top: 48,
+            top: 36,
             left: 0,
             right: 0,
             child: Row(
@@ -614,9 +653,6 @@ class _UserProfileState extends State<MyProfile> {
                     CupertinoIcons.arrow_left_circle,
                     color: Colors.white,
                   ),
-                ),
-                const SizedBox(
-                  width: 16.0,
                 ),
                 IconButton(
                   onPressed: () {

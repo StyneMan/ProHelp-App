@@ -76,7 +76,7 @@ class _CityCustomDropdownState extends State<CityCustomDropdown> {
         ),
         filled: false,
         hintText: _hint,
-        labelText: _hint,
+        labelText: "Select city",
         focusColor: Constants.accentColor,
         hintStyle: const TextStyle(
           fontFamily: "Poppins",

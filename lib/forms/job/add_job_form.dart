@@ -361,7 +361,7 @@ class _AddJobFormState extends State<AddJobForm> {
           "country": _step1Payload['country'].toString().toLowerCase(),
         },
         "recruiter": {
-          "id": widget.manager.getUser()['_id'],
+          "id": widget.manager.getUser()['id'],
           "name": widget.manager.getUser()['bio']['fullname'],
           "photo": widget.manager.getUser()['bio']['image'],
           "email": widget.manager.getUser()['email'],

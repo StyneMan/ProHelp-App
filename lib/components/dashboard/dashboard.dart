@@ -18,11 +18,14 @@ import 'package:prohelp_app/screens/jobs/jobs.dart';
 import 'package:prohelp_app/screens/messages/messages.dart';
 import 'package:prohelp_app/screens/network/no_internet.dart';
 import 'package:prohelp_app/screens/pros/pros.dart';
+import 'package:prohelp_app/screens/user/my_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Dashboard extends StatefulWidget {
   final PreferenceManager manager;
-  Dashboard({Key? key, required this.manager}) : super(key: key);
+  final bool showProfile;
+  Dashboard({Key? key, required this.manager, this.showProfile = false})
+      : super(key: key);
 
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -183,8 +186,8 @@ class _DashboardState extends State<Dashboard> {
       }).catchError((onError) {
         debugPrint("STATE GET freelancer ERROR >>> $onError");
         if (onError.toString().contains("rk is unreachable")) {
-        _controller.hasInternetAccess.value = false;
-      }
+          _controller.hasInternetAccess.value = false;
+        }
       });
 
       // }
@@ -222,6 +225,12 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     super.initState();
     _initDialog();
+    if (widget.showProfile) {
+      Future.delayed(const Duration(milliseconds: 1200), () {
+        Get.to(MyProfile(manager: widget.manager),
+            transition: Transition.cupertino);
+      });
+    }
     // debugPrint("CURR USER STATE >> ${_controller.userData.value}");
   }
 

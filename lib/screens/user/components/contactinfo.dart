@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
@@ -12,7 +11,6 @@ import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/account/components/wallet.dart';
-import 'package:prohelp_app/screens/payment/pay_to_view.dart';
 
 class ContactInfoContent extends StatelessWidget {
   var guestData;
@@ -43,9 +41,9 @@ class ContactInfoContent extends StatelessWidget {
 
   _addConnection() async {
     Map _payload = {
-      "guestId": "${guestData['_id']}",
+      "guestId": "${guestData['id']}",
       "guestName": "${guestData['bio']['fullname']}",
-      "userId": "${manager.getUser()['_id']}",
+      "userId": "${manager.getUser()['id']}",
     };
 
     try {
@@ -197,15 +195,19 @@ class ContactInfoContent extends StatelessWidget {
                             ),
                           ),
                           builder: (context) => SizedBox(
-                            height: 256,
+                            height: 300,
                             width: MediaQuery.of(context).size.height * 0.84,
                             child: Container(
                               color: Colors.white,
                               padding: const EdgeInsets.all(16.0),
                               child: Column(
                                 children: [
+                                  Image.asset(
+                                    "assets/images/coin_gold.png",
+                                    width: 48
+                                  ),
                                   TextPoppins(
-                                    text: "Info",
+                                    text: "Coin Alert",
                                     fontSize: 21,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -213,7 +215,7 @@ class ContactInfoContent extends StatelessWidget {
                                     height: 16.0,
                                   ),
                                   _controller.userData.value['wallet']
-                                              ['balance'] >
+                                              ['balance'] >=
                                           200
                                       ? Column(
                                           children: [

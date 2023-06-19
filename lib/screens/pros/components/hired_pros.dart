@@ -18,7 +18,7 @@ class HiredProfessionals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return manager.getUser()['savedPros'].isEmpty
+    return manager.getUser()['connections'].isEmpty
         ? Container(
             padding: const EdgeInsets.all(16.0),
             width: double.infinity,
@@ -30,7 +30,7 @@ class HiredProfessionals extends StatelessWidget {
                 children: [
                   Image.asset('assets/images/empty.png'),
                   const Text(
-                    "NO saved professionals found",
+                    "No professionals found",
                     textAlign: TextAlign.center,
                   ),
                 ],

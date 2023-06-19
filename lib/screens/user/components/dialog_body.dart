@@ -162,7 +162,7 @@ class _CupertinoDialogBodyState extends State<CupertinoDialogBody> {
   _init() {
     if (_controller.shouldExitExpEdu.value) {
       Navigator.pop(context);
-    } 
+    }
   }
 
   @override
@@ -189,7 +189,7 @@ class _CupertinoDialogBodyState extends State<CupertinoDialogBody> {
           /// Show full screen by default
           initialChildSize: 1,
           builder: (context, controller) {
-            if(_controller.shouldExitExpEdu.value) {
+            if (_controller.shouldExitExpEdu.value) {
               Navigator.of(context).pop();
             }
             return _CupertinoBottomSheetContainer(
@@ -214,7 +214,8 @@ class _CupertinoDialogBodyState extends State<CupertinoDialogBody> {
                           widget.title,
                           style: CupertinoTheme.of(context)
                               .textTheme
-                              .navLargeTitleTextStyle,
+                              .navTitleTextStyle,
+                          // .navLargeTitleTextStyle,
                         ),
                         trailing: CupertinoButton(
                           padding: const EdgeInsets.all(4.0),

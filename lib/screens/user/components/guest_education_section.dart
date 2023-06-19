@@ -35,64 +35,72 @@ class GuestEducationSection extends StatelessWidget {
             height: 10.0,
           ),
           Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: data.isEmpty
-                  ? []
-                  : [
-                      for (var e = 0; e < data.length; e++)
-                        Column(
-                          children: [
-                            SizedBox(
-                              height: 90,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: 100,
-                                    height: 200,
-                                    child: Image.network(
-                                      data[e]['schoolLogo'],
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) =>
-                                              Image.asset(
-                                        "assets/images/logo_dark.png",
-                                        color: Constants.accentColor,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: data.isEmpty
+                ? []
+                : [
+                    for (var e = 0; e < data.length; e++)
+                      Column(
+                        children: [
+                          data[e]['school'].toString() == 'undefined' ||
+                                  data[e]['school'].toString() == 'null'
+                              ? const SizedBox()
+                              : SizedBox(
+                                  height: 90,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        width: 100,
+                                        height: 200,
+                                        child: Image.network(
+                                          "${data[e]['schoolLogo']}",
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  Image.asset(
+                                            "assets/images/logo_dark.png",
+                                            color: Constants.accentColor,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10.0,
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        TextPoppins(
-                                          text: "${data[e]['school']}",
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
+                                      const SizedBox(
+                                        width: 10.0,
+                                      ),
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            TextPoppins(
+                                              text: "${data[e]['school']}",
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            TextPoppins(
+                                              text:
+                                                  "${data[e]['degree']} ${data[e]['course']}",
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ],
                                         ),
-                                        TextPoppins(
-                                          text:
-                                              "${data[e]['degree']} ${data[e]['course']}",
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            const Divider(),
-                          ],
-                        ),
-                    ])
+                                      )
+                                    ],
+                                  ),
+                                ),
+                          data[e]['school'].toString() == 'undefined' ||
+                                  data[e]['school'].toString() == 'null'
+                              ? const SizedBox()
+                              : const Divider(),
+                        ],
+                      ),
+                  ],
+          ),
         ],
       ),
     );

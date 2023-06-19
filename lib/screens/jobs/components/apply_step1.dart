@@ -66,7 +66,7 @@ class _ApplyJobStep1State extends State<ApplyJobStep1> {
             style: const TextStyle(
               fontWeight: FontWeight.w400,
               color: Colors.black,
-              fontSize: 21,
+              fontSize: 18,
             ),
             children: [
               TextSpan(
@@ -74,7 +74,7 @@ class _ApplyJobStep1State extends State<ApplyJobStep1> {
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
-                  fontSize: 21,
+                  fontSize: 18,
                 ),
               ),
               const TextSpan(

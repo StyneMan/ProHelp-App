@@ -1,20 +1,14 @@
-import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/instance_manager.dart';
-import 'package:http/http.dart' as http;
 import 'package:prohelp_app/components/drawer/custom_drawer.dart';
 import 'package:prohelp_app/components/search/search_delegate.dart';
-import 'package:prohelp_app/components/shimmer/banner_shimmer.dart';
-import 'package:prohelp_app/components/shimmer/product_shimmer.dart';
-import 'package:prohelp_app/components/shimmer/pros_shimmer.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
-import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/pros/components/all_pros.dart';
 import 'package:prohelp_app/screens/pros/components/hired_pros.dart';
@@ -178,7 +172,7 @@ class _ProsState extends State<Pros> with SingleTickerProviderStateMixin {
                             child: TextPoppins(text: "All", fontSize: 13),
                           ),
                           Tab(
-                            child: TextPoppins(text: "Following", fontSize: 13),
+                            child: TextPoppins(text: "Saved", fontSize: 13),
                           ),
                           Tab(
                             child: TextPoppins(

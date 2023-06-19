@@ -164,8 +164,9 @@ class _ManageExperienceState extends State<ManageExperience> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
-                        TextInter(
+                      children: [
+                        Image.asset('assets/images/empty.png'),
+                        const TextInter(
                           text: "No work experience found",
                           fontSize: 16,
                           align: TextAlign.center,

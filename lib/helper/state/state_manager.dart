@@ -76,19 +76,24 @@ class StateController extends GetxController {
   // ****** ALL Clearable State Data ******
   var pickedDocuments = [].obs;
   var documentsModel = [].obs;
+  var languagesSpoken = [].obs;
+  var languagesSpeakWrite = [].obs;
   var accountType = "Boy".obs;
   var currentProfileStep = 0.obs;
   var registrationEmail = "".obs;
   var registrationPhone = "".obs;
 
   // ****** PROFILE SETUP STEP ONE *******
-  var name = "".obs;
+  var firstname = "".obs;
+  var middlename = "".obs;
+  var lastname = "".obs;
   var email = "".obs;
   var phone = "".obs;
   var address = "".obs;
   var gender = "".obs;
   var state = "".obs;
   var dob = "".obs;
+  var experience = "".obs;
   var city = "".obs;
   var country = "".obs;
   var profession = "".obs;
@@ -118,7 +123,7 @@ class StateController extends GetxController {
       debugPrint(e.toString());
     }
   }
-
+ 
   @override
   void onInit() async {
     super.onInit();
@@ -176,7 +181,7 @@ class StateController extends GetxController {
       final myJobsResp = await APIService().getUserJobs(
         accessToken: _token,
         email: map['email'],
-        userId: map['_id'],
+        userId: map['id'],
       );
       debugPrint("MY JOBS RESPONSE >> ${myJobsResp.body}");
 
@@ -255,7 +260,9 @@ class StateController extends GetxController {
     gender.value = "";
     phone.value = "";
     email.value = "";
-    name.value = "";
+    firstname.value = "";
+    middlename.value = "";
+    lastname.value = "";
     profession.value = "";
     city.value = "";
     state.value = "";
@@ -299,94 +306,7 @@ class StateController extends GetxController {
     return _res;
   }
 
-  Future<dynamic> addOrder(
-      var cartItems, resp, userName, email, var userId) async {
-    DateTime currentPhoneDate = DateTime.now(); //DateTime
-    Timestamp myTimeStamp = Timestamp.fromDate(currentPhoneDate); //T
 
-    await FirebaseFirestore.instance
-        .collection("orders")
-        .doc("${currentPhoneDate.microsecondsSinceEpoch}")
-        .set({
-      "id": currentPhoneDate.microsecondsSinceEpoch,
-      "orderNo": resp['data']['reference'],
-      "createdAt": myTimeStamp,
-      "customerId": userId,
-      "customerName": userName,
-      "email": email,
-      "paidAt": resp['data']['paid_at'],
-      "deliveryFee": 1000,
-      // "deliveryInfo": deliveryInfo,
-      "paymentMethod": resp['data']['channel'],
-      "status": "Pending",
-      "items": [],
-      "strItems": cartItems.toString(),
-    });
-
-    return cartItems?.forEach((element) async {
-      // debugPrint("Hi..>>..");
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc("$userId")
-          .update({
-        "orders": FieldValue.arrayUnion([
-          {
-            "orderNo": resp['data']['reference'],
-            "name": element['name'],
-            "price": element['price'],
-            "image": element['image'],
-            "paidAt": resp['data']['paid_at'],
-            "productId": element['productId'],
-            "menu": element['menu'],
-            "cost": element['cost'],
-            "quantity": element['quantity'],
-            // "deliveryInfo": deliveryInfo,
-            "paymentMethod": resp['data']['channel'],
-          }
-        ])
-      });
-
-      await FirebaseFirestore.instance
-          .collection("products")
-          .doc("${element['productId']}")
-          .update({"quantity": FieldValue.increment(-element['quantity'])});
-
-      //Add to orders collection too db
-      FirebaseFirestore.instance
-          .collection("orders")
-          .doc("${currentPhoneDate.microsecondsSinceEpoch}")
-          .update({
-        "items": FieldValue.arrayUnion([
-          {
-            "name": element['name'],
-            "price": element['price'],
-            "image": element['image'],
-            "productId": element['productId'],
-            "menu": element['menu'],
-            "cost": element['cost'],
-            "quantity": element['quantity'],
-          }
-        ])
-      });
-
-      FirebaseFirestore.instance
-          .collection("orders")
-          .doc("${currentPhoneDate.microsecondsSinceEpoch}")
-          .update({
-        "strItems": FieldValue.arrayUnion([
-          {
-            "name": element['name'],
-            "price": element['price'],
-            "image": element['image'],
-            "productId": element['productId'],
-            "menu": element['menu'],
-            "cost": element['cost'],
-            "quantity": element['quantity'],
-          }.toString()
-        ])
-      });
-    });
-  }
 
   void setAccessToken(String token) {
     accessToken.value = token;

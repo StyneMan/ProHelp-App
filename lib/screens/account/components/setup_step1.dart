@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:prohelp_app/components/inputfield/city_dropdown.dart';
 import 'package:prohelp_app/components/inputfield/customdropdown.dart';
-import 'package:prohelp_app/components/inputfield/datefield.dart';
 import 'package:prohelp_app/components/inputfield/dob_datefield.dart';
 import 'package:prohelp_app/components/inputfield/state_dropdown.dart';
 import 'package:prohelp_app/components/inputfield/textfield.dart';
@@ -29,12 +28,14 @@ class SetupStep1 extends StatefulWidget {
 }
 
 class _SetupStep1State extends State<SetupStep1> {
-  final _nameController = TextEditingController();
+  final _fnameController = TextEditingController();
+  final _mnameController = TextEditingController();
+  final _lnameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
   final _dateController = TextEditingController();
-  // final _zipCodeController = TextEditingController();
+  final _experienceController = TextEditingController();
   // final _professionController = TextEditingController();
 
   final _controller = Get.find<StateController>();
@@ -52,8 +53,8 @@ class _SetupStep1State extends State<SetupStep1> {
   _init() {
     setState(() {
       _emailController.text = widget.email;
-      _nameController.text =
-          "${widget.name?.toLowerCase() == 'null' ? "" : widget.name}";
+      // _nameController.text =
+      //     "${widget.name?.toLowerCase() == 'null' ? "" : widget.name}";
     });
   }
 
@@ -61,7 +62,9 @@ class _SetupStep1State extends State<SetupStep1> {
     _selectedGender = val;
     widget.onStep1Completed(
       {
-        "fullname": _nameController.text,
+        "firstname": _fnameController.text,
+        "lastname": _lnameController.text,
+        "middlename": _mnameController.text,
         "email": _emailController.text,
         "phone": _phoneController.text.startsWith("0")
             ? "+234${_phoneController.text.substring(1)}"
@@ -71,6 +74,7 @@ class _SetupStep1State extends State<SetupStep1> {
         "dob": _dateController.text,
         "state": _selectedState,
         "country": _selectedCountry,
+        "experienceYears": _experienceController.text,
         "profession": _selectedProfession,
         "city": _selectedCity.contains("Select") ? "" : _selectedCity,
       },
@@ -90,7 +94,9 @@ class _SetupStep1State extends State<SetupStep1> {
 
     widget.onStep1Completed(
       {
-        "fullname": _nameController.text,
+        "firstname": _fnameController.text,
+        "lastname": _lnameController.text,
+        "middlename": _mnameController.text,
         "email": _emailController.text,
         "phone": _phoneController.text.startsWith("0")
             ? "+234${_phoneController.text.substring(1)}"
@@ -100,6 +106,7 @@ class _SetupStep1State extends State<SetupStep1> {
         "dob": _dateController.text,
         "state": val,
         "country": _selectedCountry,
+        "experienceYears": _experienceController.text,
         "profession": _selectedProfession,
         "city": _selectedCity.contains("Select") ? "" : _selectedCity,
       },
@@ -113,7 +120,9 @@ class _SetupStep1State extends State<SetupStep1> {
 
     widget.onStep1Completed(
       {
-        "fullname": _nameController.text,
+        "firstname": _fnameController.text,
+        "lastname": _lnameController.text,
+        "middlename": _mnameController.text,
         "email": _emailController.text,
         "phone": _phoneController.text.startsWith("0")
             ? "+234${_phoneController.text.substring(1)}"
@@ -125,6 +134,7 @@ class _SetupStep1State extends State<SetupStep1> {
         "country": _selectedCountry,
         "profession": _selectedProfession,
         "city": val,
+        "experienceYears": _experienceController.text,
       },
     );
   }
@@ -136,7 +146,9 @@ class _SetupStep1State extends State<SetupStep1> {
 
     widget.onStep1Completed(
       {
-        "fullname": _nameController.text,
+        "firstname": _fnameController.text,
+        "lastname": _lnameController.text,
+        "middlename": _mnameController.text,
         "email": _emailController.text,
         "phone": _phoneController.text.startsWith("0")
             ? "+234${_phoneController.text.substring(1)}"
@@ -147,6 +159,7 @@ class _SetupStep1State extends State<SetupStep1> {
         "state": _selectedState,
         "country": val,
         "profession": _selectedProfession,
+        "experienceYears": _experienceController.text,
         "city": _selectedCity.contains("Select") ? "" : _selectedCity,
       },
     );
@@ -159,7 +172,9 @@ class _SetupStep1State extends State<SetupStep1> {
 
     widget.onStep1Completed(
       {
-        "fullname": _nameController.text,
+        "firstname": _fnameController.text,
+        "lastname": _lnameController.text,
+        "middlename": _mnameController.text,
         "email": _emailController.text,
         "phone": _phoneController.text.startsWith("0")
             ? "+234${_phoneController.text.substring(1)}"
@@ -170,6 +185,7 @@ class _SetupStep1State extends State<SetupStep1> {
         "state": _selectedState,
         "country": _selectedCountry,
         "profession": val,
+        "experienceYears": _experienceController.text,
         "city": _selectedCity.contains("Select") ? "" : _selectedCity,
       },
     );
@@ -178,9 +194,12 @@ class _SetupStep1State extends State<SetupStep1> {
   @override
   void initState() {
     _init();
-    _nameController.text = _controller.name.value;
+    _fnameController.text = _controller.firstname.value;
+    _mnameController.text = _controller.middlename.value;
+    _lnameController.text = _controller.lastname.value;
     _addressController.text = _controller.address.value;
     _dateController.text = _controller.dob.value;
+    _experienceController.text = _controller.experience.value;
     _selectedGender = _controller.gender.value;
     _phoneController.text = _controller.phone.value;
     _selectedCity = _controller.city.value;
@@ -194,9 +213,12 @@ class _SetupStep1State extends State<SetupStep1> {
   @override
   void didChangeDependencies() {
     _init();
-    _nameController.text = _controller.name.value;
+    _fnameController.text = _controller.firstname.value;
+    _mnameController.text = _controller.middlename.value;
+    _lnameController.text = _controller.lastname.value;
     // _emailController.text = _controller.email.value;
     _addressController.text = _controller.address.value;
+    _experienceController.text = _controller.experience.value;
     _phoneController.text = _controller.phone.value;
     _dateController.text = _controller.dob.value;
     _selectedGender = _controller.gender.value;
@@ -212,7 +234,9 @@ class _SetupStep1State extends State<SetupStep1> {
     _encodedDate = raw;
     widget.onStep1Completed(
       {
-        "fullname": _nameController.text,
+        "firstname": _fnameController.text,
+        "lastname": _lnameController.text,
+        "middlename": _mnameController.text,
         "email": _emailController.text,
         "phone": _phoneController.text.startsWith("0")
             ? "+234${_phoneController.text.substring(1)}"
@@ -223,6 +247,7 @@ class _SetupStep1State extends State<SetupStep1> {
         "state": _selectedState,
         "country": _selectedCountry,
         "profession": _selectedProfession,
+        "experienceYears": _experienceController.text,
         "city": _selectedCity.contains("Select") ? "" : _selectedCity,
       },
     );
@@ -237,12 +262,14 @@ class _SetupStep1State extends State<SetupStep1> {
           height: 16.0,
         ),
         CustomTextField(
-          hintText: "Full Name",
+          hintText: "First name",
           onChanged: (val) {
-            _controller.name.value = val;
+            _controller.firstname.value = val;
             widget.onStep1Completed(
               {
-                "fullname": val,
+                "firstname": val,
+                "lastname": _lnameController.text,
+                "middlename": _mnameController.text,
                 "email": _emailController.text,
                 "phone": _phoneController.text.startsWith("0")
                     ? "+234${_phoneController.text.substring(1)}"
@@ -253,14 +280,89 @@ class _SetupStep1State extends State<SetupStep1> {
                 "state": _selectedState,
                 "country": _selectedCountry,
                 "profession": _selectedProfession,
+                "experienceYears": _experienceController.text,
                 "city": _selectedCity.contains("Select") ? "" : _selectedCity,
               },
             );
           },
-          controller: _nameController,
+          controller: _fnameController,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter your first and last name';
+              return 'Please enter your first name';
+            }
+            return null;
+          },
+          inputType: TextInputType.text,
+          capitalization: TextCapitalization.words,
+        ),
+        const SizedBox(
+          height: 16.0,
+        ),
+        CustomTextField(
+          hintText: "Middle name",
+          onChanged: (val) {
+            _controller.middlename.value = val;
+            widget.onStep1Completed(
+              {
+                "firstname": _fnameController.text,
+                "lastname": _lnameController.text,
+                "middlename": val,
+                "email": _emailController.text,
+                "phone": _phoneController.text.startsWith("0")
+                    ? "+234${_phoneController.text.substring(1)}"
+                    : "+234${_phoneController.text}",
+                "address": _addressController.text,
+                "gender": _selectedGender,
+                "dob": _dateController.text,
+                "state": _selectedState,
+                "country": _selectedCountry,
+                "profession": _selectedProfession,
+                "experienceYears": _experienceController.text,
+                "city": _selectedCity.contains("Select") ? "" : _selectedCity,
+              },
+            );
+          },
+          controller: _mnameController,
+          validator: (value) {
+            // if (value == null || value.isEmpty) {
+            //   return 'Please enter your middle name';
+            // }
+            return null;
+          },
+          inputType: TextInputType.text,
+          capitalization: TextCapitalization.words,
+        ),
+        const SizedBox(
+          height: 16.0,
+        ),
+        CustomTextField(
+          hintText: "Last name",
+          onChanged: (val) {
+            _controller.lastname.value = val;
+            widget.onStep1Completed(
+              {
+                "firstname": _fnameController.text,
+                "lastname": val,
+                "middlename": _mnameController.text,
+                "email": _emailController.text,
+                "phone": _phoneController.text.startsWith("0")
+                    ? "+234${_phoneController.text.substring(1)}"
+                    : "+234${_phoneController.text}",
+                "address": _addressController.text,
+                "gender": _selectedGender,
+                "dob": _dateController.text,
+                "state": _selectedState,
+                "country": _selectedCountry,
+                "profession": _selectedProfession,
+                "experienceYears": _experienceController.text,
+                "city": _selectedCity.contains("Select") ? "" : _selectedCity,
+              },
+            );
+          },
+          controller: _lnameController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your last name';
             }
             return null;
           },
@@ -276,7 +378,9 @@ class _SetupStep1State extends State<SetupStep1> {
           onChanged: (val) {
             widget.onStep1Completed(
               {
-                "fullname": _nameController.text,
+                "firstname": _fnameController.text,
+                "lastname": _lnameController.text,
+                "middlename": _mnameController.text,
                 "email": _emailController.text,
                 "phone": _phoneController.text.startsWith("0")
                     ? "+234${_phoneController.text.substring(1)}"
@@ -287,6 +391,7 @@ class _SetupStep1State extends State<SetupStep1> {
                 "state": _selectedState,
                 "country": _selectedCountry,
                 "profession": _selectedProfession,
+                "experienceYears": _experienceController.text,
                 "city": _selectedCity.contains("Select") ? "" : _selectedCity,
               },
             );
@@ -312,7 +417,9 @@ class _SetupStep1State extends State<SetupStep1> {
           onChanged: (val) {
             widget.onStep1Completed(
               {
-                "fullname": _nameController.text,
+                "firstname": _fnameController.text,
+                "lastname": _lnameController.text,
+                "middlename": _mnameController.text,
                 "email": _emailController.text,
                 "phone": val.startsWith("0")
                     ? "+234${val.substring(1)}"
@@ -323,6 +430,7 @@ class _SetupStep1State extends State<SetupStep1> {
                 "state": _selectedState,
                 "country": _selectedCountry,
                 "profession": _selectedProfession,
+                "experienceYears": _experienceController.text,
                 "city": _selectedCity.contains("Select") ? "" : _selectedCity,
               },
             );
@@ -360,7 +468,7 @@ class _SetupStep1State extends State<SetupStep1> {
         ),
         StateCustomDropdown(
           onSelected: _onStateSelected,
-          hint: "Select state",
+          hint: "State of Origin",
           items: stateCities,
         ),
         const SizedBox(
@@ -379,7 +487,9 @@ class _SetupStep1State extends State<SetupStep1> {
           onChanged: (val) {
             widget.onStep1Completed(
               {
-                "fullname": _nameController.text,
+                "firstname": _fnameController.text,
+                "lastname": _lnameController.text,
+                "middlename": _mnameController.text,
                 "email": _emailController.text,
                 "phone": _phoneController.text.startsWith("0")
                     ? "+234${_phoneController.text.substring(1)}"
@@ -390,6 +500,7 @@ class _SetupStep1State extends State<SetupStep1> {
                 "state": _selectedState,
                 "country": _selectedCountry,
                 "profession": _selectedProfession,
+                "experienceYears": _experienceController.text,
                 "city": _selectedCity.contains("Select") ? "" : _selectedCity,
               },
             );
@@ -406,46 +517,48 @@ class _SetupStep1State extends State<SetupStep1> {
         const SizedBox(
           height: 16.0,
         ),
-        // CustomTextField(
-        //   hintText: "Zip Code",
-        //   onChanged: (val) {
-        //     widget.onStep1Completed(
-        //       {
-        //         "fullname": _nameController.text,
-        //         "email": _emailController.text,
-        //         "phone": _phoneController.text.startsWith("0")
-        //             ? "+234${_phoneController.text.substring(1)}"
-        //             : "+234${_phoneController.text}",
-        //         "zipCode": val,
-        //         'address': _addressController.text,
-        //         "gender": _selectedGender,
-        //         "dob": _dateController.text,
-        //         "state": _selectedState,
-        //         "country": _selectedCountry,
-        //         "profession": _selectedProfession,
-        //         "city": _selectedCity.contains("Select ") ? "" : _selectedCity
-        //       },
-        //     );
-        //   },
-        //   controller: _zipCodeController,
-        //   validator: (value) {
-        //     // if (value == null || value.isEmpty) {
-        //     //   return 'Please enter your zip code';
-        //     // }
-        //     return null;
-        //   },
-        //   inputType: TextInputType.number,
-        // ),
-        // const SizedBox(
-        //   height: 16.0,
-        // ),
         CustomDropdown(
           onSelected: _onProfessionSelected,
           hint: "Profession",
-          items: const ["Programming", "Catering", "Driving", "Baking"],
+          items: const ["Gardening", "Catering", "Driving", "Baking"],
         ),
         const SizedBox(
-          height: 21.0,
+          height: 16.0,
+        ),
+        CustomTextField(
+          hintText: "Years of Experience",
+          onChanged: (val) {
+            widget.onStep1Completed(
+              {
+                "firstname": _fnameController.text,
+                "middlename": _mnameController.text,
+                "lastname": _lnameController.text,
+                "email": _emailController.text,
+                "phone": _phoneController.text.startsWith("0")
+                    ? "+234${_phoneController.text.substring(1)}"
+                    : "+234${_phoneController.text}",
+                "experienceYears": val,
+                'address': _addressController.text,
+                "gender": _selectedGender,
+                "dob": _dateController.text,
+                "state": _selectedState,
+                "country": _selectedCountry,
+                "profession": _selectedProfession,
+                "city": _selectedCity.contains("Select ") ? "" : _selectedCity
+              },
+            );
+          },
+          controller: _experienceController,
+          validator: (value) {
+            // if (value == null || value.isEmpty) {
+            //   return 'Please enter your zip code';
+            // }
+            return null;
+          },
+          inputType: TextInputType.number,
+        ),
+        const SizedBox(
+          height: 16.0,
         ),
         CustomDoBDateField(
           hintText: "Date of birth",

@@ -236,7 +236,7 @@ class _JobsState extends State<Jobs> with SingleTickerProviderStateMixin {
                                         5
                                     ? (_controller.userData.value['wallet']
                                                     ['balance'] ??
-                                                0) >
+                                                0) >=
                                             200
                                         ? () {
                                             Get.to(

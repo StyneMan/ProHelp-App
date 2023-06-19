@@ -31,7 +31,7 @@ class CustomTextArea2 extends StatelessWidget {
     this.endIcon = const SizedBox(),
     this.placeholder = "",
     this.focusNode,
-     this.maxLines = 10,
+    this.maxLines = 10,
     this.maxLength,
   }) : super(key: key);
 
@@ -42,7 +42,7 @@ class CustomTextArea2 extends StatelessWidget {
       cursorColor: Constants.primaryColor,
       controller: controller,
       validator: validator,
-     maxLines: maxLines,
+      maxLines: maxLines,
       maxLength: maxLength,
       enabled: isEnabled,
       focusNode: focusNode,

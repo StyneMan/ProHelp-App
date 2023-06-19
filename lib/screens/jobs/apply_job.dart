@@ -155,14 +155,11 @@ class _ApplyJobState extends State<ApplyJob> {
           ),
           body: Container(
             color: Colors.white,
-            padding: const EdgeInsets.all(18.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(
-                  height: 5.0,
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -177,7 +174,7 @@ class _ApplyJobState extends State<ApplyJob> {
                   ],
                 ),
                 const SizedBox(
-                  height: 10.0,
+                  height: 5.0,
                 ),
                 EasyStepper(
                   activeStep: _controller.currentApplicationStep.value,
@@ -250,9 +247,16 @@ class _ApplyJobState extends State<ApplyJob> {
                   key: _formKey,
                   child: Expanded(
                     child: ListView(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
                       shrinkWrap: true,
                       children: [
+                        const Text(
+                          "NB: You will be charged 200 coins to apply for this job",
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(
+                          height: 16.0,
+                        ),
                         _controller.currentApplicationStep.value == 0
                             ? ApplyJobStep1(
                                 data: widget.data,
