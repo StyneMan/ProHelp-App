@@ -402,244 +402,252 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
                             height: 386,
                             width: MediaQuery.of(context).size.width * 0.98,
                             child: InfoDialog(
-                              body: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              body: Wrap(
                                 children: [
-                                  Container(
-                                    decoration: const BoxDecoration(
-                                      color: Constants.primaryColor,
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(
-                                          Constants.padding,
-                                        ),
-                                        topRight: Radius.circular(
-                                          Constants.padding,
-                                        ),
-                                      ),
-                                    ),
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        const TextInter(
-                                          text: "Add Profile Picture",
-                                          fontSize: 16,
-                                          color: Colors.white,
-                                        ),
-                                        InkWell(
-                                          onTap: () => Navigator.pop(context),
-                                          child: const Icon(
-                                            Icons.cancel_outlined,
-                                            color: Colors.white,
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        decoration: const BoxDecoration(
+                                          color: Constants.primaryColor,
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(
+                                              Constants.padding,
+                                            ),
+                                            topRight: Radius.circular(
+                                              Constants.padding,
+                                            ),
                                           ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8.0),
-                                  Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      children: [
-                                        Stack(
-                                          clipBehavior: Clip.none,
-                                          children: [
-                                            ClipOval(
-                                              child: _isImagePicked
-                                                  ? Container(
-                                                      height: 120,
-                                                      width: 120,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(60),
-                                                      ),
-                                                      child: Image.file(
-                                                        File(_croppedFile),
-                                                        errorBuilder: (context,
-                                                                error,
-                                                                stackTrace) =>
-                                                            ClipOval(
-                                                          child:
-                                                              SvgPicture.asset(
-                                                            "assets/images/personal.svg",
-                                                            fit: BoxFit.cover,
-                                                          ),
-                                                        ),
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    )
-                                                  : Container(
-                                                      height: 128,
-                                                      width: 128,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(64),
-                                                      ),
-                                                      child: Image.network(
-                                                        "kjj",
-                                                        errorBuilder: (context,
-                                                                error,
-                                                                stackTrace) =>
-                                                            ClipOval(
-                                                          child:
-                                                              SvgPicture.asset(
-                                                            "assets/images/personal.svg",
-                                                            fit: BoxFit.cover,
-                                                          ),
-                                                        ),
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                            ),
-                                            Positioned(
-                                              bottom: 12,
-                                              right: -3,
-                                              child: CircleAvatar(
-                                                backgroundColor:
-                                                    Constants.primaryColor,
-                                                child: IconButton(
-                                                  onPressed: () {
-                                                    showBarModalBottomSheet(
-                                                      expand: false,
-                                                      context: context,
-                                                      topControl: ClipOval(
-                                                        child: GestureDetector(
-                                                          onTap: () {
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                          },
-                                                          child: Container(
-                                                            width: 32,
-                                                            height: 32,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color:
-                                                                  Colors.white,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                16,
-                                                              ),
-                                                            ),
-                                                            child: const Center(
-                                                              child: Icon(
-                                                                Icons.close,
-                                                                size: 24,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      backgroundColor:
-                                                          Colors.white,
-                                                      builder: (context) =>
-                                                          SizedBox(
-                                                        height: 175,
-                                                        child: ImgPicker(
-                                                          onCropped:
-                                                              _onImageSelected,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons.add_a_photo_outlined,
-                                                    color: Constants
-                                                        .secondaryColor,
-                                                    size: 24,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
                                         ),
-                                        const SizedBox(
-                                          height: 24.0,
-                                        ),
-                                        Row(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            RoundedButton(
-                                              bgColor: Colors.transparent,
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: const [
-                                                  TextInter(
-                                                    text: "Skip",
-                                                    fontSize: 15,
-                                                    color:
-                                                        Constants.primaryColor,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ],
+                                            const TextInter(
+                                              text: "Add Profile Picture",
+                                              fontSize: 16,
+                                              color: Colors.white,
+                                            ),
+                                            InkWell(
+                                              onTap: () => Navigator.pop(context),
+                                              child: const Icon(
+                                                Icons.cancel_outlined,
+                                                color: Colors.white,
                                               ),
-                                              borderColor:
-                                                  Constants.primaryColor,
-                                              foreColor: Constants.primaryColor,
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                                Future.delayed(
-                                                  const Duration(
-                                                      milliseconds: 500),
-                                                  () => _saveProfile(
-                                                    "",
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8.0),
+                                      Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Column(
+                                          children: [
+                                            Stack(
+                                              clipBehavior: Clip.none,
+                                              children: [
+                                                ClipOval(
+                                                  child: _isImagePicked
+                                                      ? Container(
+                                                          height: 120,
+                                                          width: 120,
+                                                          decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(60),
+                                                          ),
+                                                          child: Image.file(
+                                                            File(_croppedFile),
+                                                            errorBuilder: (context,
+                                                                    error,
+                                                                    stackTrace) =>
+                                                                ClipOval(
+                                                              child:
+                                                                  SvgPicture.asset(
+                                                                "assets/images/personal.svg",
+                                                                fit: BoxFit.cover,
+                                                              ),
+                                                            ),
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        )
+                                                      : Container(
+                                                          height: 128,
+                                                          width: 128,
+                                                          decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(64),
+                                                          ),
+                                                          child: Image.network(
+                                                            "kjj",
+                                                            errorBuilder: (context,
+                                                                    error,
+                                                                    stackTrace) =>
+                                                                ClipOval(
+                                                              child:
+                                                                  SvgPicture.asset(
+                                                                "assets/images/personal.svg",
+                                                                fit: BoxFit.cover,
+                                                              ),
+                                                            ),
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+                                                ),
+                                                Positioned(
+                                                  bottom: 12,
+                                                  right: -3,
+                                                  child: CircleAvatar(
+                                                    backgroundColor:
+                                                        Constants.primaryColor,
+                                                    child: IconButton(
+                                                      onPressed: () {
+                                                        showBarModalBottomSheet(
+                                                          expand: false,
+                                                          context: context,
+                                                          topControl: ClipOval(
+                                                            child: GestureDetector(
+                                                              onTap: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                              child: Container(
+                                                                width: 32,
+                                                                height: 32,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color:
+                                                                      Colors.white,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                    16,
+                                                                  ),
+                                                                ),
+                                                                child: const Center(
+                                                                  child: Icon(
+                                                                    Icons.close,
+                                                                    size: 24,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          backgroundColor:
+                                                              Colors.white,
+                                                          builder: (context) =>
+                                                              SizedBox(
+                                                            height: 175,
+                                                            child: ImgPicker(
+                                                              onCropped:
+                                                                  _onImageSelected,
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                      icon: const Icon(
+                                                        Icons.add_a_photo_outlined,
+                                                        color: Constants
+                                                            .secondaryColor,
+                                                        size: 24,
+                                                      ),
+                                                    ),
                                                   ),
-                                                );
-                                              },
-                                              variant: "Outlined",
+                                                ),
+                                              ],
                                             ),
                                             const SizedBox(
-                                              width: 16.0,
+                                              height: 24.0,
                                             ),
-                                            RoundedButton(
-                                              bgColor: Constants.primaryColor,
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: const [
-                                                  TextInter(
-                                                    text: "Continue",
-                                                    fontSize: 15,
-                                                    color:
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Expanded(
+                                                  child: RoundedButton(
+                                                    bgColor: Colors.transparent,
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment.center,
+                                                      children: const [
+                                                        TextInter(
+                                                          text: "Skip",
+                                                          fontSize: 15,
+                                                          color:
+                                                              Constants.primaryColor,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    borderColor:
                                                         Constants.primaryColor,
-                                                    fontWeight: FontWeight.w500,
+                                                    foreColor: Constants.primaryColor,
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      Future.delayed(
+                                                        const Duration(
+                                                            milliseconds: 500),
+                                                        () => _saveProfile(
+                                                          "",
+                                                        ),
+                                                      );
+                                                    },
+                                                    variant: "Outlined",
                                                   ),
-                                                ],
-                                              ),
-                                              borderColor: Colors.transparent,
-                                              foreColor: Colors.white,
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                                if (_controller.croppedPic.value
-                                                    .isNotEmpty) {
-                                                  _uploadPhoto();
-                                                } else {
-                                                  Constants.toast(
-                                                      "You must select a picture to continue");
-                                                }
-                                              },
-                                              variant: "Filled",
-                                            ),
+                                                ),
+                                                const SizedBox(
+                                                  width: 16.0,
+                                                ),
+                                                Expanded(
+                                                  child: RoundedButton(
+                                                    bgColor: Constants.primaryColor,
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment.center,
+                                                      children: const [
+                                                        TextInter(
+                                                          text: "Continue",
+                                                          fontSize: 15,
+                                                          color:
+                                                              Colors.white,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    borderColor: Colors.transparent,
+                                                    foreColor: Colors.white,
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      if (_controller.croppedPic.value
+                                                          .isNotEmpty) {
+                                                        _uploadPhoto();
+                                                      } else {
+                                                        Constants.toast(
+                                                            "You must select a picture to continue");
+                                                      }
+                                                    },
+                                                    variant: "Filled",
+                                                  ),
+                                                ),
+                                              ],
+                                            )
                                           ],
-                                        )
-                                      ],
-                                    ),
-                                  )
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ],
                               ),
                             ),
