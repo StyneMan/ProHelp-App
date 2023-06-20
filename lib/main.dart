@@ -154,7 +154,7 @@ class _MyAppState extends State<MyApp> {
       final chatResp = await APIService().getUsersChats(
         accessToken: _token,
         email: userMap['email'],
-        userId: userMap['_id'],
+        userId: userMap['id'],
       );
       debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
       if (chatResp.statusCode == 200) {
@@ -214,7 +214,7 @@ class _MyAppState extends State<MyApp> {
         "job-application",
         (data) {
           // debugPrint("DATA FROM JOB APPLICATION >> $data");
-          if (data['job']['recruiter']['id'] == _userMap['_id']) {
+          if (data['job']['recruiter']['id'] == _userMap['id']) {
             //UPDate here
             // debugPrint("TIRGGER HERE -->>");
             _controller.onInit();
@@ -228,7 +228,7 @@ class _MyAppState extends State<MyApp> {
           debugPrint("DATA FROM MESSAGE >> ${(data)}");
           Map<String, dynamic> map = jsonDecode(jsonEncode(data));
           final senderId = map['senderId'];
-          if (senderId != _userMap['_id']) {
+          if (senderId != _userMap['id']) {
             _controller.currentConversation.add(map['message']);
           }
 

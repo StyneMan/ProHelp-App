@@ -309,7 +309,7 @@ class _UpdateEducationFormState extends State<EditEducationForm> {
                   ),
                   Row(
                     children: [
-                      Text("Still Schooling"),
+                      const Text("Still Schooling"),
                       CupertinoSwitch(
                         value: _stillHere,
                         activeColor: Constants.primaryColor,

@@ -411,8 +411,9 @@ class _PayToViewState extends State<PayToView> {
   _fundWallet(ref, status, summary) async {
     Map _payload = {
       "amount": widget.data['amount'],
+      "value": widget.data['value'],
       "reference": ref,
-      "summary": "Fund wallet: $summary",
+      "summary": "Fund wallet with value of ${widget.data['value']} coins: $summary",
       "userId": widget.manager.getUser()['id'],
       "type": "fund_wallet",
       "status": "$status",

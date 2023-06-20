@@ -26,25 +26,25 @@ class _MessageRowState extends State<MessageRow> {
   var socket;
 
   _getOtherUserName() {
-    return widget.manager.getUser()['_id'] == widget.data['initiator']['id']
+    return widget.manager.getUser()['id'] == widget.data['initiator']['id']
         ? widget.data['receiver']['name']
         : widget.data['initiator']['name'];
   }
 
   _getOtherUserPhoto() {
-    return widget.manager.getUser()['_id'] == widget.data['initiator']['id']
+    return widget.manager.getUser()['id'] == widget.data['initiator']['id']
         ? widget.data['receiver']['photo']
         : widget.data['initiator']['photo'];
   }
 
   _getOtherUserId() {
-    return widget.manager.getUser()['_id'] == widget.data['initiator']['id']
+    return widget.manager.getUser()['id'] == widget.data['initiator']['id']
         ? widget.data['receiver']['id']
         : widget.data['initiator']['id'];
   }
 
   _getOtherUserEmail() {
-    return widget.manager.getUser()['_id'] == widget.data['initiator']['id']
+    return widget.manager.getUser()['id'] == widget.data['initiator']['id']
         ? widget.data['receiver']['email']
         : widget.data['initiator']['email'];
   }

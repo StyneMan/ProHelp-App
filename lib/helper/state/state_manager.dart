@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -277,36 +276,6 @@ class StateController extends GetxController {
   setSearchData(var data) {
     searchData.value.add(data);
   }
-
-  Future<bool?> _isItemAlreadyAdded(var data, var userId) async {
-    bool _res = false;
-
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc("${currentUser?.uid}")
-          .get()
-          .then((documentSnapshot) {
-        documentSnapshot.data()!['cart'].forEach((v) {
-          if ((data['id']) == v['productId']) {
-            debugPrint('Added');
-            _res = true;
-          } else {
-            debugPrint('Not Yet Added');
-            _res = false;
-          }
-          // debugPrint("VELO: ${v['price']}");
-          // cart!.add(CartModel.fromJson(v));
-        });
-      });
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-
-    return _res;
-  }
-
-
 
   void setAccessToken(String token) {
     accessToken.value = token;

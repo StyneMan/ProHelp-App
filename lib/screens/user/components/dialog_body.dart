@@ -2,12 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get/instance_manager.dart';
 import 'package:loading_overlay_pro/loading_overlay_pro.dart';
-import 'package:prohelp_app/forms/education/add_edu_form.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
-import 'package:prohelp_app/screens/account/about.dart';
 
 /// Inspiration taken from [modal_bottom_sheet](https://github.com/jamesblasco/modal_bottom_sheet)
 class _CupertinoBottomSheetContainer extends StatelessWidget {

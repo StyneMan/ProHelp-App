@@ -203,17 +203,17 @@ class _ConnectedInfoContentState extends State<ConnectedInfoContent> {
 
     _controller.setLoading(true);
     Map _data = {
-      "userIds": [widget.guestData['_id'], widget.manager.getUser()['_id']],
-      "chatInitiator": widget.manager.getUser()['_id'],
+      "userIds": [widget.guestData['id'], widget.manager.getUser()['id']],
+      "chatInitiator": widget.manager.getUser()['id'],
       "receiver": {
         "name": widget.guestData['bio']['fullname'],
-        "id": widget.guestData['_id'],
+        "id": widget.guestData['id'],
         "photo": widget.guestData['bio']['image'],
         "email": widget.guestData['email'],
       },
       "initiator": {
         "name": widget.manager.getUser()['bio']['fullname'],
-        "id": widget.manager.getUser()['_id'],
+        "id": widget.manager.getUser()['id'],
         "email": widget.manager.getUser()['email'],
         "photo": widget.manager.getUser()['bio']['image'],
       }
@@ -234,7 +234,7 @@ class _ConnectedInfoContentState extends State<ConnectedInfoContent> {
             "subscribe",
             ({
               "room": map['data']['chatId'],
-              "otherUser": widget.guestData['_id']
+              "otherUser": widget.guestData['id']
             }));
 
         Get.to(

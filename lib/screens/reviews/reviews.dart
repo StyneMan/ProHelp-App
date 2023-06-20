@@ -39,7 +39,7 @@ class _ViewReviewsState extends State<ViewReviews> {
         .getReviewsByUserIdStreamed(
             accessToken: widget.manager.getAccessToken(),
             email: widget.manager.getUser()['email'],
-            userId: widget.data['_id'])
+            userId: widget.data['id'])
         .then((resp) => controller.add(resp))
         .catchError((error) => controller.addError(error));
     return controller.stream;
@@ -48,7 +48,7 @@ class _ViewReviewsState extends State<ViewReviews> {
   _checkReviewed() {
     for (var i = 0; i < widget.data['reviews']?.length; i++) {
       if (widget.data['reviews'][i]['reviewer'] ==
-          widget.manager.getUser()['_id']) {
+          widget.manager.getUser()['id']) {
         setState(() {
           _isReviewed = true;
         });
@@ -108,12 +108,12 @@ class _ViewReviewsState extends State<ViewReviews> {
               color: Constants.secondaryColor,
             ),
             centerTitle:
-                (widget.manager.getUser()['_id'] == widget.data['_id'] ||
+                (widget.manager.getUser()['id'] == widget.data['id'] ||
                         _isReviewed)
                     ? true
                     : false,
             actions: [
-              (widget.manager.getUser()['_id'] == widget.data['_id'] ||
+              (widget.manager.getUser()['id'] == widget.data['id'] ||
                       _isReviewed)
                   ? const SizedBox()
                   : TextButton.icon(
@@ -178,7 +178,7 @@ class _ViewReviewsState extends State<ViewReviews> {
                       children: [
                          Image.asset('assets/images/empty.png'),
                         const TextInter(text: "No reviews found", fontSize: 16),
-                        widget.manager.getUser()['_id'] == widget.data['_id']
+                        widget.manager.getUser()['id'] == widget.data['id']
                             ? const SizedBox()
                             : TextButton.icon(
                                 onPressed: () {

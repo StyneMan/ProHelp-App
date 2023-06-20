@@ -5,10 +5,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
-import 'package:get/instance_manager.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
 import 'package:prohelp_app/components/inputfield/textfield.dart';
 import 'package:prohelp_app/components/text_components.dart';
@@ -351,7 +349,7 @@ class _NewDocumentFormState extends State<NewDocumentForm> {
         final uploadTask = storageRef
             .child("docs")
             .child(
-                "${widget.manager.getUser()['_id']}_${_textControllers.elementAt(i).text}")
+                "${widget.manager.getUser()['id']}_${_textControllers.elementAt(i).text}")
             .putFile(file);
 
         uploadTask.then((p0) async {

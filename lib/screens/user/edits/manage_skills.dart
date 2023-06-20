@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:loading_overlay_pro/loading_overlay_pro.dart';
-import 'package:prohelp_app/components/drawer/custom_drawer.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/forms/skills/skills_form.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';

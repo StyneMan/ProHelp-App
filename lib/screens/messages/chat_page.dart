@@ -86,25 +86,25 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   _getOtherUserName() {
-    return widget.manager.getUser()['_id'] == widget.data['initiator']['id']
+    return widget.manager.getUser()['id'] == widget.data['initiator']['id']
         ? widget.data['receiver']['name']
         : widget.data['initiator']['name'];
   }
 
   _getOtherUserPhoto() {
-    return widget.manager.getUser()['_id'] == widget.data['initiator']['id']
+    return widget.manager.getUser()['id'] == widget.data['initiator']['id']
         ? widget.data['receiver']['photo']
         : widget.data['initiator']['photo'];
   }
 
   _getOtherUserId() {
-    return widget.manager.getUser()['_id'] == widget.data['initiator']['id']
+    return widget.manager.getUser()['id'] == widget.data['initiator']['id']
         ? widget.data['receiver']['id']
         : widget.data['initiator']['id'];
   }
 
   _getOtherUserEmail() {
-    return widget.manager.getUser()['_id'] == widget.data['initiator']['id']
+    return widget.manager.getUser()['id'] == widget.data['initiator']['id']
         ? widget.data['receiver']['email']
         : widget.data['initiator']['email'];
   }
@@ -114,7 +114,7 @@ class _ChatPageState extends State<ChatPage> {
     if (socket.disconnected) {
       socket.connect();
       socket.emit('isRead', {
-        'reader': widget.manager.getUser()['_id'],
+        'reader': widget.manager.getUser()['id'],
         'readerName': widget.manager.getUser()['bio']['fullname'],
         'otherUser': _getOtherUserId(),
         'chatId': widget.caller == "profile"
@@ -123,7 +123,7 @@ class _ChatPageState extends State<ChatPage> {
       });
     } else {
       socket.emit('isRead', {
-        'reader': widget.manager.getUser()['_id'],
+        'reader': widget.manager.getUser()['id'],
         'readerName': widget.manager.getUser()['bio']['fullname'],
         'otherUser': _getOtherUserId(),
         'chatId': widget.caller == "profile"
@@ -134,9 +134,9 @@ class _ChatPageState extends State<ChatPage> {
 
     //Already on the chat page
     socket.on('new-message', (data) {
-      if (data['senderId'] != widget.manager.getUser()['_id']) {
+      if (data['senderId'] != widget.manager.getUser()['id']) {
         socket.emit('isRead', {
-          'reader': widget.manager.getUser()['_id'],
+          'reader': widget.manager.getUser()['id'],
           'readerName': widget.manager.getUser()['bio']['fullname'],
           'otherUser': _getOtherUserId(),
           'chatId': widget.caller == "profile"
@@ -360,7 +360,7 @@ class _ChatPageState extends State<ChatPage> {
             },
             itemBuilder: (BuildContext bc) {
               return widget.data['initiator']['id'] ==
-                      widget.manager.getUser()['_id']
+                      widget.manager.getUser()['id']
                   ? [
                       const PopupMenuItem(
                         child: Text("User profile"),
@@ -438,7 +438,7 @@ class _ChatPageState extends State<ChatPage> {
                               itemBuilder: (context, index) {
                                 return _controller.currentConversation
                                             .value[index]['sender']['id'] ==
-                                        widget.manager.getUser()['_id']
+                                        widget.manager.getUser()['id']
                                     ? Align(
                                         alignment: Alignment.centerRight,
                                         child: OwnMessageBox(
@@ -449,7 +449,7 @@ class _ChatPageState extends State<ChatPage> {
                                     : _controller.currentConversation
                                                     .value[index]['receiver']
                                                 ['id'] ==
-                                            widget.manager.getUser()['_id']
+                                            widget.manager.getUser()['id']
                                         ? Align(
                                             alignment: Alignment.centerLeft,
                                             child: GuestMessageBox(
@@ -530,7 +530,7 @@ class _ChatPageState extends State<ChatPage> {
       final chatResp = await APIService().getUsersChats(
         accessToken: _token,
         email: userMap['email'],
-        userId: userMap['_id'],
+        userId: userMap['id'],
       );
       debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
       if (chatResp.statusCode == 200) {
@@ -547,12 +547,12 @@ class _ChatPageState extends State<ChatPage> {
       "message": _inputController.text,
       "chatId": widget.data['chatId'],
       "receiver": {
-        "id": user1Id == widget.manager.getUser()['_id'] ? user2Id : user1Id,
+        "id": user1Id == widget.manager.getUser()['id'] ? user2Id : user1Id,
         "name": _getOtherUserName(),
         "photo": _getOtherUserPhoto(),
       },
       "sender": {
-        "id": widget.manager.getUser()['_id'],
+        "id": widget.manager.getUser()['id'],
         "name": widget.manager.getUser()['bio']['fullname'],
         "photo": widget.manager.getUser()['bio']['image'],
       }
@@ -562,12 +562,12 @@ class _ChatPageState extends State<ChatPage> {
       "message": _inputController.text,
       "chatId": widget.data['_id'],
       "receiver": {
-        "id": user1Id == widget.manager.getUser()['_id'] ? user2Id : user1Id,
+        "id": user1Id == widget.manager.getUser()['id'] ? user2Id : user1Id,
         "name": _getOtherUserName(),
         "photo": _getOtherUserPhoto(),
       },
       "sender": {
-        "id": widget.manager.getUser()['_id'],
+        "id": widget.manager.getUser()['id'],
         "name": widget.manager.getUser()['bio']['fullname'],
         "photo": widget.manager.getUser()['bio']['image'],
       }

@@ -1,14 +1,8 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:prohelp_app/components/shimmer/pros_shimmer.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 
-import 'package:http/http.dart' as http;
-import 'package:prohelp_app/helper/service/api_service.dart';
-import 'package:prohelp_app/screens/pros/components/professional_card.dart';
 
-import 'job_card.dart';
 
 class RecommendedJobs extends StatelessWidget {
   final PreferenceManager manager;

@@ -98,7 +98,6 @@ class _UserProfileState extends State<UserProfile> {
   _checkConnection() {
     for (var element in _controller.userData.value['connections']) {
       if (element == widget.data['id']) {
-        debugPrint("TRUE");
         setState(() {
           _isConnected = true;
         });
@@ -273,9 +272,7 @@ class _UserProfileState extends State<UserProfile> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              // (_controller.userData
-                              //             .value['isDocumentVerified'] == Null ??
-                              //         false)
+                             
                               8 == 8
                                   ? TextPoppins(
                                       text: "Not verified",

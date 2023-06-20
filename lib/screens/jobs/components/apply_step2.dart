@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
@@ -53,9 +52,6 @@ class _ApplyJobStep2State extends State<ApplyJobStep2> {
       _pickedFile = result?.files.first;
       _fileSize = (result?.files.first.size ?? 1000.0) /
           1000; //return size in kilobytes
-
-      // _pickedFiles?.add(result!.files.first.name);
-      // _controller.resumee = result.files.first;
     });
 
     if (((result?.files.first.size ?? 1000.0) / 1000) > 500.0) {

@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:prohelp_app/components/text_components.dart';
-import 'package:prohelp_app/helper/constants/constants.dart';
 
 class GuestMessageBox extends StatefulWidget {
   var data;
@@ -64,7 +63,7 @@ class _GuestMessageBoxState extends State<GuestMessageBox> {
                     children: [
                       Text(
                         _formattedDate,
-                        style: TextStyle(fontSize: 13, color: Colors.black54),
+                        style: const TextStyle(fontSize: 13, color: Colors.black54),
                       ),
                       const SizedBox(
                         width: 8.0,

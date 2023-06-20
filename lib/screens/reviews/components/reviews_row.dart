@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:get/get_utils/get_utils.dart';
-import 'package:get/instance_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prohelp_app/components/inputfield/textarea.dart';
@@ -77,7 +75,7 @@ class ReviewRow extends StatelessWidget {
                           ),
                           TextInter(
                             text:
-                                " ${data['reviewer']['id'] == manager.getUser()['_id'] ? "(You)" : ""}",
+                                " ${data['reviewer']['id'] == manager.getUser()['id'] ? "(You)" : ""}",
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
@@ -146,8 +144,8 @@ class ReviewRow extends StatelessWidget {
                     ],
                   ),
                 ),
-                manager.getUser()['_id'] == data['reviewer']['id'] ||
-                        (manager.getUser()['_id'] == data['userId'] &&
+                manager.getUser()['id'] == data['reviewer']['id'] ||
+                        (manager.getUser()['id'] == data['userId'] &&
                             (data['reply'] == null ||
                                 data['reply'].toString().isEmpty ||
                                 data['reply'].toString() == "{}"))
@@ -391,7 +389,7 @@ class ReviewRow extends StatelessWidget {
                           }
                         },
                         itemBuilder: (BuildContext bc) {
-                          return manager.getUser()['_id'] ==
+                          return manager.getUser()['id'] ==
                                   data['reviewer']['id']
                               ? [
                                   const PopupMenuItem(
@@ -399,7 +397,7 @@ class ReviewRow extends StatelessWidget {
                                     value: 0,
                                   )
                                 ]
-                              : (manager.getUser()['_id'] == data['userId'] &&
+                              : (manager.getUser()['id'] == data['userId'] &&
                                       (data['reply'] == null ||
                                           data['reply'].toString().isEmpty ||
                                           data['reply'].toString() == "{}"))

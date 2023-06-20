@@ -397,8 +397,8 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => widget.data['_id'] ==
-                                          widget.manager.getUser()['_id']
+                                  builder: (context) => widget.data['id'] ==
+                                          widget.manager.getUser()['id']
                                       ? MyProfile(
                                           manager: widget.manager,
                                         )

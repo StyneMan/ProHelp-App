@@ -14,7 +14,6 @@ import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/jobs/apply_job.dart';
 import 'package:prohelp_app/screens/jobs/view_application.dart';
-import 'package:prohelp_app/screens/jobs/viewjob.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ApplicantCard extends StatefulWidget {
@@ -223,7 +222,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
                 ),
                 widget.manager.getUser()['accountType'] == "recruiter" &&
                         widget.data['job']['recruiter']['id'] ==
-                            widget.manager.getUser()['_id']
+                            widget.manager.getUser()['id']
                     ? Expanded(
                         flex: 2,
                         child: CustomButton(
@@ -231,7 +230,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
                               ? Colors.grey
                               : Constants.primaryColor,
                           child: widget.data['job']['recruiter']['id'] ==
-                                  widget.manager.getUser()['_id']
+                                  widget.manager.getUser()['id']
                               ? TextPoppins(
                                   text: widget.data['status'] == "submitted"
                                       ? "Accept"
@@ -374,7 +373,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
                     onPressed: widget.data['status'] != "accepting"
                         ? null
                         : widget.data['job']['recruiter']['id'] !=
-                                widget.manager.getUser()['_id']
+                                widget.manager.getUser()['id']
                             ? () {
                                 //Apply for job here
                                 Get.to(
@@ -422,28 +421,6 @@ class _ApplicantCardState extends State<ApplicantCard> {
                                   ),
                                 );
 
-                                // setState(() {
-                                //   triggerHire = true;
-                                // });
-
-                                // Future.delayed(const Duration(milliseconds: 500),
-                                //     () {
-                                //   Navigator.push(
-                                //     context,
-                                //     MaterialPageRoute(
-                                //       builder: (context) => widget.data['_id'] ==
-                                //               widget.manager.getUser()['_id']
-                                //           ? MyProfile(
-                                //               manager: widget.manager,
-                                //             )
-                                //           : UserProfile(
-                                //               manager: widget.manager,
-                                //               triggerHire: triggerHire,
-                                //               data: widget.data,
-                                //             ),
-                                //     ),
-                                //   );
-                                // });
                               },
                     variant: "Filled",
                   ),

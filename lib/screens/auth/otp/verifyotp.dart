@@ -11,7 +11,6 @@ import 'package:loading_overlay_pro/loading_overlay_pro.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
-import 'package:prohelp_app/components/inputfield/textfield.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/screens/account/setup_profile.dart';
@@ -64,97 +63,22 @@ class _State extends State<VerifyOTP> {
   }
 
   _resendCode() async {
-    // if (widget.caller == "Login") {
-    //   //Show Dialog here for phone number
-    //   // showDialog(
-    //   //   context: context,
-    //   //   builder: (context) => AlertDialog(
-    //   //     content: Column(
-    //   //       children: [
-    //   //         CustomTextField(
-    //   //           hintText: "Phone",
-    //   //           onChanged: (val) {},
-    //   //           controller: _phoneController,
-    //   //           validator: (value) {
-    //   //             if (value == null || value.isEmpty) {
-    //   //               return 'Please enter your phone';
-    //   //             }
-    //   //             if (value.toString().length < 11) {
-    //   //               return 'Please enter a valid email';
-    //   //             }
-    //   //             return null;
-    //   //           },
-    //   //           inputType: TextInputType.phone,
-    //   //         ),
-    //   //         const SizedBox(
-    //   //           height: 12.0,
-    //   //         ),
-    //   //         RoundedButton(
-    //   //           bgColor: Constants.primaryColor,
-    //   //           child: TextPoppins(text: "CONTINUE", fontSize: 16),
-    //   //           borderColor: Colors.transparent,
-    //   //           foreColor: Colors.white,
-    //   //           onPressed: () async {
-    //   //             _controller.setLoading(true);
-    //   //             try {
-    //   //               FirebaseAuth _auth = FirebaseAuth.instance;
-    //   //               await _auth.verifyPhoneNumber(
-    //   //                 phoneNumber: "${widget.phone}",
-    //   //                 verificationCompleted: (PhoneAuthCredential credential) {
-    //   //                   _controller.setLoading(false);
-    //   //                   // resp.user!.updatePhoneNumber(credential);
-    //   //                 },
-    //   //                 verificationFailed: (FirebaseAuthException e) {
-    //   //                   _controller.setLoading(false);
-    //   //                   if (e.code == 'invalid-phone-number') {
-    //   //                     debugPrint('The provided phone number is not valid.');
-    //   //                     Constants.toast(
-    //   //                         'The provided phone number is not valid.');
-    //   //                   } else if (e.code == "expired-action-code") {
-    //   //                     Constants.toast('The code has expired. Try again.');
-    //   //                   } else if (e.code == "invalid-action-code") {
-    //   //                     Constants.toast('Incorrect code entered.');
-    //   //                   } else {
-    //   //                     debugPrint("${e.code} - ${e.message}");
-    //   //                     Constants.toast('${e.message}');
-    //   //                   }
-    //   //                 },
-    //   //                 codeSent: (String verificationId, int? resendToken) {
-    //   //                   _controller.setLoading(false);
-    //   //                   //show dialog to take input from the user
-    //   //                 },
-    //   //                 codeAutoRetrievalTimeout: (String verificationId) {
-    //   //                   _controller.setLoading(false);
-    //   //                 },
-    //   //               );
-
-    //   //               _controller.setLoading(false);
-    //   //             } catch (e) {
-    //   //               _controller.setLoading(false);
-    //   //             }
-    //   //           },
-    //   //           variant: "Filled",
-    //   //         ),
-    //   //       ],
-    //   //     ),
-    //   //   ),
-    //   // );
-    // } else {
-      _controller.setLoading(true);
-      try {
-        final resp = await APIService().resendOTP(email: widget.email, type: "register");
-        debugPrint("RESEND OTP RESPONSE:: ${resp.body}");
-        _controller.setLoading(false);
-        if (resp.statusCode == 200) {
-          Map<String, dynamic> map = jsonDecode(resp.body);
-          Constants.toast(map['message']);
-        } else {
-          Map<String, dynamic> map = jsonDecode(resp.body);
-          Constants.toast(map['message']);
-        }
-      } catch (e) {
-        _controller.setLoading(false);
+    _controller.setLoading(true);
+    try {
+      final resp =
+          await APIService().resendOTP(email: widget.email, type: "register");
+      debugPrint("RESEND OTP RESPONSE:: ${resp.body}");
+      _controller.setLoading(false);
+      if (resp.statusCode == 200) {
+        Map<String, dynamic> map = jsonDecode(resp.body);
+        Constants.toast(map['message']);
+      } else {
+        Map<String, dynamic> map = jsonDecode(resp.body);
+        Constants.toast(map['message']);
       }
+    } catch (e) {
+      _controller.setLoading(false);
+    }
     // }
   }
 
@@ -190,14 +114,12 @@ class _State extends State<VerifyOTP> {
         } else {
           Navigator.of(context).pushReplacement(
             PageTransition(
-              type: PageTransitionType.size,
-              alignment: Alignment.bottomCenter,
-              child: NewPassword(
-                      manager: _manager!,
-                      email: "${widget.email}",
-                    )
-                  
-            ),
+                type: PageTransitionType.size,
+                alignment: Alignment.bottomCenter,
+                child: NewPassword(
+                  manager: _manager!,
+                  email: "${widget.email}",
+                )),
           );
         }
       } else {
@@ -414,7 +336,7 @@ class _State extends State<VerifyOTP> {
                   borderColor: Colors.transparent,
                   foreColor: Colors.white,
                   onPressed: () {
-                      _linkAccount();
+                    _linkAccount();
                   },
                   variant: "Filled",
                 ),

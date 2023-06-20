@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:get/instance_manager.dart';
-import 'package:prohelp_app/components/inputfield/city_dropdown.dart';
 import 'package:prohelp_app/components/inputfield/customdropdown.dart';
-import 'package:prohelp_app/components/inputfield/state_dropdown.dart';
 import 'package:prohelp_app/components/inputfield/textfield.dart';
 import 'package:prohelp_app/components/text_components.dart';
-import 'package:prohelp_app/data/state/statesAndCities.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 

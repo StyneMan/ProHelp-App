@@ -6,8 +6,6 @@ import 'package:get/get.dart';
 import 'package:loading_overlay_pro/loading_overlay_pro.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prohelp_app/components/text_components.dart';
-import 'package:prohelp_app/forms/education/add_edu_form.dart';
-import 'package:prohelp_app/forms/education/edit_edu_form.dart';
 import 'package:prohelp_app/forms/experience/add_experience_form.dart';
 import 'package:prohelp_app/forms/experience/edit_experience_form.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
@@ -15,7 +13,6 @@ import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 
-import '../components/dialog_body.dart';
 
 class ManageExperience extends StatefulWidget {
   final List experience;

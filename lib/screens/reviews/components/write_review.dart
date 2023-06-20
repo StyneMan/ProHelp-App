@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
-import 'package:get/get_utils/get_utils.dart';
-import 'package:get/instance_manager.dart';
 import 'package:prohelp_app/components/button/custombutton.dart';
 import 'package:prohelp_app/components/inputfield/textarea.dart';
 import 'package:prohelp_app/components/text_components.dart';
@@ -164,7 +162,8 @@ class _WriteReviewState extends State<WriteReview> {
                             _createReview();
                           } else {
                             Constants.toast(
-                                "Rating and comment are both required");
+                              "Rating and comment are both required",
+                            );
                           }
                         },
                   variant: "Filled",
@@ -182,9 +181,9 @@ class _WriteReviewState extends State<WriteReview> {
     Map _payload = {
       "rating": "$_rating".contains(".") ? _rating : _rating.toDouble(),
       "comment": _reviewController.text,
-      "userId": widget.data['_id'],
+      "userId": widget.data['id'],
       "reviewer": {
-        "id": widget.manager.getUser()['_id'],
+        "id": widget.manager.getUser()['id'],
         "name": widget.manager.getUser()['bio']['fullname'],
         "photo": widget.manager.getUser()['bio']['image'],
         "email": widget.manager.getUser()['email'],

@@ -197,14 +197,14 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
         _controller.onInit();
 
         _controller.clearTempProfile();
-        socket.emit('identity', map['data']["_id"]);
+        socket.emit('identity', map['data']["id"]);
 
         Navigator.of(context).pushReplacement(
           PageTransition(
             type: PageTransitionType.size,
             alignment: Alignment.bottomCenter,
             child: AccountSuccess(
-              firstname: "${map["data"]["bio"]["fullname"]}".split(" ")[0],
+              firstname: "${map["data"]["bio"]["firstname"]}",
               accountType: "recruiter",
             ),
           ),

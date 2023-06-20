@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:easy_stepper/easy_stepper.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:loading_overlay_pro/loading_overlay_pro.dart';
@@ -389,7 +388,7 @@ class _ApplyJobState extends State<ApplyJob> {
       final uploadTask = storageRef
           .child("resumes")
           .child(
-              "${widget.manager.getUser()['_id']}_resume${_step2Payload['pickedFile']?.extension}")
+              "${widget.manager.getUser()['id']}_resume${_step2Payload['pickedFile']?.extension}")
           .putFile(file);
 
       uploadTask.then((p0) async {
@@ -429,7 +428,7 @@ class _ApplyJobState extends State<ApplyJob> {
           "jobId": widget.data['id'],
           "job": widget.data,
           "applicant": {
-            "id": widget.manager.getUser()['_id'],
+            "id": widget.manager.getUser()['id'],
             "email": _step1Payload['email'],
             "phone": _step1Payload['phone'],
             "name": widget.manager.getUser()['bio']['fullname'],

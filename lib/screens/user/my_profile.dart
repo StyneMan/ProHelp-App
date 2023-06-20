@@ -37,8 +37,6 @@ class _UserProfileState extends State<MyProfile> {
   @override
   void initState() {
     super.initState();
-    // debugPrint("SKILLS CHECKING:: >> ${widget.manager.getUser()['skills']}");
-    // debugPrint("USER STATE:: >> ${_controller.userData.value['bio']}");
   }
 
   @override

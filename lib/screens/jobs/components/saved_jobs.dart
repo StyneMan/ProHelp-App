@@ -7,7 +7,6 @@ import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:http/http.dart' as http;
 import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/screens/jobs/components/job_card.dart';
-import 'package:prohelp_app/screens/pros/components/professional_card.dart';
 
 class SavedJobs extends StatelessWidget {
   final PreferenceManager manager;

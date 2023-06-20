@@ -43,7 +43,7 @@ class _JobCardState extends State<JobCard> {
     _controller.setLoading(true);
     Map _payload = {
       "jobId": "${widget.data['id']}",
-      "userId": "${widget.manager.getUser()['_id']}",
+      "userId": "${widget.manager.getUser()['id']}",
     };
     try {
       final resp = await APIService().saveJob(_payload,
@@ -295,7 +295,7 @@ class _JobCardState extends State<JobCard> {
                           _saveJob();
                         },
                   icon: widget.data['recruiter']['id'] ==
-                          widget.manager.getUser()['_id']
+                          widget.manager.getUser()['id']
                       ? const Icon(
                           CupertinoIcons.delete_simple,
                           color: Colors.grey,
@@ -396,7 +396,7 @@ class _JobCardState extends State<JobCard> {
                               ? Colors.grey
                               : Constants.primaryColor,
                           child: widget.data['recruiter']['id'] ==
-                                  widget.manager.getUser()['_id']
+                                  widget.manager.getUser()['id']
                               ? TextPoppins(
                                   text: "Close",
                                   fontSize: 16,
@@ -534,7 +534,7 @@ class _JobCardState extends State<JobCard> {
                             ? Colors.grey
                             : Constants.primaryColor,
                     child: widget.data['recruiter']['id'] ==
-                            widget.manager.getUser()['_id']
+                            widget.manager.getUser()['id']
                         ? TextPoppins(
                             text: "Edit",
                             fontSize: 16,
@@ -555,7 +555,7 @@ class _JobCardState extends State<JobCard> {
                             _isApplied
                         ? null
                         : widget.data['recruiter']['id'] !=
-                                widget.manager.getUser()['_id']
+                                widget.manager.getUser()['id']
                             ? (_controller.userData.value['wallet']
                                             ['balance'] ??
                                         0) >=
@@ -616,28 +616,7 @@ class _JobCardState extends State<JobCard> {
                                   ),
                                 );
 
-                                // setState(() {
-                                //   triggerHire = true;
-                                // });
-
-                                // Future.delayed(const Duration(milliseconds: 500),
-                                //     () {
-                                //   Navigator.push(
-                                //     context,
-                                //     MaterialPageRoute(
-                                //       builder: (context) => widget.data['_id'] ==
-                                //               widget.manager.getUser()['_id']
-                                //           ? MyProfile(
-                                //               manager: widget.manager,
-                                //             )
-                                //           : UserProfile(
-                                //               manager: widget.manager,
-                                //               triggerHire: triggerHire,
-                                //               data: widget.data,
-                                //             ),
-                                //     ),
-                                //   );
-                                // });
+                    
                               },
                     variant: "Filled",
                   ),
@@ -656,7 +635,7 @@ class _JobCardState extends State<JobCard> {
       final resp = await APIService().deleteJob(
           accessToken: widget.manager.getAccessToken(),
           email: widget.manager.getUser()['email'],
-          jobId: widget.data['_id']);
+          jobId: widget.data['id']);
       _controller.setLoading(false);
       debugPrint("DEL JOBS RESPONSE ==> ${resp.body}");
       if (resp.statusCode == 200) {
@@ -676,7 +655,7 @@ class _JobCardState extends State<JobCard> {
       final resp = await APIService().updateJob(
         accessToken: widget.manager.getAccessToken(),
         email: widget.manager.getUser()['email'],
-        jobId: widget.data['_id'],
+        jobId: widget.data['id'],
         payload: _payload,
       );
 

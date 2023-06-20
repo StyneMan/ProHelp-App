@@ -64,7 +64,7 @@ class _PaymentSuccessState extends State<PaymentSuccess> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF7E8D2),
+      backgroundColor: const Color(0xFFF7E8D2),
       body: SizedBox(
         width: double.infinity,
         height: double.infinity,

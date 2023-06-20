@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:prohelp_app/components/button/roundedbutton.dart';
-import 'package:prohelp_app/components/inputfield/lineddropdown.dart';
-import 'package:prohelp_app/components/inputfield/llinedtextfield.dart';
-import 'package:prohelp_app/components/text_components.dart';
-import 'package:prohelp_app/data/banks/banks.dart';
-import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 
 class Bank extends StatefulWidget {

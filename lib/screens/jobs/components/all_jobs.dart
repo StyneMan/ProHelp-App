@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/jobs/components/job_card.dart';
-import 'package:prohelp_app/screens/pros/components/professional_card.dart';
 
 class AllJobs extends StatelessWidget {
   final PreferenceManager manager;

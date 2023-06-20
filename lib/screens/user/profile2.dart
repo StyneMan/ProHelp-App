@@ -6,7 +6,6 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:prohelp_app/components/button/custombutton.dart';
-import 'package:prohelp_app/components/button/roundedbutton.dart';
 import 'package:prohelp_app/components/dialog/info_dialog.dart';
 import 'package:prohelp_app/components/drawer/custom_drawer.dart';
 import 'package:prohelp_app/components/shimmer/banner_shimmer.dart';
@@ -15,11 +14,13 @@ import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
+import 'package:prohelp_app/helper/socket/socket_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/reviews/reviews.dart';
 import 'package:prohelp_app/screens/user/edits/manage_connections.dart';
 import 'package:http/http.dart' as http;
 
+import 'components/block_report.dart';
 import 'components/conectedinfo.dart';
 import 'components/contactinfo.dart';
 import 'components/guest_education_section.dart';
@@ -55,7 +56,7 @@ class _UserProfile2State extends State<UserProfile2> {
     Map _payload = {
       "guestId": widget.userId,
       "guestName": widget.name,
-      "userId": "${widget.manager.getUser()['_id']}",
+      "userId": "${widget.manager.getUser()['id']}",
     };
     try {
       final resp = await APIService().likeUser(_payload,
@@ -108,11 +109,17 @@ class _UserProfile2State extends State<UserProfile2> {
     }
   }
 
+  _checkOnlineStatus() {
+    final socket = SocketManager().socket;
+    socket.emit('checkOnline', _controller.userData.value['id']);
+  }
+
   @override
   void initState() {
     super.initState();
     _checkLiked();
     _checkConnection();
+    _checkOnlineStatus();
   }
 
   @override
@@ -234,7 +241,7 @@ class _UserProfile2State extends State<UserProfile2> {
                         ),
                       ),
                       Positioned(
-                        left: 16,
+                        left: 12,
                         bottom: -Constants.avatarRadius,
                         child: CircleAvatar(
                           backgroundColor: Constants.secondaryColor,
@@ -255,24 +262,40 @@ class _UserProfile2State extends State<UserProfile2> {
                               child: Image.network(
                                 widget.image,
                                 fit: BoxFit.cover,
-                                width: Constants.avatarRadius + 64,
-                                height: Constants.avatarRadius + 64,
+                                width: Constants.avatarRadius + 48,
+                                height: Constants.avatarRadius + 48,
                                 errorBuilder: (context, error, stackTrace) =>
                                     SvgPicture.asset(
                                   "assets/images/personal_icon.svg",
-                                  width: Constants.avatarRadius + 64,
-                                  height: Constants.avatarRadius + 64,
+                                  width: Constants.avatarRadius + 40,
+                                  height: Constants.avatarRadius + 40,
                                 ),
                               ),
                             ),
                           ),
                         ),
                       ),
+                      Positioned(
+                        bottom: -Constants.avatarRadius + 24,
+                        left: (Constants.avatarRadius * 2) - 10,
+                        child: ClipOval(
+                          child: Container(
+                            width: 18,
+                            height: 18,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(9),
+                              color: Colors.green,
+                            ),
+                          ),
+                        ),
+                      )
                     ],
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0, vertical: 2.0),
+                      horizontal: 8.0,
+                      vertical: 2.0,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -292,27 +315,33 @@ class _UserProfile2State extends State<UserProfile2> {
                                     MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Wrap(
-                                    children: [
-                                      TextInter(
-                                        text:
-                                            "${map['data']['bio']['fullname']}"
-                                                .capitalize,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ],
-                                  ),
+                                  // Wrap(
+                                  //   children: [
+                                  //     TextInter(
+                                  //       text:
+                                  //           "${map['data']['bio']['fullname']}"
+                                  //               .capitalize,
+                                  //       fontSize: 20,
+                                  //       fontWeight: FontWeight.w600,
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                  8 == 8
+                                      ? TextPoppins(
+                                          text: "Not verified",
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Constants.golden,
+                                        )
+                                      : TextPoppins(
+                                          text: "Verified",
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.green,
+                                        ),
                                   const SizedBox(
                                     width: 4.0,
                                   ),
-                                  // InkWell(
-                                  //   onTap: () {},
-                                  //   child: const Icon(
-                                  //     CupertinoIcons.heart,
-                                  //     size: 18,
-                                  //   ),
-                                  // ),
                                   InkWell(
                                     onTap: () => _likeUser(),
                                     child: Padding(
@@ -328,9 +357,7 @@ class _UserProfile2State extends State<UserProfile2> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(
-                                height: 10.0,
-                              ),
+
                               // SizedBox(
                               //   width: MediaQuery.of(context).size.width * 0.6,
                               //   child: TextPoppins(
@@ -374,130 +401,174 @@ class _UserProfile2State extends State<UserProfile2> {
                               //     ),
                               //   ],
                               // ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      RatingBar.builder(
-                                        initialRating: 4, //widget.data.rating,
-                                        minRating: 1,
-                                        direction: Axis.horizontal,
-                                        allowHalfRating: true,
-                                        ignoreGestures: true,
-                                        itemCount: 5,
-                                        itemSize: 21,
-                                        itemPadding: const EdgeInsets.symmetric(
-                                            horizontal: 0.0),
-                                        itemBuilder: (context, _) => const Icon(
-                                          Icons.star,
-                                          size: 18,
-                                          color: Colors.amber,
-                                        ),
-                                        onRatingUpdate: (rating) {
-                                          debugPrint("$rating");
-                                        },
-                                      ),
-                                      const SizedBox(
-                                        width: 4.0,
-                                      ),
-                                      TextPoppins(
-                                        text:
-                                            "(${map['reviews']?.length} reviews)",
-                                        fontSize: 12,
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    width: 4.0,
-                                  ),
-                                  InkWell(
-                                    onTap: () {
-                                      Get.to(
-                                        ViewReviews(
-                                          manager: widget.manager,
-                                          data: map,
-                                        ),
-                                        transition: Transition.cupertino,
-                                      );
-                                    },
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(4.0),
-                                      child: Icon(
-                                        CupertinoIcons.forward,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              )
                             ],
                           ),
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(height: 21.0),
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 1.0),
+                      horizontal: 16.0,
+                      vertical: 1.0,
+                    ),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        TextPoppins(
+                          text: "${map['data']['bio']['fullname']}".capitalize,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        TextPoppins(
+                          text: "${map['data']['profession']}".capitalize,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            TextPoppins(
-                              text: "${map['data']['address']['state']},  ${map['data']['address']['country']}".capitalize,
-                              fontSize: 13,
-                              color: Colors.black54,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                RatingBar.builder(
+                                  initialRating:
+                                      "${map['data']['rating']}".contains(".")
+                                          ? map['data']['rating']
+                                          : (map['data']['rating'] ?? 0)
+                                                  .toDouble() ??
+                                              0.0, //map['data'].rating,
+                                  minRating: 1,
+                                  direction: Axis.horizontal,
+                                  allowHalfRating: true,
+                                  ignoreGestures: true,
+                                  itemCount: 5,
+                                  itemSize: 21,
+                                  itemPadding: const EdgeInsets.symmetric(
+                                      horizontal: 0.0),
+                                  itemBuilder: (context, _) => const Icon(
+                                    Icons.star,
+                                    size: 18,
+                                    color: Colors.amber,
+                                  ),
+                                  onRatingUpdate: (rating) {
+                                    debugPrint("$rating");
+                                  },
+                                ),
+                                const SizedBox(
+                                  width: 4.0,
+                                ),
+                                TextPoppins(
+                                  text:
+                                      "(${map['data']['reviews']?.length} reviews)",
+                                  fontSize: 12,
+                                ),
+                              ],
                             ),
                             const SizedBox(
-                              width: 5.0,
+                              width: 4.0,
                             ),
-                            const Icon(
-                              Icons.circle,
-                              size: 6,
-                              color: Colors.black87,
-                            ),
-                            const SizedBox(
-                              width: 5.0,
-                            ),
-                            TextPoppins(
-                              text:
-                                  " ${map['data']['connections'].length} Connections",
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: Constants.primaryColor,
-                            ),
+                            InkWell(
+                              onTap: () {
+                                Get.to(
+                                  ViewReviews(
+                                    manager: widget.manager,
+                                    data: map['data'],
+                                  ),
+                                  transition: Transition.cupertino,
+                                );
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.all(4.0),
+                                child: Icon(
+                                  CupertinoIcons.forward,
+                                ),
+                              ),
+                            )
                           ],
                         ),
+                        map['data']['accountType'] == "recruiter"
+                            ? const SizedBox()
+                            : Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  TextPoppins(
+                                    text:
+                                        "${map['data']['address']['state']}, ${map['data']['address']['country']}"
+                                            .capitalize,
+                                    fontSize: 13,
+                                    color: Colors.black54,
+                                  ),
+                                  const SizedBox(
+                                    width: 5.0,
+                                  ),
+                                  const SizedBox(
+                                    width: 5.0,
+                                  ),
+                                  TextPoppins(
+                                    text:
+                                        " ${map['data']['connections']?.length} Connections",
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    color: Constants.primaryColor,
+                                  ),
+                                  const SizedBox(
+                                    width: 6.0,
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      Get.to(
+                                        ManageConnections(
+                                          caller: "guest",
+                                          data: map['data'],
+                                          connections: map['data']
+                                              ['connections'],
+                                          manager: widget.manager,
+                                        ),
+                                        transition: Transition.cupertino,
+                                      );
+                                    },
+                                    child: const Text(
+                                      "See more",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        decoration: TextDecoration.underline,
+                                        fontStyle: FontStyle.italic,
+                                        fontWeight: FontWeight.w500,
+                                        color: Constants.primaryColor,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
                         const SizedBox(
                           height: 8.0,
                         ),
                         Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              for (var e = 0;
-                                  e < map['data']['skills']?.length;
-                                  e++)
-                                Container(
-                                  padding: const EdgeInsets.all(2.0),
-                                  margin: const EdgeInsets.all(1.5),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    borderRadius: BorderRadius.circular(4.0),
-                                  ),
-                                  child: TextPoppins(
-                                    text: map['data']['skills'][e]['name'],
-                                    fontSize: 12,
-                                  ),
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            for (var e = 0;
+                                e < map['data']['skills']?.length;
+                                e++)
+                              Container(
+                                padding: const EdgeInsets.all(2.0),
+                                margin: const EdgeInsets.all(1.5),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(4.0),
                                 ),
-                            ]),
+                                child: TextPoppins(
+                                  text: map['data']['skills'][e]['name'],
+                                  fontSize: 12,
+                                ),
+                              ),
+                          ],
+                        ),
                         const SizedBox(
                           height: 8.0,
                         ),
@@ -537,6 +608,7 @@ class _UserProfile2State extends State<UserProfile2> {
                                   onPressed: () {
                                     showDialog(
                                       context: context,
+                                      barrierDismissible: false,
                                       builder: (context) {
                                         return SizedBox(
                                           height: 200,
@@ -565,35 +637,57 @@ class _UserProfile2State extends State<UserProfile2> {
                               const SizedBox(
                                 width: 3.0,
                               ),
-                              Expanded(
-                                child: CustomButton(
-                                  borderRadius: 36.0,
-                                  paddingY: 1.0,
-                                  bgColor: Colors.grey.shade400,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.flag,
-                                        size: 14,
+                              !_isConnected
+                                  ? const SizedBox()
+                                  : Expanded(
+                                      child: CustomButton(
+                                        borderRadius: 36.0,
+                                        paddingY: 1.0,
+                                        bgColor: Colors.grey.shade400,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            const Icon(
+                                              Icons.flag,
+                                              size: 14,
+                                            ),
+                                            const SizedBox(
+                                              width: 5.0,
+                                            ),
+                                            TextPoppins(
+                                              text: "Report/Block",
+                                              fontSize: 11,
+                                            )
+                                          ],
+                                        ),
+                                        borderColor: Colors.transparent,
+                                        foreColor: Colors.black,
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (context) {
+                                              return SizedBox(
+                                                height: 200,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.98,
+                                                child: InfoDialog(
+                                                  body: BlockReport(
+                                                    data: map['data'],
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
+                                        variant: "Filled",
                                       ),
-                                      const SizedBox(
-                                        width: 5.0,
-                                      ),
-                                      TextPoppins(
-                                        text: "Report/Block",
-                                        fontSize: 11,
-                                      )
-                                    ],
-                                  ),
-                                  borderColor: Colors.transparent,
-                                  foreColor: Colors.black,
-                                  onPressed: () {},
-                                  variant: "Filled",
-                                ),
-                              ),
+                                    ),
                               const SizedBox(
                                 width: 3.0,
                               ),
@@ -613,6 +707,7 @@ class _UserProfile2State extends State<UserProfile2> {
                                             ? CupertinoIcons.person_3_fill
                                             : Icons.edit_document,
                                         size: 14,
+                                        color: Colors.white,
                                       ),
                                       const SizedBox(
                                         width: 5.0,
@@ -639,11 +734,13 @@ class _UserProfile2State extends State<UserProfile2> {
                                               manager: widget.manager,
                                               data: map['data'],
                                             ),
+                                            transition: Transition.cupertino,
                                           );
                                         }
                                       : () {
                                           showDialog(
                                             context: context,
+                                            barrierDismissible: false,
                                             builder: (context) {
                                               return SizedBox(
                                                 height: 200,
@@ -670,36 +767,38 @@ class _UserProfile2State extends State<UserProfile2> {
                         const SizedBox(
                           height: 16.0,
                         ),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16.0),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: 0.75,
-                            ),
-                            borderRadius: BorderRadius.circular(16.0),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TextPoppins(
-                                text: "About",
-                                fontSize: 16,
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
+                        map['data']['accountType'] == "recruiter"
+                            ? const SizedBox()
+                            : Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(16.0),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.grey,
+                                    width: 0.75,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16.0),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextPoppins(
+                                      text: "About",
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    const SizedBox(
+                                      height: 4.0,
+                                    ),
+                                    TextPoppins(
+                                      text: map['data']['bio']['about'],
+                                      fontSize: 12,
+                                    ),
+                                  ],
+                                ),
                               ),
-                              const SizedBox(
-                                height: 4.0,
-                              ),
-                              TextPoppins(
-                                text: map['data']['bio']['about'],
-                                fontSize: 12,
-                              ),
-                            ],
-                          ),
-                        ),
                         map['data']['accountType'].toString().toLowerCase() ==
                                 "recruiter"
                             ? const SizedBox()
