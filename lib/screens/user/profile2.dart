@@ -277,18 +277,28 @@ class _UserProfile2State extends State<UserProfile2> {
                       ),
                       Positioned(
                         bottom: -Constants.avatarRadius + 24,
-                        left: (Constants.avatarRadius * 2) - 10,
+                        left: (Constants.avatarRadius * 2) - 6,
                         child: ClipOval(
                           child: Container(
-                            width: 18,
-                            height: 18,
+                            width: 24,
+                            height: 24,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(9),
-                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.white,
+                            ),
+                            child: Center(
+                              child: Container(
+                                width: 18,
+                                height: 18,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(9),
+                                  color: Colors.green,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      )
+                      ),
                     ],
                   ),
                   Padding(
@@ -418,7 +428,9 @@ class _UserProfile2State extends State<UserProfile2> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         TextPoppins(
-                          text: "${map['data']['bio']['fullname']}".capitalize,
+                          text:
+                              "${map['data']['bio']['firstname']} ${map['data']['bio']['middlename']} ${map['data']['bio']['lastname']}"
+                                  .capitalize,
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                         ),

@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prohelp_app/components/picker/img_picker.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
+import 'package:prohelp_app/helper/state/state_manager.dart';
 
 class ImageUploader extends StatefulWidget {
   const ImageUploader({Key? key}) : super(key: key);
@@ -15,6 +16,7 @@ class ImageUploader extends StatefulWidget {
 }
 
 class _ImageUploaderState extends State<ImageUploader> {
+  final _controller = Get.find<StateController>();
   bool _isImagePicked = false;
   String _croppedFile = "";
 
@@ -38,10 +40,10 @@ class _ImageUploaderState extends State<ImageUploader> {
                     height: 120,
                     width: 120,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(60),
+                      borderRadius: BorderRadius.circular(64),
                     ),
                     child: Image.file(
-                      File(_croppedFile),
+                      File(_controller.croppedPic.value),
                       errorBuilder: (context, error, stackTrace) => ClipOval(
                         child: SvgPicture.asset(
                           "assets/images/personal.svg",

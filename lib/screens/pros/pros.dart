@@ -143,7 +143,7 @@ class _ProsState extends State<Pros> with SingleTickerProviderStateMixin {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -156,7 +156,7 @@ class _ProsState extends State<Pros> with SingleTickerProviderStateMixin {
                   children: [
                     Container(
                       color: Colors.white,
-                      padding: const EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(3),
                       child: TabBar(
                         unselectedLabelColor: Colors.grey,
                         labelColor: Colors.white,

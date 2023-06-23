@@ -406,7 +406,7 @@ class _ManageEducationState extends State<ManageEducation> {
       );
 
       _controller.setLoading(false);
-      debugPrint("EDU NEW RESPONSE:: ${_resp.body}");
+      debugPrint("EDU DELETE RESPONSE:: ${_resp.body}");
 
       if (_resp.statusCode == 200) {
         Map<String, dynamic> _map = jsonDecode(_resp.body);
@@ -415,6 +415,9 @@ class _ManageEducationState extends State<ManageEducation> {
         //Nw save user's data to preference
         String userData = jsonEncode(_map['data']);
         widget.manager.setUserData(userData);
+
+        _controller.userData.value = _map['data'];
+        _controller.onInit();
 
         Navigator.of(context).pop();
       } else {

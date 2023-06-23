@@ -65,13 +65,13 @@ class _SetupProfileState extends State<SetupProfile> {
 
   final socket = SocketManager().socket;
 
-  _onImageSelected(var file) {
-    setState(() {
-      _isImagePicked = true;
-      _croppedFile = file;
-    });
-    debugPrint("VALUIE::: :: $file");
-  }
+  // _onImageSelected(var file) {
+  //   setState(() {
+  //     _isImagePicked = true;
+  //     _croppedFile = file;
+  //   });
+  //   debugPrint("VALUIE::: :: $file");
+  // }
 
   _uploadPhoto() async {
     _controller.setLoading(true);
@@ -79,7 +79,7 @@ class _SetupProfileState extends State<SetupProfile> {
       final storageRef = FirebaseStorage.instance.ref();
       final fileRef = storageRef
           .child("photos")
-          .child("${widget.manager.getUser()['email']}");
+          .child("${_step1Payload['email']}".toString().toLowerCase());
       final _resp = await fileRef.putFile(File(_controller.croppedPic.value));
       final url = await _resp.ref.getDownloadURL();
 
@@ -182,8 +182,6 @@ class _SetupProfileState extends State<SetupProfile> {
         Map<String, dynamic> map = jsonDecode(response.body);
         Constants.toast(map['message']);
       }
-
-
     } catch (e) {
       debugPrint(e.toString());
       Constants.toast(e.toString());

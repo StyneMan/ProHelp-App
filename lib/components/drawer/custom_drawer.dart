@@ -1,25 +1,16 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:get/instance_manager.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:prohelp_app/components/text_components.dart';
-import 'package:prohelp_app/data/professionals/professionals.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
-import 'package:prohelp_app/logout_loader.dart';
 import 'package:prohelp_app/model/drawer/drawermodel.dart';
-import 'package:prohelp_app/screens/account/account.dart';
-import 'package:prohelp_app/screens/categories/categories.dart';
-import 'package:prohelp_app/screens/earnings/earnings.dart';
 import 'package:prohelp_app/screens/jobs/jobs.dart';
 import 'package:prohelp_app/screens/messages/messages.dart';
 import 'package:prohelp_app/screens/pros/pros.dart';
@@ -163,7 +154,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.275),
+      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.25),
       child: Container(
         color: Colors.white,
         height: double.infinity,
@@ -183,43 +174,47 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 children: [
                   ClipOval(
                     child: Container(
-                      height: 64,
-                      width: 64,
+                      height: 60,
+                      width: 60,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(32),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                       child: Image.network(
                         "${widget.manager.getUser()['bio']['image']}",
                         errorBuilder: (context, error, stackTrace) =>
                             const ClipOval(
-                                child: Icon(CupertinoIcons.person_alt_circle,
-                                    size: 64, color: Colors.white)),
+                          child: Icon(
+                            CupertinoIcons.person_alt_circle,
+                            size: 60,
+                            color: Colors.white,
+                          ),
+                        ),
                         fit: BoxFit.cover,
                       ),
                     ),
                   ),
                   const SizedBox(
-                    width: 16.0,
+                    width: 10.0,
                   ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextPoppins(
-                        text: widget.manager
-                                .getUser()['bio']['fullname']
-                                .toString()
-                                .capitalize ??
-                            "",
-                        fontSize: 16,
+                        text:
+                            "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['lastname']}"
+                                .capitalize,
+                        fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
-                      TextPoppins(
-                        text: widget.manager.getUser()['email'] ?? "",
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
+                      Text(
+                        widget.manager.getUser()['email'] ?? "",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   )

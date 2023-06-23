@@ -116,6 +116,7 @@ class _VerifyDocsState extends State<VerifyDocs> {
       await _uploadBack();
       Map _payload = {
         "bio": {
+          ...widget.manager.getUser()['bio'],
           "idcard": {
             "idType": _idType.toLowerCase().replaceAll(" ", "_"),
             "frontview": _frontUrl,
@@ -311,7 +312,9 @@ class _VerifyDocsState extends State<VerifyDocs> {
                           fit: BoxFit.cover,
                         )
                       : Image.network(
-                          "${widget.manager.getUser()['bio']['idcard']['frontview']}",
+                          widget.manager.getUser()['bio']['idcard'] == null
+                              ? ""
+                              : "${widget.manager.getUser()['bio']['idcard']['frontview']}",
                           errorBuilder: (context, error, stackTrace) =>
                               Image.asset(
                             "assets/images/placeholder.png",
@@ -389,7 +392,9 @@ class _VerifyDocsState extends State<VerifyDocs> {
                           fit: BoxFit.cover,
                         )
                       : Image.network(
-                          "${widget.manager.getUser()['bio']['idcard']['backview']}",
+                          widget.manager.getUser()['bio']['idcard'] == null
+                              ? ""
+                              : "${widget.manager.getUser()['bio']['idcard']['backview']}",
                           errorBuilder: (context, error, stackTrace) =>
                               Image.asset(
                             "assets/images/placeholder.png",

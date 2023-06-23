@@ -13,7 +13,6 @@ import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 
-
 class ManageExperience extends StatefulWidget {
   final List experience;
   final PreferenceManager manager;
@@ -112,41 +111,47 @@ class _ManageExperienceState extends State<ManageExperience> {
             actions: [
               IconButton(
                 onPressed: () {
-                  showBarModalBottomSheet(
-                    expand: false,
-                    context: context,
-                    useRootNavigator: true,
-                    backgroundColor: Colors.white,
-                    topControl: ClipOval(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(
-                              16,
-                            ),
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.close,
-                              size: 24,
-                            ),
-                          ),
-                        ),
-                      ),
+                  Get.to(
+                    NewExperienceForm(
+                      manager: widget.manager,
                     ),
-                    builder: (context) => SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.90,
-                      child: NewExperienceForm(
-                        manager: widget.manager,
-                      ),
-                    ),
+                    transition: Transition.cupertino,
                   );
+                  // showBarModalBottomSheet(
+                  //   expand: false,
+                  //   context: context,
+                  //   useRootNavigator: true,
+                  //   backgroundColor: Colors.white,
+                  //   topControl: ClipOval(
+                  //     child: GestureDetector(
+                  //       onTap: () {
+                  //         Navigator.of(context).pop();
+                  //       },
+                  //       child: Container(
+                  //         width: 32,
+                  //         height: 32,
+                  //         decoration: BoxDecoration(
+                  //           color: Colors.white,
+                  //           borderRadius: BorderRadius.circular(
+                  //             16,
+                  //           ),
+                  //         ),
+                  //         child: const Center(
+                  //           child: Icon(
+                  //             Icons.close,
+                  //             size: 24,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  //   builder: (context) => SizedBox(
+                  //     height: MediaQuery.of(context).size.height * 0.90,
+                  //     child: NewExperienceForm(
+                  //       manager: widget.manager,
+                  //     ),
+                  //   ),
+                  // );
                 },
                 icon: const Icon(CupertinoIcons.add),
               ),
@@ -185,20 +190,24 @@ class _ManageExperienceState extends State<ManageExperience> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(16.0),
-                            child: Image.network(
-                              widget.manager.getUser()['experience'][index]
-                                  ['companyLogo'],
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Image.asset(
-                                "assets/images/placeholder.png",
-                                width: 75,
-                                height: 75,
-                                fit: BoxFit.cover,
-                              ),
-                              width: 75,
-                              height: 75,
-                              fit: BoxFit.cover,
-                            ),
+                            child: widget.manager.getUser()['experience'][index]
+                                        ['companyLogo'] ==
+                                    null
+                                ? const SizedBox()
+                                : Image.network(
+                                    "${widget.manager.getUser()['experience'][index]['companyLogo']}",
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            Image.asset(
+                                      "assets/images/placeholder.png",
+                                      width: 75,
+                                      height: 75,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    width: 75,
+                                    height: 75,
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
                           const SizedBox(width: 8.0),
                           Expanded(
@@ -208,50 +217,77 @@ class _ManageExperienceState extends State<ManageExperience> {
                               children: [
                                 Wrap(
                                   children: [
-                                    TextPoppins(
-                                      text:
-                                          "${widget.manager.getUser()['experience'][index]['role']}",
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    widget.manager.getUser()['experience']
+                                                [index]['role'] ==
+                                            null
+                                        ? const SizedBox()
+                                        : TextPoppins(
+                                            text:
+                                                "${widget.manager.getUser()['experience'][index]['role']}"
+                                                    .capitalize,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                   ],
                                 ),
-                                TextInter(
-                                  text:
-                                      "${widget.manager.getUser()['experience'][index]['company']} . ${widget.manager.getUser()['experience'][index]['workType']}",
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                widget.manager.getUser()['experience'][index]
+                                            ['company'] ==
+                                        null
+                                    ? const SizedBox()
+                                    : TextInter(
+                                        text:
+                                            "${widget.manager.getUser()['experience'][index]['company']} . ${widget.manager.getUser()['experience'][index]['workType']}"
+                                                .capitalize,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    TextInter(
-                                      text:
-                                          "${widget.manager.getUser()['experience'][index]['startDate']}",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    widget.manager.getUser()['experience']
+                                                [index]['startDate'] ==
+                                            null
+                                        ? const SizedBox()
+                                        : TextInter(
+                                            text:
+                                                "${widget.manager.getUser()['experience'][index]['startDate']}",
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                     const SizedBox(
-                                      width: 10.0,
+                                      width: 5.0,
                                     ),
-                                    TextInter(
-                                      text: widget.manager
-                                                  .getUser()['experience']
-                                              [index]['stillSchooling']
-                                          ? "Still a student"
-                                          : "${widget.manager.getUser()['experience'][index]['endate']}",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
+                                    const TextInter(text: "-", fontSize: 21),
+                                    const SizedBox(
+                                      width: 5.0,
                                     ),
+                                    widget.manager.getUser()['experience']
+                                                [index]['company'] ==
+                                            null
+                                        ? const SizedBox()
+                                        : TextInter(
+                                            text: widget.manager
+                                                        .getUser()['experience']
+                                                    [index]['stillHere']
+                                                ? "Still working here"
+                                                : "${widget.manager.getUser()['experience'][index]['endate']}",
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                   ],
                                 ),
-                                TextInter(
-                                  text:
-                                      "${widget.manager.getUser()['experience'][index]['region']} . ${widget.manager.getUser()['experience'][index]['country']}",
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                widget.manager.getUser()['experience'][index]
+                                            ['company'] ==
+                                        null
+                                    ? const SizedBox()
+                                    : TextInter(
+                                        text:
+                                            "${widget.manager.getUser()['experience'][index]['region']} . ${widget.manager.getUser()['experience'][index]['country']}"
+                                                .capitalize,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                               ],
                             ),
                           ),
@@ -404,7 +440,6 @@ class _ManageExperienceState extends State<ManageExperience> {
                     const SizedBox(
                       height: 24.0,
                     ),
-                    // RoundedButton(bgColor: Constants.primaryColor, child: TextPoppins(text: "SAVE CHANGES", fontSize: fontSize), borderColor: borderColor, foreColor: foreColor, onPressed: onPressed, variant: variant)
                   ],
                 ),
         ),
@@ -437,6 +472,9 @@ class _ManageExperienceState extends State<ManageExperience> {
         //Nw save user's data to preference
         String userData = jsonEncode(_map['data']);
         widget.manager.setUserData(userData);
+        _controller.userData.value = _map['data'];
+
+        _controller.onInit();
 
         Navigator.of(context).pop();
       } else {

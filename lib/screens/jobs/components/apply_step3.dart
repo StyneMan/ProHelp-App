@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:prohelp_app/components/inputfield/textarea2.dart';
 import 'package:prohelp_app/components/text_components.dart';
 
@@ -48,7 +49,9 @@ class _ApplyJobStep3State extends State<ApplyJobStep3> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextPoppins(
-                text: "${widget.data['screeningQuestions'][i]}",
+                text:
+                    "${widget.data['screeningQuestions'][i]} ${widget.data['screeningQuestions'][i].toString().endsWith("?") ? "" : "?"}"
+                        .capitalizeFirst,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -69,6 +72,7 @@ class _ApplyJobStep3State extends State<ApplyJobStep3> {
                   return null;
                 },
                 inputType: TextInputType.text,
+                capitalization: TextCapitalization.sentences,
               ),
               const SizedBox(
                 height: 16.0,

@@ -120,9 +120,10 @@ class _ApplyJobStep1State extends State<ApplyJobStep1> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       TextPoppins(
-                        text: "${widget.manager.getUser()['bio']['fullname']}"
-                            .capitalize,
-                        fontSize: 16,
+                        text:
+                            "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['middlename']} ${widget.manager.getUser()['bio']['lastname']}"
+                                .capitalize,
+                        fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
                       const SizedBox(

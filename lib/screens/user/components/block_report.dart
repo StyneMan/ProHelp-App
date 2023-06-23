@@ -42,8 +42,7 @@ class _BlockReportState extends State<BlockReport> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   TextInter(
-                    text:
-                        "Block/Report ${widget.data['bio']['fullname'].toString().capitalize?.split(' ')[0]}",
+                    text: "Block/Report ${widget.data['bio']['firstname']} ${widget.data['bio']['lastname']}".capitalize,
                     fontSize: 16,
                     color: Colors.white,
                   ),

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -19,6 +18,7 @@ class TransactionRow extends StatefulWidget {
 }
 
 class _TransactionRowState extends State<TransactionRow> {
+  
   String timeUntil(DateTime date) {
     return timeago.format(date, locale: "en", allowFromNow: true);
   }

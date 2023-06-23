@@ -77,7 +77,7 @@ class ExperienceSection extends StatelessWidget {
                                   width: 100,
                                   height: 200,
                                   child: Image.network(
-                                    e['companyLogo'],
+                                    "${e['companyLogo']}",
                                     fit: BoxFit.cover,
                                   ),
                                 ),

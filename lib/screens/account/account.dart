@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:get/instance_manager.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:prohelp_app/components/drawer/custom_drawer.dart';
 import 'package:prohelp_app/components/text_components.dart';
@@ -12,7 +11,6 @@ import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/account/personal_info.dart';
 import 'package:prohelp_app/screens/account/security.dart';
-import 'package:prohelp_app/screens/account/setup_profile.dart';
 import 'package:prohelp_app/screens/account/support.dart';
 
 import 'components/wallet.dart';
@@ -117,7 +115,9 @@ class Account extends StatelessWidget {
             child: Column(
               children: [
                 TextPoppins(
-                  text: "${manager.getUser()['bio']['fullname']}".capitalize,
+                  text:
+                      "${manager.getUser()['bio']['firstname']} ${manager.getUser()['bio']['middlename']} ${manager.getUser()['bio']['lastname']}"
+                          .capitalize,
                   fontSize: 21,
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
@@ -158,7 +158,7 @@ class Account extends StatelessWidget {
             ),
           ),
           const SizedBox(
-            height: 16,
+            height: 8.0,
           ),
           Padding(
             padding: const EdgeInsets.all(12.0),

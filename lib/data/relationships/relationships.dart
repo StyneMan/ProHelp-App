@@ -6,6 +6,8 @@ List<String> relationships = const [
   'Niece',
   'Friend',
   'Spouse',
+  'Uncle',
+  'Aunty',
   'Colleage',
   'Mentor',
   'Grandparent',

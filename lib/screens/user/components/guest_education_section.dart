@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 
@@ -52,20 +53,22 @@ class GuestEducationSection extends StatelessWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      SizedBox(
-                                        width: 100,
-                                        height: 200,
-                                        child: Image.network(
-                                          "${data[e]['schoolLogo']}",
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) =>
-                                                  Image.asset(
-                                            "assets/images/logo_dark.png",
-                                            color: Constants.accentColor,
-                                          ),
-                                        ),
-                                      ),
+                                      data[e]['schoolLogo'].isEmpty
+                                          ? const SizedBox()
+                                          : SizedBox(
+                                              width: 100,
+                                              height: 200,
+                                              child: Image.network(
+                                                "${data[e]['schoolLogo']}",
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                        stackTrace) =>
+                                                    Image.asset(
+                                                  "assets/images/logo_dark.png",
+                                                  color: Constants.accentColor,
+                                                ),
+                                              ),
+                                            ),
                                       const SizedBox(
                                         width: 10.0,
                                       ),
@@ -77,13 +80,22 @@ class GuestEducationSection extends StatelessWidget {
                                               CrossAxisAlignment.start,
                                           children: [
                                             TextPoppins(
-                                              text: "${data[e]['school']}",
+                                              text: "${data[e]['school']}"
+                                                  .toUpperCase(),
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
                                             ),
                                             TextPoppins(
                                               text:
-                                                  "${data[e]['degree']} ${data[e]['course']}",
+                                                  "${data[e]['degree']}, ${data[e]['course']}"
+                                                      .capitalize,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                            TextPoppins(
+                                              text: data[e]['stillSchooling']
+                                                  ? "Still a student"
+                                                  : "Graduated ${data[e]['endate']}",
                                               fontSize: 13,
                                               fontWeight: FontWeight.w400,
                                             ),

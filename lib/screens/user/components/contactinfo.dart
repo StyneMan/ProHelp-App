@@ -42,7 +42,8 @@ class ContactInfoContent extends StatelessWidget {
   _addConnection() async {
     Map _payload = {
       "guestId": "${guestData['id']}",
-      "guestName": "${guestData['bio']['fullname']}",
+      "guestName":
+          "${guestData['bio']['firstname']} ${guestData['bio']['lastname']}",
       "userId": "${manager.getUser()['id']}",
     };
 
@@ -202,10 +203,8 @@ class ContactInfoContent extends StatelessWidget {
                               padding: const EdgeInsets.all(16.0),
                               child: Column(
                                 children: [
-                                  Image.asset(
-                                    "assets/images/coin_gold.png",
-                                    width: 48
-                                  ),
+                                  Image.asset("assets/images/coin_gold.png",
+                                      width: 48),
                                   TextPoppins(
                                     text: "Coin Alert",
                                     fontSize: 21,

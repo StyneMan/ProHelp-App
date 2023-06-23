@@ -133,29 +133,6 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                         ),
                       ),
                     ),
-                    // const SizedBox(
-                    //   height: 4.0,
-                    // ),
-                    // widget.data['accountType'] == "recruiter"
-                    //     ? const SizedBox()
-                    //     : Wrap(
-                    //         children: [
-                    //           SizedBox(
-                    //             width: 65,
-                    //             child: TextPoppins(
-                    //               text: "${widget.data['bio']['address']}"
-                    //                           .length >
-                    //                       16
-                    //                   ? "${widget.data['bio']['address']}"
-                    //                           .substring(0, 14) +
-                    //                       "..."
-                    //                   : "${widget.data['bio']['address']}",
-                    //               fontSize: 13,
-                    //               color: Constants.primaryColor,
-                    //             ),
-                    //           ),
-                    //         ],
-                    //       ),
                   ],
                 ),
                 const SizedBox(
@@ -177,11 +154,16 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                           const SizedBox(
                             width: 4.0,
                           ),
-                          TextPoppins(
-                            text:
-                                "${widget.data['bio']['fullname']}".capitalize,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                          Expanded(
+                            child: Text(
+                              "${widget.data['bio']['firstname']} ${widget.data['bio']['middlename']} ${widget.data['bio']['lastname']}"
+                                  .capitalize!,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                           const SizedBox(
                             width: 5.0,
@@ -324,7 +306,7 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                       borderRadius: BorderRadius.circular(4.0),
                     ),
                     child: TextPoppins(
-                      text: widget.data['skills'][e]['name'],
+                      text: "${widget.data['skills'][e]['name']}".capitalize,
                       fontSize: 12,
                     ),
                   ),

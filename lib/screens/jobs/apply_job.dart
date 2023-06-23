@@ -17,7 +17,6 @@ import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/jobs/components/apply_step1.dart';
 import 'package:prohelp_app/screens/jobs/components/apply_step2.dart';
 import 'package:prohelp_app/screens/jobs/components/apply_step3.dart';
-import 'package:prohelp_app/screens/pros/pros.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ApplyJob extends StatefulWidget {
@@ -313,7 +312,7 @@ class _ApplyJobState extends State<ApplyJob> {
                                   1) {
                                 if (_formKey.currentState!.validate() &&
                                     !_isNotPicked &&
-                                    _step2Payload['fileSize'] < 500.0) {
+                                    _step2Payload['fileSize'] < 2048.0) {
                                   // _saveStep2ToState();
                                   _controller.currentApplicationStep.value += 1;
                                 }
@@ -431,7 +430,8 @@ class _ApplyJobState extends State<ApplyJob> {
             "id": widget.manager.getUser()['id'],
             "email": _step1Payload['email'],
             "phone": _step1Payload['phone'],
-            "name": widget.manager.getUser()['bio']['fullname'],
+            "name":
+                "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['lastname']}",
             "photo": widget.manager.getUser()['bio']['image'],
           },
           "resume": _resumeUrl,

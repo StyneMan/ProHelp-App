@@ -197,7 +197,7 @@ class _DashboardState extends State<Dashboard> {
       final chatResp = await APIService().getUsersChats(
         accessToken: _token,
         email: userMap['email'],
-        userId: userMap['_id'],
+        userId: userMap['id'],
       );
       // debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
       if (chatResp.statusCode == 200) {

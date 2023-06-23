@@ -124,14 +124,24 @@ class _UserProfileState extends State<MyProfile> {
                     ),
                     Positioned(
                       bottom: -Constants.avatarRadius + 24,
-                      left: (Constants.avatarRadius * 2) - 10,
+                      left: (Constants.avatarRadius * 2) - 6,
                       child: ClipOval(
                         child: Container(
-                          width: 18,
-                          height: 18,
+                          width: 24,
+                          height: 24,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(9),
-                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.white,
+                          ),
+                          child: Center(
+                            child: Container(
+                              width: 18,
+                              height: 18,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(9),
+                                color: Colors.green,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -206,8 +216,9 @@ class _UserProfileState extends State<MyProfile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextPoppins(
-                        text: "${widget.manager.getUser()['bio']['fullname']}"
-                            .capitalize,
+                        text:
+                            "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['middlename']} ${widget.manager.getUser()['bio']['lastname']}"
+                                .capitalize,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),
@@ -331,10 +342,9 @@ class _UserProfileState extends State<MyProfile> {
                                                     BorderRadius.circular(4.0),
                                               ),
                                               child: TextPoppins(
-                                                text: _controller.userData
-                                                            .value['skills'][m]
-                                                        ['name'] ??
-                                                    "",
+                                                text:
+                                                    "${_controller.userData.value['skills'][m]['name']}"
+                                                        .capitalize,
                                                 fontSize: 12,
                                               ),
                                             ),
@@ -613,8 +623,7 @@ class _UserProfileState extends State<MyProfile> {
                       widget.manager.getUser()['accountType'] == "recruiter"
                           ? const SizedBox()
                           : ExperienceSection(
-                              data: _controller.userData.value['experience'] ??
-                                  widget.manager.getUser()['experience'],
+                              data: widget.manager.getUser()['experience'],
                               manager: widget.manager,
                             ),
                       const SizedBox(
@@ -623,7 +632,7 @@ class _UserProfileState extends State<MyProfile> {
                       widget.manager.getUser()['accountType'] == "recruiter"
                           ? const SizedBox()
                           : EducationSection(
-                              data: _controller.userData.value['education'],
+                              data: widget.manager.getUser()['education'],
                               manager: widget.manager,
                             ),
                       const SizedBox(

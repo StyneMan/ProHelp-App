@@ -110,13 +110,13 @@ class EducationSection extends StatelessWidget {
                                               CrossAxisAlignment.start,
                                           children: [
                                             TextPoppins(
-                                              text: "${e['school']}".capitalize,
+                                              text: "${e['school']}".toUpperCase(),
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
                                             ),
                                             TextPoppins(
                                               text:
-                                                  "${e['degree']} ${e['course']}"
+                                                  "${e['degree']}, ${e['course']}"
                                                       .capitalize,
                                               fontSize: 13,
                                               fontWeight: FontWeight.w400,

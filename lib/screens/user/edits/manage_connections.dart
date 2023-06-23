@@ -119,7 +119,7 @@ class ManageConnections extends StatelessWidget {
 
                     final data = snapshot.data;
                     Map<String, dynamic> map = jsonDecode(data!.body);
-                    debugPrint("SAVED PROS RESPONSE >>> ${data.body}");
+                    debugPrint("SAVED CONNEV RESPONSE >>> ${data.body}");
 
                     return ListView.separated(
                       shrinkWrap: true,

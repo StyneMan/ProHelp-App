@@ -95,15 +95,20 @@ class AboutMe extends StatelessWidget {
                   children: [
                     ClipOval(
                       child: Container(
-                        height: 128,
-                        width: 128,
+                        height: 120,
+                        width: 120,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(64),
+                          borderRadius: BorderRadius.circular(60),
                         ),
                         child: ClipOval(
-                          child: SvgPicture.asset(
-                            "assets/images/personal.svg",
+                          child: Image.network(
+                            "${manager.getUser()['bio']['image']}",
                             fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                SvgPicture.asset(
+                              "assets/images/personal.svg",
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),

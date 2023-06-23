@@ -85,7 +85,6 @@ class _AboutFormState extends State<AboutForm> {
       "bio": {
         ...widget.manager.getUser()['bio'],
         "about": _messageController.text,
-        "nin": "1234567890",
       }
     };
     try {

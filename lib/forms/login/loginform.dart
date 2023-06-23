@@ -56,7 +56,7 @@ class _LoginFormState extends State<LoginForm> {
 
         socket.emit('identity', map['data']["_id"]);
 
-        if (!map['data']["isVerified"]) {
+        if (!map['data']["isEmailVerified"]) {
           Navigator.of(context).pushReplacement(
             PageTransition(
               type: PageTransitionType.size,

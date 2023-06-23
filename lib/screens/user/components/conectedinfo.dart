@@ -206,13 +206,15 @@ class _ConnectedInfoContentState extends State<ConnectedInfoContent> {
       "userIds": [widget.guestData['id'], widget.manager.getUser()['id']],
       "chatInitiator": widget.manager.getUser()['id'],
       "receiver": {
-        "name": widget.guestData['bio']['fullname'],
+        "name":
+            "${widget.guestData['bio']['firstname']} ${widget.guestData['bio']['middlename']} ${widget.guestData['bio']['lastname']}",
         "id": widget.guestData['id'],
         "photo": widget.guestData['bio']['image'],
         "email": widget.guestData['email'],
       },
       "initiator": {
-        "name": widget.manager.getUser()['bio']['fullname'],
+        "name":
+            "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['middlename']} ${widget.manager.getUser()['bio']['lastname']}",
         "id": widget.manager.getUser()['id'],
         "email": widget.manager.getUser()['email'],
         "photo": widget.manager.getUser()['bio']['image'],

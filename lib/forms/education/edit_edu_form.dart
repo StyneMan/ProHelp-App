@@ -392,6 +392,9 @@ class _UpdateEducationFormState extends State<EditEducationForm> {
           //Nw save user's data to preference
           String userData = jsonEncode(_map['data']);
           widget.manager.setUserData(userData);
+          _controller.userData.value = _map['data'];
+
+          _controller.onInit();
 
           _controller.shouldExitExpEdu.value = true;
           Future.delayed(const Duration(seconds: 1), () {
@@ -426,7 +429,7 @@ class _UpdateEducationFormState extends State<EditEducationForm> {
         );
 
         _controller.setLoading(false);
-        debugPrint("EDU NEW RESPONSE:: ${_resp.body}");
+        debugPrint("EDU EDIT RESPONSE:: ${_resp.body}");
 
         if (_resp.statusCode == 200) {
           Map<String, dynamic> _map = jsonDecode(_resp.body);
@@ -437,11 +440,14 @@ class _UpdateEducationFormState extends State<EditEducationForm> {
           widget.manager.setUserData(userData);
           _controller.userData.value = _map['data'];
 
+          _controller.onInit();
+
           // Navigator.pop(context);
           _controller.shouldExitExpEdu.value = true;
           Future.delayed(const Duration(seconds: 1), () {
             Navigator.pop(context);
           });
+
           // Navigator.of(context).pop();
         } else {
           Map<String, dynamic> _map = jsonDecode(_resp.body);

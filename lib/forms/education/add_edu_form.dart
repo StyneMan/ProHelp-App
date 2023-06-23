@@ -360,10 +360,12 @@ class _NewEducationFormState extends State<NewEducationForm> {
           //Nw save user's data to preference
           String userData = jsonEncode(_map['data']);
           widget.manager.setUserData(userData);
+          _controller.userData.value = _map['data'];
+
+          _controller.onInit();
 
           Navigator.of(context).pop();
           Navigator.of(context).pop();
-
         } else {
           Map<String, dynamic> _map = jsonDecode(resp.body);
           Constants.toast(_map['message']);
@@ -402,6 +404,8 @@ class _NewEducationFormState extends State<NewEducationForm> {
           String userData = jsonEncode(_map['data']);
           widget.manager.setUserData(userData);
           _controller.userData.value = _map['data'];
+
+          _controller.onInit();
 
           _controller.shouldExitExpEdu.value = true;
           Future.delayed(const Duration(seconds: 1), () {

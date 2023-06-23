@@ -54,7 +54,7 @@ class _ApplyJobStep2State extends State<ApplyJobStep2> {
           1000; //return size in kilobytes
     });
 
-    if (((result?.files.first.size ?? 1000.0) / 1000) > 500.0) {
+    if (((result?.files.first.size ?? 1000.0) / 1000) > 2048.0) {
       setState(() {
         _sizeError = true;
       });
@@ -188,15 +188,18 @@ class _ApplyJobStep2State extends State<ApplyJobStep2> {
                   "Formats: (.pdf .png .doc .docx)",
                 ),
                 Text(
-                  "Size: $_fileSize KB",
+                  "Size: ${_fileSize > 1024 ? "${(_fileSize / 1000).toStringAsFixed(2)} MB" : "$_fileSize KB"}",
                 ),
               ],
+            ),
+            const SizedBox(
+              height: 2.0,
             ),
             _sizeError
                 ? SizedBox(
                     width: double.infinity,
-                    child: TextPoppins(
-                      text: "File size exceeds 500KB",
+                    child: TextRoboto(
+                      text: "File size exceeds 2MB",
                       align: TextAlign.center,
                       color: Colors.red,
                       fontSize: 16,

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:get/instance_manager.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
 import 'package:prohelp_app/components/dialog/custom_dialog.dart';
@@ -106,7 +107,8 @@ class _SupportFormState extends State<SupportForm> {
       "purpose": _selectedPurpose,
       "message": _messageController.text,
       "user": {
-        "fullname": widget.manager.getUser()['bio']['fullname'],
+        "fullname":
+            "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['lastname']}".capitalize,
         "email": widget.manager.getUser()['email'],
         "image": widget.manager.getUser()['bio']['image'],
         "id": widget.manager.getUser()['id'],

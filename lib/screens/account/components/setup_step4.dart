@@ -55,6 +55,7 @@ class _SetupStep4State extends State<SetupStep4> {
         children: [
           CustomAutoComplete(
             data: languages,
+          
             onItemSelected: (val) {
               debugPrint("VALUE SELECTED:: $val");
               FocusManager.instance.primaryFocus?.unfocus();
@@ -63,6 +64,7 @@ class _SetupStep4State extends State<SetupStep4> {
                   setState(() {
                     _controller.languagesSpoken.add(val);
                   });
+
                 } else {
                   Constants.toast("Language already selected!");
                 }
@@ -211,7 +213,7 @@ class _SetupStep4State extends State<SetupStep4> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              TextPoppins(text: 'Do you have disabilities? ', fontSize: 16),
+              TextPoppins(text: 'Do you have disabilities? ', fontSize: 15),
               Checkbox(
                 value: !_isDisablity,
                 onChanged: (val) {
@@ -221,9 +223,7 @@ class _SetupStep4State extends State<SetupStep4> {
                 },
               ),
               const Text("NO"),
-              const SizedBox(
-                width: 5.0,
-              ),
+              
               Checkbox(
                 value: _isDisablity,
                 onChanged: (val) {

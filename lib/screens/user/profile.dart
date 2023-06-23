@@ -237,18 +237,28 @@ class _UserProfileState extends State<UserProfile> {
                   ),
                   Positioned(
                     bottom: -Constants.avatarRadius + 24,
-                    left: (Constants.avatarRadius * 2) - 10,
+                    left: (Constants.avatarRadius * 2) - 6,
                     child: ClipOval(
                       child: Container(
-                        width: 18,
-                        height: 18,
+                        width: 24,
+                        height: 24,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(9),
-                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.white,
+                        ),
+                        child: Center(
+                          child: Container(
+                            width: 18,
+                            height: 18,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(9),
+                              color: Colors.green,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
               Padding(
@@ -272,16 +282,15 @@ class _UserProfileState extends State<UserProfile> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                             
-                              8 == 8
+                              !widget.data['isVerified']
                                   ? TextPoppins(
-                                      text: "Not verified",
+                                      text: " Not verified",
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
                                       color: Constants.golden,
                                     )
                                   : TextPoppins(
-                                      text: "Verified",
+                                      text: " Verified",
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
                                       color: Colors.green,
@@ -320,7 +329,9 @@ class _UserProfileState extends State<UserProfile> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextPoppins(
-                      text: "${widget.data['bio']['fullname']}".capitalize,
+                      text:
+                          "${widget.data['bio']['firstname']} ${widget.data['bio']['middlename']} ${widget.data['bio']['lastname']}"
+                              .capitalize,
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                     ),
@@ -420,29 +431,32 @@ class _UserProfileState extends State<UserProfile> {
                               const SizedBox(
                                 width: 6.0,
                               ),
-                              InkWell(
-                                onTap: () {
-                                  Get.to(
-                                    ManageConnections(
-                                      caller: "guest",
-                                      data: widget.data,
-                                      connections: widget.data['connections'],
-                                      manager: widget.manager,
-                                    ),
-                                    transition: Transition.cupertino,
-                                  );
-                                },
-                                child: const Text(
-                                  "See more",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    decoration: TextDecoration.underline,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.w500,
-                                    color: Constants.primaryColor,
-                                  ),
-                                ),
-                              )
+                              widget.data['connections']?.isEmpty
+                                  ? const SizedBox()
+                                  : InkWell(
+                                      onTap: () {
+                                        Get.to(
+                                          ManageConnections(
+                                            caller: "guest",
+                                            data: widget.data,
+                                            connections:
+                                                widget.data['connections'],
+                                            manager: widget.manager,
+                                          ),
+                                          transition: Transition.cupertino,
+                                        );
+                                      },
+                                      child: const Text(
+                                        "See more",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          decoration: TextDecoration.underline,
+                                          fontStyle: FontStyle.italic,
+                                          fontWeight: FontWeight.w500,
+                                          color: Constants.primaryColor,
+                                        ),
+                                      ),
+                                    )
                             ],
                           ),
                     const SizedBox(

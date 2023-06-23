@@ -3,10 +3,8 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:loading_overlay_pro/loading_overlay_pro.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
 import 'package:prohelp_app/components/dialog/info_dialog.dart';
@@ -15,7 +13,6 @@ import 'package:prohelp_app/components/inputfield/customdropdown.dart';
 import 'package:prohelp_app/components/inputfield/dob_datefield.dart';
 import 'package:prohelp_app/components/inputfield/state_dropdown.dart';
 import 'package:prohelp_app/components/inputfield/textfield.dart';
-import 'package:prohelp_app/components/picker/img_picker.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/data/state/statesAndCities.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
@@ -25,6 +22,8 @@ import 'package:prohelp_app/helper/socket/socket_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/auth/account_created/successscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'components/image_uploader.dart';
 
 class SetupProfileEmployer extends StatefulWidget {
   final PreferenceManager manager;
@@ -50,7 +49,6 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
-  final _zipCodeController = TextEditingController();
   final _dateController = TextEditingController();
 
   final _controller = Get.find<StateController>();
@@ -68,14 +66,6 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
   var _croppedFile;
 
   final socket = SocketManager().socket;
-
-  _onImageSelected(var file) {
-    setState(() {
-      _isImagePicked = true;
-      _croppedFile = file;
-    });
-    debugPrint("VALUIE::: :: $file");
-  }
 
   void _onSelected(String val) {
     _selectedGender = val;
@@ -134,9 +124,8 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
     _controller.setLoading(true);
     try {
       final storageRef = FirebaseStorage.instance.ref();
-      final fileRef = storageRef
-          .child("photos")
-          .child("${widget.manager.getUser()['email']}");
+      final fileRef =
+          storageRef.child("photos").child(_emailController.text.toLowerCase());
       final _resp = await fileRef.putFile(File(_controller.croppedPic.value));
       final url = await _resp.ref.getDownloadURL();
 
@@ -406,7 +395,8 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
                                 children: [
                                   Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Container(
                                         decoration: const BoxDecoration(
@@ -433,7 +423,8 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
                                               color: Colors.white,
                                             ),
                                             InkWell(
-                                              onTap: () => Navigator.pop(context),
+                                              onTap: () =>
+                                                  Navigator.pop(context),
                                               child: const Icon(
                                                 Icons.cancel_outlined,
                                                 color: Colors.white,
@@ -447,127 +438,14 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
                                         padding: const EdgeInsets.all(16.0),
                                         child: Column(
                                           children: [
-                                            Stack(
-                                              clipBehavior: Clip.none,
-                                              children: [
-                                                ClipOval(
-                                                  child: _isImagePicked
-                                                      ? Container(
-                                                          height: 120,
-                                                          width: 120,
-                                                          decoration: BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(60),
-                                                          ),
-                                                          child: Image.file(
-                                                            File(_croppedFile),
-                                                            errorBuilder: (context,
-                                                                    error,
-                                                                    stackTrace) =>
-                                                                ClipOval(
-                                                              child:
-                                                                  SvgPicture.asset(
-                                                                "assets/images/personal.svg",
-                                                                fit: BoxFit.cover,
-                                                              ),
-                                                            ),
-                                                            fit: BoxFit.cover,
-                                                          ),
-                                                        )
-                                                      : Container(
-                                                          height: 128,
-                                                          width: 128,
-                                                          decoration: BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(64),
-                                                          ),
-                                                          child: Image.network(
-                                                            "kjj",
-                                                            errorBuilder: (context,
-                                                                    error,
-                                                                    stackTrace) =>
-                                                                ClipOval(
-                                                              child:
-                                                                  SvgPicture.asset(
-                                                                "assets/images/personal.svg",
-                                                                fit: BoxFit.cover,
-                                                              ),
-                                                            ),
-                                                            fit: BoxFit.cover,
-                                                          ),
-                                                        ),
-                                                ),
-                                                Positioned(
-                                                  bottom: 12,
-                                                  right: -3,
-                                                  child: CircleAvatar(
-                                                    backgroundColor:
-                                                        Constants.primaryColor,
-                                                    child: IconButton(
-                                                      onPressed: () {
-                                                        showBarModalBottomSheet(
-                                                          expand: false,
-                                                          context: context,
-                                                          topControl: ClipOval(
-                                                            child: GestureDetector(
-                                                              onTap: () {
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop();
-                                                              },
-                                                              child: Container(
-                                                                width: 32,
-                                                                height: 32,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color:
-                                                                      Colors.white,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                    16,
-                                                                  ),
-                                                                ),
-                                                                child: const Center(
-                                                                  child: Icon(
-                                                                    Icons.close,
-                                                                    size: 24,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          backgroundColor:
-                                                              Colors.white,
-                                                          builder: (context) =>
-                                                              SizedBox(
-                                                            height: 175,
-                                                            child: ImgPicker(
-                                                              onCropped:
-                                                                  _onImageSelected,
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                      icon: const Icon(
-                                                        Icons.add_a_photo_outlined,
-                                                        color: Constants
-                                                            .secondaryColor,
-                                                        size: 24,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                            const ImageUploader(),
                                             const SizedBox(
                                               height: 24.0,
                                             ),
                                             Row(
                                               mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
                                               children: [
@@ -576,22 +454,26 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
                                                     bgColor: Colors.transparent,
                                                     child: Row(
                                                       mainAxisAlignment:
-                                                          MainAxisAlignment.center,
+                                                          MainAxisAlignment
+                                                              .center,
                                                       crossAxisAlignment:
-                                                          CrossAxisAlignment.center,
+                                                          CrossAxisAlignment
+                                                              .center,
                                                       children: const [
                                                         TextInter(
                                                           text: "Skip",
                                                           fontSize: 15,
-                                                          color:
-                                                              Constants.primaryColor,
-                                                          fontWeight: FontWeight.w500,
+                                                          color: Constants
+                                                              .primaryColor,
+                                                          fontWeight:
+                                                              FontWeight.w500,
                                                         ),
                                                       ],
                                                     ),
                                                     borderColor:
                                                         Constants.primaryColor,
-                                                    foreColor: Constants.primaryColor,
+                                                    foreColor:
+                                                        Constants.primaryColor,
                                                     onPressed: () {
                                                       Navigator.pop(context);
                                                       Future.delayed(
@@ -610,28 +492,32 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
                                                 ),
                                                 Expanded(
                                                   child: RoundedButton(
-                                                    bgColor: Constants.primaryColor,
+                                                    bgColor:
+                                                        Constants.primaryColor,
                                                     child: Row(
                                                       mainAxisAlignment:
-                                                          MainAxisAlignment.center,
+                                                          MainAxisAlignment
+                                                              .center,
                                                       crossAxisAlignment:
-                                                          CrossAxisAlignment.center,
+                                                          CrossAxisAlignment
+                                                              .center,
                                                       children: const [
                                                         TextInter(
                                                           text: "Continue",
                                                           fontSize: 15,
-                                                          color:
-                                                              Colors.white,
-                                                          fontWeight: FontWeight.w500,
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.w500,
                                                         ),
                                                       ],
                                                     ),
-                                                    borderColor: Colors.transparent,
+                                                    borderColor:
+                                                        Colors.transparent,
                                                     foreColor: Colors.white,
                                                     onPressed: () {
                                                       Navigator.pop(context);
-                                                      if (_controller.croppedPic.value
-                                                          .isNotEmpty) {
+                                                      if (_controller.croppedPic
+                                                          .value.isNotEmpty) {
                                                         _uploadPhoto();
                                                       } else {
                                                         Constants.toast(

@@ -5,7 +5,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:get/get.dart';
 import 'package:get/instance_manager.dart';
+import 'package:loading_overlay_pro/loading_overlay_pro.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
 import 'package:prohelp_app/components/inputfield/customautocomplete.dart';
 import 'package:prohelp_app/components/inputfield/datefield.dart';
@@ -73,315 +75,361 @@ class _NewExperienceFormState extends State<NewExperienceForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0.0,
-      color: Colors.grey.shade300,
-      child: Form(
-        key: _formKey,
-        child: Localizations(
-          delegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          locale: const Locale('en', ''),
-          child: ListView(
-            padding: const EdgeInsets.all(16.0),
-            shrinkWrap: true,
+    return Obx(
+      () => LoadingOverlayPro(
+        isLoading: _controller.isLoading.value,
+        child: Scaffold(
+          backgroundColor: Colors.grey.shade300,
+          appBar: AppBar(
+            elevation: 0.0,
+            foregroundColor: Constants.secondaryColor,
+            backgroundColor: Constants.primaryColor,
+            automaticallyImplyLeading: false,
+            leading: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: 16.0,
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Icon(
+                    CupertinoIcons.arrow_left_circle,
+                  ),
+                ),
+                const SizedBox(
+                  width: 4.0,
+                ),
+              ],
+            ),
+            title: TextPoppins(
+              text: "Add Experience".toUpperCase(),
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: Constants.secondaryColor,
+            ),
+            centerTitle: true,
+          ),
+          body: ListView(
             children: [
-              Center(
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16.0),
-                      child: Image.file(
-                        File(_controller.croppedPic.value),
-                        errorBuilder: (context, error, stackTrace) =>
-                            Image.asset(
-                          "assets/images/placeholder.png",
-                          width: 108,
-                          height: 108,
-                          fit: BoxFit.cover,
-                        ),
-                        width: 108,
-                        height: 108,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Positioned(
-                      bottom: -4,
-                      right: -6,
-                      child: CircleAvatar(
-                        child: IconButton(
-                          onPressed: () {
-                            showCupertinoDialog(
-                              context: context,
-                              useRootNavigator: true,
-                              builder: (context) => CupertinoAlertDialog(
-                                title: TextPoppins(
-                                  text: "Image Picker".toUpperCase(),
-                                  fontSize: 18,
+              Form(
+                key: _formKey,
+                child: Localizations(
+                  delegates: const [
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                  ],
+                  locale: const Locale('en', ''),
+                  child: ListView(
+                    padding: const EdgeInsets.all(16.0),
+                    shrinkWrap: true,
+                    children: [
+                      Center(
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(16.0),
+                              child: Image.file(
+                                File(_controller.croppedPic.value),
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Image.asset(
+                                  "assets/images/placeholder.png",
+                                  width: 108,
+                                  height: 108,
+                                  fit: BoxFit.cover,
                                 ),
-                                content: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.96,
-                                  height: 160,
-                                  child: Column(
-                                    children: [
-                                      const SizedBox(
-                                        height: 21,
-                                      ),
-                                      ImgPicker(
-                                        onCropped: _onImageSelected,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                actions: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: TextRoboto(
-                                        text: "Close",
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                width: 108,
+                                height: 108,
+                                fit: BoxFit.cover,
                               ),
-                            );
-                          },
-                          icon: const Icon(
-                            Icons.add_a_photo,
+                            ),
+                            Positioned(
+                              bottom: -4,
+                              right: -6,
+                              child: CircleAvatar(
+                                child: IconButton(
+                                  onPressed: () {
+                                    showCupertinoDialog(
+                                      context: context,
+                                      useRootNavigator: true,
+                                      builder: (context) =>
+                                          CupertinoAlertDialog(
+                                        title: TextPoppins(
+                                          text: "Image Picker".toUpperCase(),
+                                          fontSize: 18,
+                                        ),
+                                        content: SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.96,
+                                          height: 160,
+                                          child: Column(
+                                            children: [
+                                              const SizedBox(
+                                                height: 21,
+                                              ),
+                                              ImgPicker(
+                                                onCropped: _onImageSelected,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        actions: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: TextRoboto(
+                                                text: "Close",
+                                                fontSize: 18,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    Icons.add_a_photo,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 6.0,
+                      ),
+                      const Text(
+                        "Company's Logo (optional)",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.black, fontSize: 15),
+                      ),
+                      const SizedBox(
+                        height: 24.0,
+                      ),
+                      CustomTextField(
+                        hintText: "Company name",
+                        onChanged: (val) {},
+                        controller: _companyController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Name of company is required';
+                          }
+
+                          return null;
+                        },
+                        inputType: TextInputType.text,
+                        capitalization: TextCapitalization.words,
+                      ),
+                      const SizedBox(
+                        height: 16.0,
+                      ),
+                      CustomTextField(
+                        hintText: "Position (Role)",
+                        onChanged: (val) {},
+                        controller: _roleController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Position occupied here is required';
+                          }
+
+                          return null;
+                        },
+                        inputType: TextInputType.text,
+                        capitalization: TextCapitalization.words,
+                      ),
+                      const SizedBox(
+                        height: 16.0,
+                      ),
+                      DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 24.0,
+                            vertical: 12.0,
+                          ),
+                          border: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(36),
+                            ),
+                            gapPadding: 4.0,
+                          ),
+                          enabledBorder: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(36),
+                            ),
+                            gapPadding: 4.0,
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(36),
+                            ),
+                            gapPadding: 4.0,
+                          ),
+                          filled: false,
+                          hintText: _selectedWorkType,
+                          labelText: "Work Type",
+                          focusColor: Constants.accentColor,
+                          hintStyle: const TextStyle(
+                            fontFamily: "Inter",
+                            color: Colors.black38,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 6.0,
-              ),
-              const Text(
-                "Company's Logo (optional)",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black, fontSize: 15),
-              ),
-              const SizedBox(
-                height: 24.0,
-              ),
-              CustomTextField(
-                hintText: "Company name",
-                onChanged: (val) {},
-                controller: _companyController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Name of company is required';
-                  }
-
-                  return null;
-                },
-                inputType: TextInputType.text,
-                capitalization: TextCapitalization.words,
-              ),
-              const SizedBox(
-                height: 16.0,
-              ),
-              CustomTextField(
-                hintText: "Position (Role)",
-                onChanged: (val) {},
-                controller: _roleController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Position occupied here is required';
-                  }
-
-                  return null;
-                },
-                inputType: TextInputType.text,
-                capitalization: TextCapitalization.words,
-              ),
-              const SizedBox(
-                height: 16.0,
-              ),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 24.0,
-                    vertical: 12.0,
-                  ),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(36),
-                    ),
-                    gapPadding: 4.0,
-                  ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(36),
-                    ),
-                    gapPadding: 4.0,
-                  ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(36),
-                    ),
-                    gapPadding: 4.0,
-                  ),
-                  filled: false,
-                  hintText: _selectedWorkType,
-                  labelText: "Work Type",
-                  focusColor: Constants.accentColor,
-                  hintStyle: const TextStyle(
-                    fontFamily: "Inter",
-                    color: Colors.black38,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                items: _workTypes
-                    .map(
-                      (e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(e),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (val) {
-                  setState(() {
-                    _selectedWorkType = val as String;
-                  });
-                },
-              ),
-              const SizedBox(
-                height: 16.0,
-              ),
-              CustomDateField(
-                hintText: "Start Date",
-                onDateSelected: (String raw, String val) {
-                  setState(() {
-                    _startDateController.text = val;
-                  });
-                },
-                controller: _startDateController,
-              ),
-              const SizedBox(
-                height: 16.0,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: CustomDateField(
-                      isEnabled: !_stillHere,
-                      hintText: "End Date",
-                      onDateSelected: (String raw, String val) {
-                        setState(() {
-                          _endDateController.text = val;
-                        });
-                      },
-                      controller: _endDateController,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 16.0,
-                  ),
-                  Row(
-                    children: [
-                      const Text("Still Working"),
-                      CupertinoSwitch(
-                        value: _stillHere,
-                        activeColor: Constants.primaryColor,
+                        items: _workTypes
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e,
+                                child: Text(e),
+                              ),
+                            )
+                            .toList(),
                         onChanged: (val) {
                           setState(() {
-                            _stillHere = val;
+                            _selectedWorkType = val as String;
                           });
                         },
                       ),
+                      const SizedBox(
+                        height: 16.0,
+                      ),
+                      CustomDateField(
+                        hintText: "Start Date",
+                        onDateSelected: (String raw, String val) {
+                          setState(() {
+                            _startDateController.text = val;
+                          });
+                        },
+                        controller: _startDateController,
+                      ),
+                      const SizedBox(
+                        height: 16.0,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: CustomDateField(
+                              isEnabled: !_stillHere,
+                              hintText: "End Date",
+                              onDateSelected: (String raw, String val) {
+                                setState(() {
+                                  _endDateController.text = val;
+                                });
+                              },
+                              controller: _endDateController,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 16.0,
+                          ),
+                          Row(
+                            children: [
+                              const Text("Still Working"),
+                              CupertinoSwitch(
+                                value: _stillHere,
+                                activeColor: Constants.primaryColor,
+                                onChanged: (val) {
+                                  setState(() {
+                                    _stillHere = val;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 16.0,
+                      ),
+                      DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 24.0,
+                            vertical: 12.0,
+                          ),
+                          border: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(36),
+                            ),
+                            gapPadding: 4.0,
+                          ),
+                          enabledBorder: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(36),
+                            ),
+                            gapPadding: 4.0,
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(36),
+                            ),
+                            gapPadding: 4.0,
+                          ),
+                          filled: false,
+                          hintText: _selectedState,
+                          labelText: "State of Company",
+                          focusColor: Constants.accentColor,
+                          hintStyle: const TextStyle(
+                            fontFamily: "Inter",
+                            color: Colors.black38,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        items: nigerianStates
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e,
+                                child: Text(e),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            _selectedState = val as String;
+                          });
+                        },
+                      ),
+                      const SizedBox(
+                        height: 16.0,
+                      ),
+                      CustomAutoComplete(
+                        data: countries,
+                        onItemSelected: _onCountrySelected,
+                        hintText: "Country",
+                      ),
+                      const SizedBox(
+                        height: 24.0,
+                      ),
+                      RoundedButton(
+                        bgColor: Constants.primaryColor,
+                        child:
+                            const TextInter(text: "SAVE CHANGES", fontSize: 16),
+                        borderColor: Colors.transparent,
+                        foreColor: Colors.white,
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            _save();
+                          }
+                        },
+                        variant: "Filled",
+                      ),
                     ],
                   ),
-                ],
-              ),
-              const SizedBox(
-                height: 16.0,
-              ),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 24.0,
-                    vertical: 12.0,
-                  ),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(36),
-                    ),
-                    gapPadding: 4.0,
-                  ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(36),
-                    ),
-                    gapPadding: 4.0,
-                  ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(36),
-                    ),
-                    gapPadding: 4.0,
-                  ),
-                  filled: false,
-                  hintText: _selectedState,
-                  labelText: "State of Company",
-                  focusColor: Constants.accentColor,
-                  hintStyle: const TextStyle(
-                    fontFamily: "Inter",
-                    color: Colors.black38,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                  ),
                 ),
-                items: nigerianStates
-                    .map(
-                      (e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(e),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (val) {
-                  setState(() {
-                    _selectedState = val as String;
-                  });
-                },
               ),
-              const SizedBox(
-                height: 16.0,
-              ),
-              CustomAutoComplete(
-                data: countries,
-                onItemSelected: _onCountrySelected,
-                hintText: "Country",
-              ),
-              const SizedBox(
-                height: 24.0,
-              ),
-              RoundedButton(
-                bgColor: Constants.primaryColor,
-                child: const TextInter(text: "SAVE CHANGES", fontSize: 16),
-                borderColor: Colors.transparent,
-                foreColor: Colors.white,
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _save();
-                  }
-                },
-                variant: "Filled",
-              ),
+              const SizedBox(height: 32)
             ],
           ),
         ),
@@ -397,14 +445,14 @@ class _NewExperienceFormState extends State<NewExperienceForm> {
         final storageRef = FirebaseStorage.instance.ref();
         final fileRef = storageRef
             .child("experience")
-            .child(widget.manager.getUser()['email']);
+            .child("${widget.manager.getUser()['email']}_${_companyController.text.toLowerCase()}");
         final _resp = await fileRef.putFile(File(_controller.croppedPic.value));
         final url = await _resp.ref.getDownloadURL();
 
         //Now save this url to server
         Map _payload = {
           "experience": [
-            ...widget.manager.getUser()['education'],
+            ...widget.manager.getUser()['experience'],
             {
               "company": _companyController.text.toLowerCase(),
               "role": _roleController.text.toLowerCase(),
@@ -440,6 +488,8 @@ class _NewExperienceFormState extends State<NewExperienceForm> {
           _controller.userData.value = _map['data'];
           widget.manager.setUserData(userData);
 
+          _controller.onInit();
+
           Navigator.of(context).pop();
           Navigator.of(context).pop();
         } else {
@@ -448,7 +498,7 @@ class _NewExperienceFormState extends State<NewExperienceForm> {
         }
       } else {
         Map payload = {
-          "education": [
+          "experience": [
             ...widget.manager.getUser()['experience'],
             {
               "company": _companyController.text.toLowerCase(),
@@ -482,6 +532,8 @@ class _NewExperienceFormState extends State<NewExperienceForm> {
           String userData = jsonEncode(_map['data']);
           _controller.userData.value = _map['data'];
           widget.manager.setUserData(userData);
+
+          _controller.onInit();
 
           Navigator.of(context).pop();
           Navigator.of(context).pop();

@@ -431,8 +431,8 @@ class _UpdateEducationFormState extends State<EditExperienceForm> {
       if (_controller.croppedPic.value.isNotEmpty) {
         //Now upload to Firebase Storage first
         final storageRef = FirebaseStorage.instance.ref();
-        final fileRef =
-            storageRef.child("experience").child(widget.manager.getUser()['email']);
+        final fileRef = storageRef.child("experience").child(
+            "${widget.manager.getUser()['email']}_${_companyController.text.toLowerCase()}");
         final _resp = await fileRef.putFile(File(_controller.croppedPic.value));
         final url = await _resp.ref.getDownloadURL();
 
@@ -489,7 +489,7 @@ class _UpdateEducationFormState extends State<EditExperienceForm> {
           "experience": [
             ...li,
             {
-             "company": _companyController.text.toLowerCase(),
+              "company": _companyController.text.toLowerCase(),
               "role": _roleController.text.toLowerCase(),
               "region": _selectedState.toLowerCase(),
               "workType": _selectedWorkType.toLowerCase(),
@@ -520,6 +520,8 @@ class _UpdateEducationFormState extends State<EditExperienceForm> {
           String userData = jsonEncode(_map['data']);
           _controller.setUserData(_map['data']);
           widget.manager.setUserData(userData);
+
+          _controller.onInit();
 
           // Navigator.pop(context);
           _controller.shouldExitExpEdu.value = true;

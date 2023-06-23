@@ -60,7 +60,7 @@ class _ChatPageState extends State<ChatPage> {
       _controller.isConversationLoading.value = false;
 
       setState(() {
-        _myId = widget.manager.getUser()['_id'];
+        _myId = widget.manager.getUser()['id'];
       });
       if (res.statusCode == 200) {
         Map<String, dynamic> map = jsonDecode(res.body);
@@ -76,8 +76,8 @@ class _ChatPageState extends State<ChatPage> {
           // _guestPhoto = map['conversation'][0]['receiver']['photo'];
           // senderId  = map['conversation'][0]['sender']['photo'];
           // _guestId = map['conversation'][0]['receiver']['id'];
-          user1Id = map['users'][0]['_id'];
-          user2Id = map['users'][1]['_id'];
+          user1Id = map['users'][0]['id'];
+          user2Id = map['users'][1]['id'];
         });
       }
     } catch (e) {
@@ -115,7 +115,8 @@ class _ChatPageState extends State<ChatPage> {
       socket.connect();
       socket.emit('isRead', {
         'reader': widget.manager.getUser()['id'],
-        'readerName': widget.manager.getUser()['bio']['fullname'],
+        'readerName':
+            "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['middlename']} ${widget.manager.getUser()['bio']['lastname']}",
         'otherUser': _getOtherUserId(),
         'chatId': widget.caller == "profile"
             ? widget.data['chatId']
@@ -124,7 +125,8 @@ class _ChatPageState extends State<ChatPage> {
     } else {
       socket.emit('isRead', {
         'reader': widget.manager.getUser()['id'],
-        'readerName': widget.manager.getUser()['bio']['fullname'],
+        'readerName':
+            "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['middlename']} ${widget.manager.getUser()['bio']['lastname']}",
         'otherUser': _getOtherUserId(),
         'chatId': widget.caller == "profile"
             ? widget.data['chatId']
@@ -137,7 +139,8 @@ class _ChatPageState extends State<ChatPage> {
       if (data['senderId'] != widget.manager.getUser()['id']) {
         socket.emit('isRead', {
           'reader': widget.manager.getUser()['id'],
-          'readerName': widget.manager.getUser()['bio']['fullname'],
+          'readerName':
+              "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['middlename']} ${widget.manager.getUser()['bio']['lastname']}",
           'otherUser': _getOtherUserId(),
           'chatId': widget.caller == "profile"
               ? widget.data['chatId']
@@ -553,7 +556,8 @@ class _ChatPageState extends State<ChatPage> {
       },
       "sender": {
         "id": widget.manager.getUser()['id'],
-        "name": widget.manager.getUser()['bio']['fullname'],
+        "name":
+            "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['middlename']} ${widget.manager.getUser()['bio']['lastname']}",
         "photo": widget.manager.getUser()['bio']['image'],
       }
     };
@@ -568,7 +572,7 @@ class _ChatPageState extends State<ChatPage> {
       },
       "sender": {
         "id": widget.manager.getUser()['id'],
-        "name": widget.manager.getUser()['bio']['fullname'],
+        "name": "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['middlename']} ${widget.manager.getUser()['bio']['lastname']}",
         "photo": widget.manager.getUser()['bio']['image'],
       }
     };

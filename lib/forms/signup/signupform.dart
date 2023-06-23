@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
@@ -129,7 +127,7 @@ class _SignupFormState extends State<SignupForm> {
                 return 'Please re-type password';
               }
               if (_passwordController.text != value) {
-                return 'Please does not match';
+                return 'Password does not match';
               }
               return null;
             },
