@@ -114,6 +114,12 @@ class _UserProfile2State extends State<UserProfile2> {
     socket.emit('checkOnline', _controller.userData.value['id']);
   }
 
+  _onConnected(val) {
+    setState(() {
+      _isConnected = val;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -292,7 +298,9 @@ class _UserProfile2State extends State<UserProfile2> {
                                 height: 18,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(9),
-                                  color: Colors.green,
+                                  color: !map['isVerified']
+                                      ? Constants.golden
+                                      : Colors.green,
                                 ),
                               ),
                             ),
@@ -319,24 +327,13 @@ class _UserProfile2State extends State<UserProfile2> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 3.0),
+                              const SizedBox(height: 8.0),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  // Wrap(
-                                  //   children: [
-                                  //     TextInter(
-                                  //       text:
-                                  //           "${map['data']['bio']['fullname']}"
-                                  //               .capitalize,
-                                  //       fontSize: 20,
-                                  //       fontWeight: FontWeight.w600,
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                  8 == 8
+                                  !map['isVerified']
                                       ? TextPoppins(
                                           text: "Not verified",
                                           fontSize: 16,
@@ -637,6 +634,7 @@ class _UserProfile2State extends State<UserProfile2> {
                                                 : ContactInfoContent(
                                                     manager: widget.manager,
                                                     guestData: map['data'],
+                                                    onConnected: _onConnected,
                                                   ),
                                           ),
                                         );

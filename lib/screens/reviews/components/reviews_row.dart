@@ -182,7 +182,7 @@ class ReviewRow extends StatelessWidget {
                                           children: [
                                             TextSpan(
                                               text:
-                                                  "${manager.getUser()['bio']['fullname']}"
+                                                  "${manager.getUser()['bio']['firstname']} ${manager.getUser()['bio']['middlename']} ${manager.getUser()['bio']['lastname']}"
                                                       .capitalize,
                                               style: const TextStyle(
                                                 color: Constants.primaryColor,
@@ -214,7 +214,7 @@ class ReviewRow extends StatelessWidget {
                                             ),
                                             TextSpan(
                                               text:
-                                                  "${userData['bio']['fullname']}"
+                                                  "${userData['bio']['firstname']} ${manager.getUser()['bio']['middlename']} ${manager.getUser()['bio']['lastname']}"
                                                       .capitalize,
                                               style: const TextStyle(
                                                 color: Colors.black,
@@ -434,7 +434,7 @@ class ReviewRow extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                "Reply by ${userData['bio']['fullname'].toString().capitalize} on ",
+                                "Reply by ${userData['bio']['firstname'].toString().capitalize} ${userData['bio']['lastname'].toString().capitalize} on ",
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,

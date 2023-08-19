@@ -157,13 +157,15 @@ class CustomSearchDelegate extends SearchDelegate {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextInter(
-                              text: "${map['data'][index]['bio']['fullname']}".capitalize,
+                              text:
+                                  "${map['data'][index]['bio']['firstname']} ${map['data'][index]['bio']['middlename']} ${map['data'][index]['bio']['lastname']}"
+                                      .capitalize,
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                             ),
                             TextInter(
                               text:
-                                  "${map['data'][index]['accountType'].toString().capitalize} - ${map['data'][index]['reviews']?.length} reviews",
+                                  "${map['data'][index]['accountType'].toString().toLowerCase() == "freelancer" ? "Professional" : "Recruiter"} - ${map['data'][index]['reviews']?.length} reviews",
                               fontSize: 14,
                             )
                           ],
@@ -177,7 +179,5 @@ class CustomSearchDelegate extends SearchDelegate {
           );
   }
 
-  _saveToDb() async {
-    // await DatabaseHandler().saveTransaction(trans.data);
-  }
+
 }

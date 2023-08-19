@@ -91,12 +91,11 @@ class APIService {
     );
   }
 
-  Future<http.Response> getFreelancers(String accessToken, String email) async {
+  Future<http.Response> getFreelancers() async {
     return await client.get(
-      Uri.parse('${Constants.baseURL}/api/freelancers/$email'),
+      Uri.parse('${Constants.baseURL}/api/freelancers/'),
       headers: {
         "Content-type": "application/json",
-        "Authorization": "Bearer " + accessToken,
       },
     );
   }
@@ -205,7 +204,6 @@ class APIService {
       Uri.parse('${Constants.baseURL}/api/search/$key'),
       headers: {
         "Content-type": "application/json",
-        "Authorization": "Bearer " + accessToken,
       },
     );
   }
@@ -345,12 +343,11 @@ class APIService {
     );
   }
 
-  Future<http.Response> getAllJobs({var accessToken, var email}) async {
+  Future<http.Response> getAllJobs() async {
     return await client.get(
-      Uri.parse('${Constants.baseURL}/api/job/all/$email'),
+      Uri.parse('${Constants.baseURL}/api/job/all/'),
       headers: {
         "Content-type": "application/json",
-        "Authorization": "Bearer " + accessToken,
       },
     );
   }

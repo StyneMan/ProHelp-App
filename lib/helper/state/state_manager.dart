@@ -152,10 +152,10 @@ class StateController extends GetxController {
       });
 
       // if (map['accountType'] != "freelancer") {
-      APIService().getFreelancers(_token, map['email']).then((value) {
+      APIService().getFreelancers().then((value) {
         debugPrint("STATE GET FREELANCERS >>> ${value.body}");
         Map<String, dynamic> data = jsonDecode(value.body);
-        freelancers.value = data['data'];
+        freelancers.value = data['docs'];
       }).catchError((onError) {
         if (onError.toString().contains("rk is unreachable")) {
           hasInternetAccess.value = false;
@@ -164,7 +164,7 @@ class StateController extends GetxController {
       });
 
       APIService()
-          .getAllJobs(accessToken: _token, email: map['email'])
+          .getAllJobs()
           .then((value) {
         debugPrint("STATE GET JOBS >>> ${value.body}");
         Map<String, dynamic> data = jsonDecode(value.body);

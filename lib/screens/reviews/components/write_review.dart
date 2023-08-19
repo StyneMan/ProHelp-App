@@ -56,7 +56,7 @@ class _WriteReviewState extends State<WriteReview> {
               children: [
                 TextInter(
                   text:
-                      "Review ${widget.data['bio']['fullname'].toString().capitalize?.split(' ')[0]}",
+                      "Review ${widget.data['bio']['firstname'].toString().capitalize}",
                   fontSize: 16,
                   color: Colors.white,
                 ),
@@ -184,7 +184,9 @@ class _WriteReviewState extends State<WriteReview> {
       "userId": widget.data['id'],
       "reviewer": {
         "id": widget.manager.getUser()['id'],
-        "name": widget.manager.getUser()['bio']['fullname'],
+        "name": widget.manager.getUser()['bio']['firstname'] +
+            " " +
+            widget.manager.getUser()['bio']['lastname'],
         "photo": widget.manager.getUser()['bio']['image'],
         "email": widget.manager.getUser()['email'],
       }

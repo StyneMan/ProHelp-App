@@ -42,7 +42,9 @@ class _BlockReportState extends State<BlockReport> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   TextInter(
-                    text: "Block/Report ${widget.data['bio']['firstname']} ${widget.data['bio']['lastname']}".capitalize,
+                    text:
+                        "Block/Report ${widget.data['bio']['firstname']} ${widget.data['bio']['lastname']}"
+                            .capitalize,
                     fontSize: 16,
                     color: Colors.white,
                   ),
@@ -62,7 +64,7 @@ class _BlockReportState extends State<BlockReport> {
                 children: [
                   TextInter(
                     text:
-                        "If you block and report ${widget.data['bio']['fullname']}, you will no longer receive or send message to each other. However, you can choose to only report without blocking. ${widget.data['bio']['fullname'].toString().capitalize} will not know you reported",
+                        "If you block and report ${widget.data['bio']['firstname']} ${widget.data['bio']['lastname']}, you will no longer receive or send message to each other. However, you can choose to only report without blocking. ${widget.data['bio']['firstname'].toString().capitalize}  ${widget.data['bio']['lastname'].toString().capitalize} will not know you reported",
                     fontSize: 16,
                   ),
                 ],
@@ -104,7 +106,7 @@ class _BlockReportState extends State<BlockReport> {
                   Expanded(
                     child: CustomButton(
                       bgColor: Colors.transparent,
-                      child: const TextInter(text: "Cancel", fontSize: 16),
+                      child: const TextInter(text: "Cancel", fontSize: 14),
                       borderColor: Constants.primaryColor,
                       foreColor: Constants.primaryColor,
                       onPressed: () {
@@ -121,7 +123,7 @@ class _BlockReportState extends State<BlockReport> {
                       bgColor: Constants.primaryColor,
                       child: const TextInter(
                         text: "Continue",
-                        fontSize: 16,
+                        fontSize: 14,
                         color: Colors.white,
                       ),
                       borderColor: Constants.primaryColor,

@@ -178,11 +178,11 @@ class _DashboardState extends State<Dashboard> {
 
       // if (widget.manager.getUser()['accountType'] != "freelancer") {
       APIService()
-          .getFreelancers(_token, widget.manager.getUser()['email'])
+          .getFreelancers()
           .then((value) {
         debugPrint("STATE GET FREELANCERS >>> ${value.body}");
         Map<String, dynamic> data = jsonDecode(value.body);
-        _controller.freelancers.value = data['data'];
+        _controller.freelancers.value = data['docs'];
       }).catchError((onError) {
         debugPrint("STATE GET freelancer ERROR >>> $onError");
         if (onError.toString().contains("rk is unreachable")) {

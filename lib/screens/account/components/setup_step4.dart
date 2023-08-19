@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:prohelp_app/components/inputfield/customautocomplete.dart';
+import 'package:prohelp_app/components/inputfield/customdropdown.dart';
 import 'package:prohelp_app/components/inputfield/textfield.dart';
 import 'package:prohelp_app/components/text_components.dart';
+import 'package:prohelp_app/data/disablility/disbilities.dart';
 import 'package:prohelp_app/data/languages/languages.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
@@ -31,6 +33,7 @@ class _SetupStep4State extends State<SetupStep4> {
   List<String> _selectedLangReadWrite = [];
 
   bool _isDisablity = false;
+  String _selectedDisability = "";
 
   // List<PlatformFile>? _pickedFiles = [];
 
@@ -48,6 +51,14 @@ class _SetupStep4State extends State<SetupStep4> {
     super.didChangeDependencies();
   }
 
+  _onSelected(val) {
+    setState(() {
+      _selectedDisability = val;
+    });
+
+    widget.onStep4Completed({"disability": val});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(
@@ -55,7 +66,6 @@ class _SetupStep4State extends State<SetupStep4> {
         children: [
           CustomAutoComplete(
             data: languages,
-          
             onItemSelected: (val) {
               debugPrint("VALUE SELECTED:: $val");
               FocusManager.instance.primaryFocus?.unfocus();
@@ -64,7 +74,6 @@ class _SetupStep4State extends State<SetupStep4> {
                   setState(() {
                     _controller.languagesSpoken.add(val);
                   });
-
                 } else {
                   Constants.toast("Language already selected!");
                 }
@@ -148,7 +157,7 @@ class _SetupStep4State extends State<SetupStep4> {
                 Constants.toast("Maximum number of languages reached!!");
               }
             },
-            hintText: "Languages you can speak and write",
+            hintText: "Languages you can read and write",
           ),
           const SizedBox(
             height: 4.0,
@@ -223,7 +232,6 @@ class _SetupStep4State extends State<SetupStep4> {
                 },
               ),
               const Text("NO"),
-              
               Checkbox(
                 value: _isDisablity,
                 onChanged: (val) {
@@ -239,24 +247,10 @@ class _SetupStep4State extends State<SetupStep4> {
             height: 8.0,
           ),
           _isDisablity
-              ? CustomTextField(
-                  hintText: "Specify",
-                  onChanged: (val) {
-                    widget.onStep4Completed(
-                      {
-                        "disability": val,
-                      },
-                    );
-                  },
-                  controller: _disabilityController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'School name is required!';
-                    }
-                    return null;
-                  },
-                  inputType: TextInputType.name,
-                  capitalization: TextCapitalization.words,
+              ? CustomDropdown(
+                  onSelected: _onSelected,
+                  hint: "Disability",
+                  items: disabilities,
                 )
               : const SizedBox(),
         ],

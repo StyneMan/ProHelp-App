@@ -15,14 +15,15 @@ class CustomAutoComplete extends StatelessWidget {
     required this.onItemSelected,
     required this.hintText,
     this.borderRadius = 36.0,
-    
   }) : super(key: key);
 
-  late TextEditingController controller;
+  final _tcontroller = TextEditingController();
+  final _focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
-    return Autocomplete<String>(
+    return RawAutocomplete<String>(
+      textEditingController: _tcontroller,
       optionsBuilder: (TextEditingValue textEditingValue) {
         if (textEditingValue.text.isEmpty) {
           return const Iterable<String>.empty();
@@ -39,35 +40,35 @@ class CustomAutoComplete extends StatelessWidget {
             itemBuilder: (context, index) {
               final String option = options.elementAt(index);
               return ListTile(
-                // title: Text(option.toString()),
                 title: SubstringHighlight(
                   text: option.toString(),
-                  term: controller.text,
-                  textStyleHighlight: TextStyle(fontWeight: FontWeight.w700),
+                  term: _tcontroller.text,
+                  textStyleHighlight:
+                      const TextStyle(fontWeight: FontWeight.w700),
                 ),
-                // subtitle: const Text("This is subtitle"),
                 onTap: () {
                   onItemSelected(option);
-                  // onSelected(option.toString());
                 },
               );
             },
-            separatorBuilder: (context, index) => Divider(),
+            separatorBuilder: (context, index) => const Divider(),
             itemCount: options.length,
           ),
         );
       },
       onSelected: (selectedString) {
-        print(selectedString);
+        // print(selectedString);
+        _tcontroller.text = "";
       },
+      focusNode: _focusNode,
       fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-        this.controller = controller;
+        // _tcontroller = controller;
         return TextField(
-          controller: controller,
+          controller: _tcontroller,
           focusNode: focusNode,
           onChanged: (String value) {},
           onEditingComplete: onEditingComplete,
-          decoration:  InputDecoration(
+          decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 24.0,
               vertical: 12.0,

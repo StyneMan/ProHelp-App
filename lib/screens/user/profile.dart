@@ -110,6 +110,12 @@ class _UserProfileState extends State<UserProfile> {
     socket.emit('checkOnline', _controller.userData.value['id']);
   }
 
+  _onConnected(val) {
+    setState(() {
+      _isConnected = val;
+    });
+  }
+
   @override
   void initState() {
     _checkOnlineStatus();
@@ -135,6 +141,7 @@ class _UserProfileState extends State<UserProfile> {
                     : ContactInfoContent(
                         manager: widget.manager,
                         guestData: widget.data,
+                        onConnected: _onConnected,
                       ),
               ),
             );
@@ -146,14 +153,11 @@ class _UserProfileState extends State<UserProfile> {
 
   @override
   void didChangeDependencies() {
-    // _checkConnection();
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    // _checkConnection();
-
     return Scaffold(
       key: _scaffoldKey,
       endDrawer: CustomDrawer(
@@ -252,7 +256,9 @@ class _UserProfileState extends State<UserProfile> {
                             height: 18,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(9),
-                              color: Colors.green,
+                              color: !widget.data['isVerified']
+                                  ? Constants.golden
+                                  : Colors.green,
                             ),
                           ),
                         ),
@@ -277,11 +283,12 @@ class _UserProfileState extends State<UserProfile> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 6.0),
+                          const SizedBox(height: 8.0),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
+
                               !widget.data['isVerified']
                                   ? TextPoppins(
                                       text: " Not verified",
@@ -534,6 +541,7 @@ class _UserProfileState extends State<UserProfile> {
                                             : ContactInfoContent(
                                                 manager: widget.manager,
                                                 guestData: widget.data,
+                                                onConnected: _onConnected,
                                               ),
                                       ),
                                     );

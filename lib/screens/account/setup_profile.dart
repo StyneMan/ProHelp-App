@@ -6,15 +6,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 // import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:loading_overlay_pro/loading_overlay_pro.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:prohelp_app/components/button/custombutton.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
 import 'package:prohelp_app/components/dialog/info_dialog.dart';
-import 'package:prohelp_app/components/picker/img_picker.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
@@ -97,38 +94,50 @@ class _SetupProfileState extends State<SetupProfile> {
     Map _payload = {
       "accountType": "freelancer",
       "bio": {
-        "firstname": _step1Payload['firstname'].toString().toLowerCase(),
-        "lastname": _step1Payload['lastname'].toString().toLowerCase(),
-        "middlename": _step1Payload['middlename'].toString().toLowerCase(),
-        "phone": _step1Payload['phone'],
-        "gender": _step1Payload['gender'].toString().toLowerCase(),
-        "address": _step1Payload['address'].toString().toLowerCase(),
+        "firstname": _step1Payload['firstname'].toLowerCase() ??
+            _controller.firstname.value.toLowerCase(),
+        "lastname": _step1Payload['lastname'].toLowerCase() ??
+            _controller.middlename.value.toLowerCase(),
+        "middlename": _step1Payload['middlename'].toLowerCase() ??
+            _controller.lastname.value.toLowerCase(),
+        "phone": _step1Payload['phone'] ?? _controller.phone.value,
+        "gender": _step1Payload['gender'].toLowerCase() ??
+            _controller.gender.value.toLowerCase(),
         "dob": _step1Payload['dob'],
         "image": url
       },
       "address": {
-        "street": _step1Payload['address'].toString().toLowerCase(),
-        "city": _step1Payload['city'],
+        "street": _step1Payload['address'].toLowerCase() ??
+            _controller.address.value.toLowerCase(),
+        "city": _step1Payload['city'] ?? _controller.city.value.toLowerCase(),
         "country":
             "nigeria", //_step1Payload['country'].toString().toLowerCase(),
-        "state": _step1Payload['state'].toString().toLowerCase(),
+        "state": _step1Payload['state'].toLowerCase() ??
+            _controller.state.value.toLowerCase(),
       },
-      "profession": _step1Payload['profession'].toString().toLowerCase(),
-      "experienceYears":
-          _step1Payload['experienceYears'].toString().toLowerCase(),
+      "profession": _step1Payload['profession'].toLowerCase() ??
+          _controller.profession.value.toLowerCase(),
+      "experienceYears": _step1Payload['experienceYears'].toLowerCase() ??
+          _controller.experience.value.toLowerCase(),
       "guarantor": {
-        "name": _step2Payload['nokName'].toString().toLowerCase(),
-        "address": _step2Payload['nokAddress'].toString().toLowerCase(),
-        "email": _step2Payload['nokEmail'],
-        "phone": _step2Payload['nokPhone'],
-        "relationship": _step2Payload['relationship'].toString().toLowerCase()
+        "name": _step2Payload['nokName'].toLowerCase() ??
+            _controller.nokName.value.toLowerCase(),
+        "address": _step2Payload['nokAddress'].toLowerCase() ??
+            _controller.nokAddress.value.toLowerCase(),
+        "email": _step2Payload['nokEmail'] ?? _controller.nokEmail.value,
+        "phone": _step2Payload['nokPhone'] ?? _controller.nokPhone.value,
+        "relationship": _step2Payload['relationship'].toLowerCase() ??
+            _controller.nokRelationship.value.toLowerCase(),
       },
       "hasProfile": true,
       "education": [
         {
-          "school": _step3Payload['school'].toString().toLowerCase(),
-          "degree": _step3Payload['degree'].toString().toLowerCase(),
-          "course": _step3Payload['fieldStudy'].toString().toLowerCase(),
+          "school": _step3Payload['school'].toLowerCase() ??
+              _controller.school.value.toLowerCase(),
+          "degree": _step3Payload['degree'].toLowerCase() ??
+              _controller.degree.value.toLowerCase(),
+          "course": _step3Payload['fieldStudy'].toLowerCase() ??
+              _controller.fieldStudy.value.toLowerCase(),
           "schoolLogo": "",
           "endate": _step3Payload['dateGraduated'],
           "stillSchooling": false
@@ -225,6 +234,7 @@ class _SetupProfileState extends State<SetupProfile> {
     _controller.country.value = _step1Payload['country'];
     _controller.profession.value = _step1Payload['profession'];
     _controller.city.value = _step1Payload['city'];
+    _controller.experience.value = _step1Payload['experienceYears'];
     _controller.phone.value =
         _step1Payload['phone'].toString().startsWith("+234")
             ? "0${_step1Payload['phone'].toString().substring(4)}"

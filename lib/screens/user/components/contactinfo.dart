@@ -12,13 +12,17 @@ import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/account/components/wallet.dart';
 
+typedef void InitCallback(bool value);
+
 class ContactInfoContent extends StatelessWidget {
   var guestData;
   final PreferenceManager manager;
+  InitCallback onConnected;
   ContactInfoContent({
     Key? key,
     required this.guestData,
     required this.manager,
+    required this.onConnected,
   }) : super(key: key);
 
   _obscurePhone(String phone) {
@@ -57,10 +61,10 @@ class ContactInfoContent extends StatelessWidget {
         Map<String, dynamic> map = jsonDecode(_resp.body);
         Constants.toast(map['message']);
 
-        _controller.userData.value = map['data'];
         String userStr = jsonEncode(map['data']);
         manager.setUserData(userStr);
-
+        _controller.userData.value = map['data'];
+        onConnected(true);
         _controller.onInit();
 
         Get.back();

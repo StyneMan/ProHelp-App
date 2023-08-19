@@ -139,7 +139,9 @@ class _UserProfileState extends State<MyProfile> {
                               height: 18,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(9),
-                                color: Colors.green,
+                                color: !widget.manager.getUser()['isVerified']
+                                    ? Constants.golden
+                                    : Colors.green,
                               ),
                             ),
                           ),
@@ -164,15 +166,11 @@ class _UserProfileState extends State<MyProfile> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: 6.0),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                // (_controller.userData
-                                //             .value['isDocumentVerified'] == Null ??
-                                //         false)
-                                8 == 8
+                                !widget.manager.getUser()['isVerified']
                                     ? TextPoppins(
                                         text: "Not verified",
                                         fontSize: 16,

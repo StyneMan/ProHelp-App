@@ -117,8 +117,8 @@ class _AccountTypeState extends State<AccountType> {
                           RoundedButton(
                             bgColor: Colors.white,
                             child: TextPoppins(
-                              text: "RENDER SERVICES",
-                              fontSize: 16,
+                              text: "SERVICE PROVIDER",
+                              fontSize: 14,
                             ),
                             borderColor: Colors.transparent,
                             foreColor: Constants.primaryColor,
@@ -167,8 +167,8 @@ class _AccountTypeState extends State<AccountType> {
                           RoundedButton(
                             bgColor: Colors.transparent,
                             child: TextPoppins(
-                              text: "HIRE A PRO",
-                              fontSize: 16,
+                              text: "HIRE SERVICE PROVIDER",
+                              fontSize: 14,
                             ),
                             borderColor: Colors.white,
                             foreColor: Colors.white,
