@@ -55,6 +55,7 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
   final _formKey = GlobalKey<FormState>();
 
   String _selectedGender = "Male";
+  String _selectedMaritalStatus = "Single";
   String _selectedState = "Abia";
   String _selectedCity = "Select City";
   String _selectedCountry = "Nigeria";
@@ -69,6 +70,10 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
 
   void _onSelected(String val) {
     _selectedGender = val;
+  }
+
+  void _onMaritalStatusSelected(String val) {
+    _selectedMaritalStatus = val;
   }
 
   void _onStateSelected(String val) {
@@ -149,7 +154,8 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
         "phone": _phoneController.text,
         "gender": _selectedGender.toString().toLowerCase(),
         "dob": _dateController.text,
-        "image": url
+        "image": url,
+        "maritalStatus": _selectedMaritalStatus.toString().toLowerCase(),
       },
       "address": {
         "state": _selectedState.toLowerCase(),
@@ -325,6 +331,14 @@ class _SetupProfileEmployerState extends State<SetupProfileEmployer> {
                     onSelected: _onSelected,
                     hint: "Gender",
                     items: const ['Male', 'Female'],
+                  ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  CustomDropdown(
+                    onSelected: _onMaritalStatusSelected,
+                    hint: "Marital status",
+                    items: const ['Single', 'Married', "Divorced", "Widowed"],
                   ),
                   const SizedBox(
                     height: 16.0,

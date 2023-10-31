@@ -21,7 +21,7 @@ class Constants {
   static const Color shimmerHighlightColor = Colors.white;
 
   static const baseURL = "https://my-prohelp-server.vercel.app";
-  //"http://192.168.0.110:8080"; //
+  //  "http://192.168.1.27:8080";  //
 
   //  "https://pro-help-api.vercel.app"; //"http://192.168.1.103:8080";
   static String pstk = "pk_test_40f544aec0415695c9fae0ba0819ee5bebcb6a5e";

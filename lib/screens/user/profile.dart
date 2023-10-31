@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:prohelp_app/components/button/custombutton.dart';
 import 'package:prohelp_app/components/dialog/info_dialog.dart';
 import 'package:prohelp_app/components/drawer/custom_drawer.dart';
@@ -46,6 +47,7 @@ class _UserProfileState extends State<UserProfile> {
 
   bool _isLiked = false;
   bool _isConnected = false;
+  String _professionBanner = "";
 
   _likeUser() async {
     _controller.setLoading(true);
@@ -116,10 +118,24 @@ class _UserProfileState extends State<UserProfile> {
     });
   }
 
+  _setBanner() {
+    if (_controller.allProfessions.value.isNotEmpty) {
+      var pro = _controller.allProfessions.value.where((item) =>
+          item['name'].toLowerCase() ==
+          widget.data['profession']?.toLowerCase());
+      //   console.log("PROF : ", pro);
+      setState(() {
+        _professionBanner = "${pro.first['image']}";
+      });
+      // setProfessionBanner(pro[0]?.image);
+    }
+  }
+
   @override
   void initState() {
     _checkOnlineStatus();
     super.initState();
+    _setBanner();
     _checkConnection();
     _checkLiked();
 
@@ -174,8 +190,8 @@ class _UserProfileState extends State<UserProfile> {
                   SizedBox(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.height * 0.25,
-                    child: Image.asset(
-                      "assets/images/profile_bg.png",
+                    child: Image.network(
+                      _professionBanner,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -223,17 +239,19 @@ class _UserProfileState extends State<UserProfile> {
                               width: 1.0,
                             ),
                           ),
-                          child: Image.network(
-                            widget.data['bio']['image'],
-                            fit: BoxFit.cover,
-                            width: Constants.avatarRadius + 48,
-                            height: Constants.avatarRadius + 48,
-                            errorBuilder: (context, error, stackTrace) =>
+                          child: CachedNetworkImage(
+                            imageUrl: widget.data['bio']['image'],
+                            placeholder: (context, url) =>
+                                CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
                                 SvgPicture.asset(
                               "assets/images/personal_icon.svg",
                               width: Constants.avatarRadius + 40,
                               height: Constants.avatarRadius + 40,
                             ),
+                            fit: BoxFit.cover,
+                            width: Constants.avatarRadius + 48,
+                            height: Constants.avatarRadius + 48,
                           ),
                         ),
                       ),
@@ -288,7 +306,6 @@ class _UserProfileState extends State<UserProfile> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-
                               !widget.data['isVerified']
                                   ? TextPoppins(
                                       text: " Not verified",
@@ -359,7 +376,7 @@ class _UserProfileState extends State<UserProfile> {
                               initialRating: "${widget.data['rating']}"
                                       .contains(".")
                                   ? widget.data['rating']
-                                  : (widget.data['rating'] ?? 0).toDouble() ??
+                                  : (widget.data['rating'] ?? 1).toDouble() ??
                                       0.0, //widget.data.rating,
                               minRating: 1,
                               direction: Axis.horizontal,
@@ -469,19 +486,15 @@ class _UserProfileState extends State<UserProfile> {
                     const SizedBox(
                       height: 8.0,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    Wrap(
+                      spacing: 0,
+                      runSpacing: -8,
+                      alignment: WrapAlignment.start,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         for (var e = 0; e < widget.data['skills']?.length; e++)
-                          Container(
-                            padding: const EdgeInsets.all(2.0),
-                            margin: const EdgeInsets.all(1.5),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(4.0),
-                            ),
-                            child: TextPoppins(
+                          Chip(
+                            label: TextPoppins(
                               text: widget.data['skills'][e]['name'],
                               fontSize: 12,
                             ),

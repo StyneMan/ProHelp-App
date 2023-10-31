@@ -5,9 +5,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:prohelp_app/components/dashboard/dashboard.dart';
+import 'package:prohelp_app/firebase_options.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
@@ -24,6 +25,10 @@ import 'package:socket_io_client/socket_io_client.dart';
 
 import 'helper/service/api_service.dart';
 import 'helper/socket/socket_manager.dart';
+
+Future initFirebase() async {
+  await Firebase.initializeApp();
+}
 
 enum Version { lazy, wait }
 
@@ -57,6 +62,12 @@ class AwaitBindings extends Bindings {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  // await initFirebase();
+
+  // FirebaseApp app = await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
+  // print('Initialized default app $app');
 
   await FlutterDownloader.initialize(
       debug:
@@ -121,12 +132,12 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-List _socketEvents = [
-  "-notification-created",
-  "-booking-updated",
-  "-chat-alert",
-  "-profile-updated",
-];
+// List _socketEvents = [
+//   "-notification-created",
+//   "-booking-updated",
+//   "-chat-alert",
+//   "-profile-updated",
+// ];
 
 class _MyAppState extends State<MyApp> {
   final _controller = Get.put(StateController());
@@ -308,7 +319,7 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> {
   _init() async {
     try {
-      await FirebaseFirestore.instance.collection("stores").snapshots();
+      // await FirebaseFirestore.instance.collection("stores").snapshots();
     } on SocketException catch (io) {
       widget.controller.setHasInternet(false);
     } catch (e) {

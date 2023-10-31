@@ -3,10 +3,11 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_paystack/flutter_paystack.dart';
+// import 'package:flutter_paystack/flutter_paystack.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:loading_overlay_pro/loading_overlay_pro.dart';
+import 'package:pay_with_paystack/pay_with_paystack.dart';
 import 'package:prohelp_app/components/button/custombutton.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/card/card_utils.dart';
@@ -52,7 +53,7 @@ class _PayToViewState extends State<PayToView> {
 
   final _controller = Get.find<StateController>();
 
-  final plugin = PaystackPlugin();
+  // final plugin = PaystackPlugin();
   CardType cardType = CardType.Invalid;
 
   final _formKey = GlobalKey<FormState>();
@@ -67,7 +68,7 @@ class _PayToViewState extends State<PayToView> {
         getCardTypeFrmNumber();
       },
     );
-    plugin.initialize(publicKey: Constants.pstk);
+    // plugin.initialize(publicKey: Constants.pstk);
     super.initState();
   }
 
@@ -355,21 +356,21 @@ class _PayToViewState extends State<PayToView> {
     );
   }
 
-  PaymentCard _getCardFromUI() {
-    // Using just the must-required parameters.
-    var numb = cardNumberController.text.replaceAll(" ", "");
-    var cleanedCVV = _cvvController.text.replaceAll(" ", "");
-    var expiryArray = _expiryController.text.split("/");
-    var expMonth = expiryArray[0];
-    var expYear = expiryArray[1];
+  // PaymentCard _getCardFromUI() {
+  //   // Using just the must-required parameters.
+  //   var numb = cardNumberController.text.replaceAll(" ", "");
+  //   var cleanedCVV = _cvvController.text.replaceAll(" ", "");
+  //   var expiryArray = _expiryController.text.split("/");
+  //   var expMonth = expiryArray[0];
+  //   var expYear = expiryArray[1];
 
-    return PaymentCard(
-      number: numb,
-      cvc: cleanedCVV,
-      expiryMonth: int.parse(expMonth),
-      expiryYear: int.parse(expYear),
-    );
-  }
+  //   return PaymentCard(
+  //     number: numb,
+  //     cvc: cleanedCVV,
+  //     expiryMonth: int.parse(expMonth),
+  //     expiryYear: int.parse(expYear),
+  //   );
+  // }
 
   _getAccessCode() {
     return "${widget.manager.getUser()['email']}" +
@@ -377,32 +378,35 @@ class _PayToViewState extends State<PayToView> {
   }
 
   _chargeCard() async {
-    var charge = Charge()
-      ..card = _getCardFromUI()
-      ..amount = widget.data['amount'] * 100
-      ..email = "${widget.manager.getUser()['email']}"
-      ..reference = _getAccessCode();
+    // var charge = Charge()
+    //   ..card = _getCardFromUI()
+    //   ..amount = widget.data['amount'] * 100
+    //   ..email = "${widget.manager.getUser()['email']}"
+    //   ..reference = _getAccessCode();
 
     try {
-      final response = await plugin.chargeCard(context, charge: charge);
-      debugPrint(
-          "CHARGE RESPONSE >> ${response.message} , ${response.reference}, ${response.status}");
+      //   final response = await plugin.chargeCard(context, charge: charge);
+      //   debugPrint(
+      //       "CHARGE RESPONSE >> ${response.message} , ${response.reference}, ${response.status}");
 
-      // if (response.status) {
-      _fundWallet(response.reference, response.status, response.message);
-      // } else {
-      // _controller.setLoading(false);
-      // Constants.toast(response.message);
-      // Criminal record 
-      // gurantor
-      // Means of ID (nin, voter's card, drivers license, international passport)
-      // previous work address
-      // House address
-
-      // ............
-      // Disabilities
-      // ............
-      // }
+      await PayWithPayStack()
+          .now(
+              context: context,
+              secretKey: Constants.pstk,
+              customerEmail: "${widget.manager.getUser()['email']}",
+              reference: _getAccessCode(),
+              currency: "NGN",
+              paymentChannel: ["mobile_money", "card"],
+              amount: "${widget.data['amount'] * 100}",
+              transactionCompleted: () {
+                print("Transaction Successful");
+                _fundWallet(
+                    _getAccessCode(), "success", "Transaction Successful");
+              },
+              transactionNotCompleted: () {
+                print("Transaction Not Successful!");
+              })
+          .then((resp) => {debugPrint("RES PO :: $resp")});
     } catch (e) {
       debugPrint("PAYMENT ERROR >> $e");
     }
@@ -413,7 +417,8 @@ class _PayToViewState extends State<PayToView> {
       "amount": widget.data['amount'],
       "value": widget.data['value'],
       "reference": ref,
-      "summary": "Fund wallet with value of ${widget.data['value']} coins: $summary",
+      "summary":
+          "Fund wallet with value of ${widget.data['value']} coins: $summary",
       "userId": widget.manager.getUser()['id'],
       "type": "fund_wallet",
       "status": "$status",

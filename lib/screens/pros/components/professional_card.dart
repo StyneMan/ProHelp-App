@@ -108,7 +108,7 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
     return Card(
       elevation: 1.0,
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
             Row(
@@ -121,7 +121,7 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                   children: [
                     ClipOval(
                       child: Image.network(
-                        widget.data['bio']['image'],
+                        '${widget.data['bio']['image']}',
                         width: 64,
                         height: 64,
                         fit: BoxFit.cover,
@@ -204,12 +204,16 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                           const SizedBox(
                             width: 4.0,
                           ),
-                          TextPoppins(
-                            text:
-                                "${widget.data['address']['city']}, ${widget.data['address']['state']}"
-                                    .capitalize,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
+                          Expanded(
+                            child: Text(
+                              "${widget.data['address']['city']}, ${widget.data['address']['state']}"
+                                  .capitalize!,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -248,7 +252,7 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                                 "${widget.data['rating']}".contains(".")
                                     ? widget.data['rating']
                                     : (widget.data['rating'] ?? 0).toDouble() ??
-                                        0.0,
+                                        1.0,
                             minRating: 1,
                             direction: Axis.horizontal,
                             allowHalfRating: true,
@@ -259,7 +263,7 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                                 const EdgeInsets.symmetric(horizontal: 0.0),
                             itemBuilder: (context, _) => const Icon(
                               Icons.star,
-                              size: 21,
+                              size: 16,
                               color: Colors.amber,
                             ),
                             onRatingUpdate: (rating) {
@@ -271,7 +275,7 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                           ),
                           TextPoppins(
                             text: "(${widget.data['reviews']?.length} reviews)",
-                            fontSize: 12,
+                            fontSize: 11,
                           ),
                         ],
                       ),
@@ -301,19 +305,19 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                   Container(
                     padding: const EdgeInsets.all(2.0),
                     margin: const EdgeInsets.all(1.5),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(4.0),
-                    ),
-                    child: TextPoppins(
-                      text: "${widget.data['skills'][e]['name']}".capitalize,
-                      fontSize: 12,
+                    child: Chip(
+                      label: TextPoppins(
+                        text:
+                            "${widget.data['skills'][e]['name'].toString().length > 16 ? widget.data['skills'][e]['name'].toString().substring(0, 15) : widget.data['skills'][e]['name']}"
+                                .capitalize,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
               ],
             ),
             const SizedBox(
-              height: 16.0,
+              height: 8.0,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

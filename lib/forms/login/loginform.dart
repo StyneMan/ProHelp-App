@@ -75,7 +75,7 @@ class _LoginFormState extends State<LoginForm> {
                 type: PageTransitionType.size,
                 alignment: Alignment.bottomCenter,
                 child: map['data']["accountType"].toString().toLowerCase() ==
-                        "freelancer"
+                        "professional"
                     ? SetupProfile(
                         manager: widget.manager,
                         email: map['data']['email'],

@@ -120,7 +120,7 @@ class _JobCardState extends State<JobCard> {
     return Card(
       elevation: 1.0,
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(9.0),
         child: Column(
           children: [
             Row(
@@ -321,10 +321,10 @@ class _JobCardState extends State<JobCard> {
                       const Icon(
                         Icons.track_changes_rounded,
                         color: Constants.primaryColor,
-                        size: 36,
+                        size: 32,
                       ),
                       const SizedBox(
-                        width: 8.0,
+                        width: 4.0,
                       ),
                       TextPoppins(text: "Actively recruiting", fontSize: 13),
                       const SizedBox(
@@ -615,8 +615,6 @@ class _JobCardState extends State<JobCard> {
                                     // ),
                                   ),
                                 );
-
-                    
                               },
                     variant: "Filled",
                   ),

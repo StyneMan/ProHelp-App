@@ -37,7 +37,7 @@ class _MyWalletState extends State<MyWallet> {
     {"title": '500 Coins', "amount": 1000, "value": 500},
     {"title": '800 Coins', "amount": 1500, "value": 800},
     {"title": '1000 Coins', "amount": 1800, "value": 1000},
-    {"title": '1500 Coins', "amount": 1800, "value": 1500},
+    {"title": '1500 Coins', "amount": 2000, "value": 1500},
     {"title": '2000 Coins', "amount": 3400, "value": 2000},
   ];
 
@@ -258,7 +258,7 @@ class _MyWalletState extends State<MyWallet> {
                                           () {
                                             _amountController.text =
                                                 "${Constants.nairaSign(context).currencySymbol}${Constants.formatMoney(ar['amount'])}";
-                                                _value = ar['value'];
+                                            _value = ar['value'];
                                           },
                                         );
                                       },
@@ -333,7 +333,10 @@ class _MyWalletState extends State<MyWallet> {
                                         Get.to(
                                           PayToView(
                                             manager: widget.manager,
-                                            data: {"amount": _amount, "value": _value},
+                                            data: {
+                                              "amount": _amount,
+                                              "value": _value
+                                            },
                                             type: "wallet",
                                           ),
                                           transition: Transition.cupertino,

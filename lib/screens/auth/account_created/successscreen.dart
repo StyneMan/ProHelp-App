@@ -97,7 +97,7 @@ class _AccountSuccessState extends State<AccountSuccess> {
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.80,
                       child: TextInter(
-                        text: widget.accountType == "freelancer"
+                        text: widget.accountType == "professional"
                             ? "You’re one step away from being hired as a professional. "
                             : "You’re one step away from hiring a professoinal for your project/service",
                         fontSize: 16,

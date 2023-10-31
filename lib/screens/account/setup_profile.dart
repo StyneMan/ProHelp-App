@@ -103,6 +103,8 @@ class _SetupProfileState extends State<SetupProfile> {
         "phone": _step1Payload['phone'] ?? _controller.phone.value,
         "gender": _step1Payload['gender'].toLowerCase() ??
             _controller.gender.value.toLowerCase(),
+        "maritalStatus": _step1Payload['maritalStatus'].toLowerCase() ??
+            _controller.maritalStatus.value.toLowerCase(),
         "dob": _step1Payload['dob'],
         "image": url
       },
@@ -132,14 +134,12 @@ class _SetupProfileState extends State<SetupProfile> {
       "hasProfile": true,
       "education": [
         {
-          "school": _step3Payload['school'].toLowerCase() ??
-              _controller.school.value.toLowerCase(),
-          "degree": _step3Payload['degree'].toLowerCase() ??
-              _controller.degree.value.toLowerCase(),
-          "course": _step3Payload['fieldStudy'].toLowerCase() ??
-              _controller.fieldStudy.value.toLowerCase(),
+          "school": "${_step3Payload['school']}".toLowerCase(),
+          "degree": "${_step3Payload['degree']}".toLowerCase(),
+          "course": "${_step3Payload['fieldStudy']}"?.toLowerCase() ??
+              _controller.fieldStudy.value?.toLowerCase(),
           "schoolLogo": "",
-          "endate": _step3Payload['dateGraduated'],
+          "endate": "${_step3Payload['dateGraduated']}",
           "stillSchooling": false
         },
       ],
@@ -183,7 +183,7 @@ class _SetupProfileState extends State<SetupProfile> {
             alignment: Alignment.bottomCenter,
             child: AccountSuccess(
               firstname: "${map["data"]["bio"]["firstname"]}",
-              accountType: "freelancer",
+              accountType: "professional",
             ),
           ),
         );
@@ -240,6 +240,7 @@ class _SetupProfileState extends State<SetupProfile> {
             ? "0${_step1Payload['phone'].toString().substring(4)}"
             : "${_step1Payload['phone']}";
     _controller.gender.value = _step1Payload['gender'];
+    _controller.maritalStatus.value = _step1Payload['maritalStatus'];
   }
 
   _saveStep2ToState() {

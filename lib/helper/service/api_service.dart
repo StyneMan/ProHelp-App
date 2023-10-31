@@ -199,6 +199,15 @@ class APIService {
     );
   }
 
+  Future<http.Response> getProfessions() async {
+    return await client.get(
+      Uri.parse('${Constants.baseURL}/api/profession/all'),
+      headers: {
+        "Content-type": "application/json",
+      },
+    );
+  }
+
   Future<http.Response> getSearchResults(String accessToken, String key) async {
     return await client.get(
       Uri.parse('${Constants.baseURL}/api/search/$key'),
@@ -501,7 +510,7 @@ class APIService {
     );
   }
 
-   Future<http.Response> topupWallet(
+  Future<http.Response> topupWallet(
     Map body,
     String accessToken,
     String email,

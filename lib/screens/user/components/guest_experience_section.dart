@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:prohelp_app/components/text_components.dart';
 
 class GuestExperienceSection extends StatelessWidget {
@@ -77,7 +78,7 @@ class GuestExperienceSection extends StatelessWidget {
                                       ),
                                       TextPoppins(
                                         text:
-                                            "${data[e]['startDate']} - ${data[e]['stillHere'] ? "Present" : data[e]['endate']}",
+                                            "${DateFormat('dd/MMM/yyyy').format(DateTime.parse(data[e]['startDate']))} - ${data[e]['stillHere'] ? "Present" : DateFormat('dd/MMM/yyyy').format(DateTime.parse(data[e]['endate']))}",
                                         fontSize: 13,
                                         fontWeight: FontWeight.w400,
                                       ),

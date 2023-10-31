@@ -8,11 +8,13 @@ import 'package:prohelp_app/components/shimmer/banner_shimmer.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
+import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/user/my_profile.dart';
 import 'package:prohelp_app/screens/user/profile.dart';
 
 class CustomSearchDelegate extends SearchDelegate {
   final PreferenceManager manager;
+  final _controller = Get.find<StateController>();
 // Demo list to show querying
   List<String> searchTerms = [
     "Apple",
@@ -165,7 +167,7 @@ class CustomSearchDelegate extends SearchDelegate {
                             ),
                             TextInter(
                               text:
-                                  "${map['data'][index]['accountType'].toString().toLowerCase() == "freelancer" ? "Professional" : "Recruiter"} - ${map['data'][index]['reviews']?.length} reviews",
+                                  "${map['data'][index]['accountType'].toString().toLowerCase() == "professional" ? "Professional" : "Recruiter"} - ${map['data'][index]['reviews']?.length} reviews",
                               fontSize: 14,
                             )
                           ],
@@ -178,6 +180,4 @@ class CustomSearchDelegate extends SearchDelegate {
             },
           );
   }
-
-
 }

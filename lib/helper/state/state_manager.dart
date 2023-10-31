@@ -23,6 +23,8 @@ class StateController extends GetxController {
   var showPlan = false.obs;
   var hasInternetAccess = true.obs;
 
+  var allProfessions = [].obs;
+
   var currentUser = FirebaseAuth.instance.currentUser;
   var croppedPic = "".obs;
   var customSearchBar = [].obs;
@@ -91,6 +93,7 @@ class StateController extends GetxController {
   var address = "".obs;
   var gender = "".obs;
   var state = "".obs;
+  var maritalStatus = "".obs;
   var dob = "".obs;
   var experience = "".obs;
   var city = "".obs;
@@ -118,22 +121,40 @@ class StateController extends GetxController {
   RxString dbItem = 'Awaiting data'.obs;
 
   _init() async {
-    try {} catch (e) {
+    try {
+      final response = await APIService().getProfessions();
+      debugPrint("RESPONSI UOT ==>> ${response.body}");
+      Map<String, dynamic> map = jsonDecode(response.body);
+      debugPrint("RESPONS  ==>> ${map['docs']}");
+      allProfessions.value = map['docs'];
+    } catch (e) {
       debugPrint(e.toString());
     }
   }
- 
+
   @override
   void onInit() async {
     super.onInit();
     initDao();
+
     final _prefs = await SharedPreferences.getInstance();
-    var user = _prefs.getString("user") ?? "";
+    var user = _prefs.getString("user") ?? "{}";
     var _token = _prefs.getString("accessToken") ?? "";
     Map<String, dynamic> map = jsonDecode(user);
     // debugDebugPrintdebugPrint("US EMIA >> ${map['email']}");
 
     _init();
+
+    // APIService().getProfessions().then((value) {
+    //   debugPrint("STATE GET PROFESSIONS >>> ${value.body}");
+    //   Map<String, dynamic> data = jsonDecode(value.body);
+    //   // allJobs.value = data['docs'];
+    // }).catchError((onError) {
+    //   debugPrint("STATE GET jobs ERROR >>> $onError");
+    //   if (onError.toString().contains("rk is unreachable")) {
+    //     hasInternetAccess.value = false;
+    //   }
+    // });
 
     if (_token.isNotEmpty) {
       //Get User Profile
@@ -163,9 +184,7 @@ class StateController extends GetxController {
         debugPrint("STATE GET freelancer ERROR >>> $onError");
       });
 
-      APIService()
-          .getAllJobs()
-          .then((value) {
+      APIService().getAllJobs().then((value) {
         debugPrint("STATE GET JOBS >>> ${value.body}");
         Map<String, dynamic> data = jsonDecode(value.body);
         allJobs.value = data['docs'];
@@ -175,6 +194,7 @@ class StateController extends GetxController {
           hasInternetAccess.value = false;
         }
       });
+
       // myJobs.value = [];
 
       final myJobsResp = await APIService().getUserJobs(
@@ -186,7 +206,7 @@ class StateController extends GetxController {
 
       if (myJobsResp.statusCode == 200) {
         Map<String, dynamic> jobMap = jsonDecode(myJobsResp.body);
-        myJobs.value = jobMap['data'];
+        myJobs.value = jobMap['docs'];
       }
     }
   }

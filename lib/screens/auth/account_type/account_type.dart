@@ -123,7 +123,7 @@ class _AccountTypeState extends State<AccountType> {
                             borderColor: Colors.transparent,
                             foreColor: Constants.primaryColor,
                             onPressed: () {
-                              _controller.accountType.value = "Boy";
+                              _controller.accountType.value = "professional";
 
                               // Navigator.of(context).push(
                               //   PageTransition(
@@ -173,7 +173,7 @@ class _AccountTypeState extends State<AccountType> {
                             borderColor: Colors.white,
                             foreColor: Colors.white,
                             onPressed: () {
-                              _controller.accountType.value = "Oga";
+                              _controller.accountType.value = "recruiter";
 
                               if (widget.isSocial!) {
                                 Navigator.of(context).push(

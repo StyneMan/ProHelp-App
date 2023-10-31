@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 
@@ -95,7 +96,7 @@ class GuestEducationSection extends StatelessWidget {
                                             TextPoppins(
                                               text: data[e]['stillSchooling']
                                                   ? "Still a student"
-                                                  : "Graduated ${data[e]['endate']}",
+                                                  : "Graduated ${DateFormat('dd/MMM/yyyy').format(DateTime.parse(data[e]['endate']))}",
                                               fontSize: 13,
                                               fontWeight: FontWeight.w400,
                                             ),

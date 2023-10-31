@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -61,45 +61,45 @@ class _ProfileFormState extends State<ProfileForm> {
     }
 
     try {
-      if (_user != null) {
-        await _user?.updateDisplayName(_nameController.text);
-        // user.updatePhoneNumber(phoneCredential)
-        // user.updatePhotoURL(cropp)
-        await FirebaseFirestore.instance
-            .collection("users")
-            .doc(_user?.uid)
-            .set({
-          "name": _nameController.text,
-          "phone": "$_countryCode$_number",
-          "address": _addressController.text,
-          "age": _ageController.text,
-        }, SetOptions(merge: true));
+      // if (_user != null) {
+      //   await _user?.updateDisplayName(_nameController.text);
+      //   // user.updatePhoneNumber(phoneCredential)
+      //   // user.updatePhotoURL(cropp)
+      //   await FirebaseFirestore.instance
+      //       .collection("users")
+      //       .doc(_user?.uid)
+      //       .set({
+      //     "name": _nameController.text,
+      //     "phone": "$_countryCode$_number",
+      //     "address": _addressController.text,
+      //     "age": _ageController.text,
+      //   }, SetOptions(merge: true));
 
-        if (widget.croppedFile != null) {
-          final storageRef = FirebaseStorage.instance.ref();
-          final fileRef = storageRef.child("photos").child("${_user?.uid}");
-          final resp = await fileRef.putFile(File(widget.croppedFile));
+      //   if (widget.croppedFile != null) {
+      //     final storageRef = FirebaseStorage.instance.ref();
+      //     final fileRef = storageRef.child("photos").child("${_user?.uid}");
+      //     final resp = await fileRef.putFile(File(widget.croppedFile));
 
-          final url = await resp.ref.getDownloadURL();
-          await FirebaseFirestore.instance
-              .collection("users")
-              .doc(_user?.uid)
-              .set({
-            "image": url,
-          }, SetOptions(merge: true));
-          await _user?.updatePhotoURL(url);
-        }
+      //     final url = await resp.ref.getDownloadURL();
+      //     await FirebaseFirestore.instance
+      //         .collection("users")
+      //         .doc(_user?.uid)
+      //         .set({
+      //       "image": url,
+      //     }, SetOptions(merge: true));
+      //     await _user?.updatePhotoURL(url);
+      //   }
 
-        await FirebaseFirestore.instance
-            .collection("users")
-            .doc(_user?.uid)
-            .get()
-            .then((value) => _controller.setUserData(value.data()));
+      //   await FirebaseFirestore.instance
+      //       .collection("users")
+      //       .doc(_user?.uid)
+      //       .get()
+      //       .then((value) => _controller.setUserData(value.data()));
 
-        _controller.setLoading(false);
-        Constants.toast("Profile updated successfully");
-        Navigator.of(context).pop();
-      }
+      //   _controller.setLoading(false);
+      //   Constants.toast("Profile updated successfully");
+      //   Navigator.of(context).pop();
+      // }
     } catch (e) {
       _controller.setLoading(false);
     }

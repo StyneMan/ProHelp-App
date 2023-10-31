@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:prohelp_app/components/inputfield/city_dropdown.dart';
 import 'package:prohelp_app/components/inputfield/customdropdown.dart';
 import 'package:prohelp_app/components/inputfield/dob_datefield.dart';
+import 'package:prohelp_app/components/inputfield/profession_dropdown.dart';
 import 'package:prohelp_app/components/inputfield/state_dropdown.dart';
 import 'package:prohelp_app/components/inputfield/textfield.dart';
 import 'package:prohelp_app/data/state/statesAndCities.dart';
@@ -33,6 +34,7 @@ class _SetupStep1State extends State<SetupStep1> {
   final _lnameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  // final _maritalStatusController = TextEditingController();
   final _addressController = TextEditingController();
   final _dateController = TextEditingController();
   final _experienceController = TextEditingController();
@@ -41,6 +43,7 @@ class _SetupStep1State extends State<SetupStep1> {
   final _controller = Get.find<StateController>();
 
   String _selectedGender = "Male";
+  String _selectedMaritalStatus = "Single";
   String _encodedDate = "";
 
   String _selectedState = "Abia";
@@ -72,6 +75,7 @@ class _SetupStep1State extends State<SetupStep1> {
         "address": _addressController.text,
         "gender": val,
         "dob": _dateController.text,
+        "maritalStatus": _selectedMaritalStatus,
         "state": _selectedState,
         "country": _selectedCountry,
         "experienceYears": _experienceController.text,
@@ -106,6 +110,7 @@ class _SetupStep1State extends State<SetupStep1> {
         "dob": _dateController.text,
         "state": val,
         "country": _selectedCountry,
+        "maritalStatus": _selectedMaritalStatus,
         "experienceYears": _experienceController.text,
         "profession": _selectedProfession,
         "city": _selectedCity.contains("Select") ? "" : _selectedCity,
@@ -134,7 +139,35 @@ class _SetupStep1State extends State<SetupStep1> {
         "country": _selectedCountry,
         "profession": _selectedProfession,
         "city": val,
+        "maritalStatus": _selectedMaritalStatus,
         "experienceYears": _experienceController.text,
+      },
+    );
+  }
+
+  void _onMaritalStatusSelected(String val) {
+    setState(() {
+      _selectedMaritalStatus = val;
+    });
+
+    widget.onStep1Completed(
+      {
+        "firstname": _fnameController.text,
+        "lastname": _lnameController.text,
+        "middlename": _mnameController.text,
+        "email": _emailController.text,
+        "phone": _phoneController.text.startsWith("0")
+            ? "+234${_phoneController.text.substring(1)}"
+            : "+234${_phoneController.text}",
+        "address": _addressController.text,
+        "gender": _selectedGender,
+        "city": _selectedCity,
+        "dob": _dateController.text,
+        "state": _selectedState,
+        "country": _selectedCountry,
+        "profession": _selectedProfession,
+        "experienceYears": _experienceController.text,
+        "maritalStatus": val,
       },
     );
   }
@@ -158,6 +191,7 @@ class _SetupStep1State extends State<SetupStep1> {
         "dob": _dateController.text,
         "state": _selectedState,
         "country": val,
+        "maritalStatus": _selectedMaritalStatus,
         "profession": _selectedProfession,
         "experienceYears": _experienceController.text,
         "city": _selectedCity.contains("Select") ? "" : _selectedCity,
@@ -185,6 +219,7 @@ class _SetupStep1State extends State<SetupStep1> {
         "state": _selectedState,
         "country": _selectedCountry,
         "profession": val,
+        "maritalStatus": _selectedMaritalStatus,
         "experienceYears": _experienceController.text,
         "city": _selectedCity.contains("Select") ? "" : _selectedCity,
       },
@@ -206,6 +241,7 @@ class _SetupStep1State extends State<SetupStep1> {
     _selectedCountry = _controller.country.value;
     _selectedProfession = _controller.profession.value;
     _selectedState = _controller.state.value;
+    _selectedMaritalStatus = _controller.maritalStatus.value;
 
     super.initState();
   }
@@ -226,6 +262,7 @@ class _SetupStep1State extends State<SetupStep1> {
     _selectedCountry = _controller.country.value;
     _selectedProfession = _controller.profession.value;
     _selectedState = _controller.state.value;
+    _selectedMaritalStatus = _controller.maritalStatus.value;
     super.didChangeDependencies();
   }
 
@@ -247,6 +284,7 @@ class _SetupStep1State extends State<SetupStep1> {
         "state": _selectedState,
         "country": _selectedCountry,
         "profession": _selectedProfession,
+        "maritalStatus": _selectedMaritalStatus,
         "experienceYears": _experienceController.text,
         "city": _selectedCity.contains("Select") ? "" : _selectedCity,
       },
@@ -256,6 +294,7 @@ class _SetupStep1State extends State<SetupStep1> {
   @override
   Widget build(BuildContext context) {
     // _init();
+    debugPrint("PROFESSIONS CHECK :: ${_controller.allProfessions.value}");
     return Column(
       children: [
         const SizedBox(
@@ -280,6 +319,7 @@ class _SetupStep1State extends State<SetupStep1> {
                 "state": _selectedState,
                 "country": _selectedCountry,
                 "profession": _selectedProfession,
+                "maritalStatus": _selectedMaritalStatus,
                 "experienceYears": _experienceController.text,
                 "city": _selectedCity.contains("Select") ? "" : _selectedCity,
               },
@@ -317,6 +357,7 @@ class _SetupStep1State extends State<SetupStep1> {
                 "state": _selectedState,
                 "country": _selectedCountry,
                 "profession": _selectedProfession,
+                "maritalStatus": _selectedMaritalStatus,
                 "experienceYears": _experienceController.text,
                 "city": _selectedCity.contains("Select") ? "" : _selectedCity,
               },
@@ -354,6 +395,7 @@ class _SetupStep1State extends State<SetupStep1> {
                 "state": _selectedState,
                 "country": _selectedCountry,
                 "profession": _selectedProfession,
+                "maritalStatus": _selectedMaritalStatus,
                 "experienceYears": _experienceController.text,
                 "city": _selectedCity.contains("Select") ? "" : _selectedCity,
               },
@@ -391,6 +433,7 @@ class _SetupStep1State extends State<SetupStep1> {
                 "state": _selectedState,
                 "country": _selectedCountry,
                 "profession": _selectedProfession,
+                "maritalStatus": _selectedMaritalStatus,
                 "experienceYears": _experienceController.text,
                 "city": _selectedCity.contains("Select") ? "" : _selectedCity,
               },
@@ -430,6 +473,7 @@ class _SetupStep1State extends State<SetupStep1> {
                 "state": _selectedState,
                 "country": _selectedCountry,
                 "profession": _selectedProfession,
+                "maritalStatus": _selectedMaritalStatus,
                 "experienceYears": _experienceController.text,
                 "city": _selectedCity.contains("Select") ? "" : _selectedCity,
               },
@@ -452,8 +496,16 @@ class _SetupStep1State extends State<SetupStep1> {
         ),
         CustomDropdown(
           onSelected: _onSelected,
-          hint: "Select gender",
+          hint: "Gender",
           items: const ['Male', 'Female'],
+        ),
+        const SizedBox(
+          height: 16.0,
+        ),
+        CustomDropdown(
+          onSelected: _onMaritalStatusSelected,
+          hint: "Marital status",
+          items: const ['Single', 'Married', "Divorced", "Widowed"],
         ),
         const SizedBox(
           height: 16.0,
@@ -500,6 +552,7 @@ class _SetupStep1State extends State<SetupStep1> {
                 "state": _selectedState,
                 "country": _selectedCountry,
                 "profession": _selectedProfession,
+                "maritalStatus": _selectedMaritalStatus,
                 "experienceYears": _experienceController.text,
                 "city": _selectedCity.contains("Select") ? "" : _selectedCity,
               },
@@ -517,10 +570,10 @@ class _SetupStep1State extends State<SetupStep1> {
         const SizedBox(
           height: 16.0,
         ),
-        CustomDropdown(
+        CustomProfessionDropdown(
           onSelected: _onProfessionSelected,
           hint: "Profession",
-          items: const ["Gardening", "Catering", "Driving", "Baking"],
+          items: _controller.allProfessions.value,
         ),
         const SizedBox(
           height: 16.0,
@@ -544,6 +597,7 @@ class _SetupStep1State extends State<SetupStep1> {
                 "state": _selectedState,
                 "country": _selectedCountry,
                 "profession": _selectedProfession,
+                "maritalStatus": _selectedMaritalStatus,
                 "city": _selectedCity.contains("Select ") ? "" : _selectedCity
               },
             );

@@ -50,7 +50,7 @@ class VerifyOTP extends StatefulWidget {
 class _State extends State<VerifyOTP> {
   final _controller = Get.find<StateController>();
   final _otpController = TextEditingController();
-  final _phoneController = TextEditingController();
+  // final _phoneController = TextEditingController();
   PreferenceManager? _manager;
   String _code = '';
   CountdownTimerController? _timerController;
@@ -100,7 +100,7 @@ class _State extends State<VerifyOTP> {
             PageTransition(
               type: PageTransitionType.size,
               alignment: Alignment.bottomCenter,
-              child: _controller.accountType.value == "Boy"
+              child: _controller.accountType.value == "professional"
                   ? SetupProfile(
                       manager: _manager!,
                       email: "${widget.email}",
@@ -114,12 +114,13 @@ class _State extends State<VerifyOTP> {
         } else {
           Navigator.of(context).pushReplacement(
             PageTransition(
-                type: PageTransitionType.size,
-                alignment: Alignment.bottomCenter,
-                child: NewPassword(
-                  manager: _manager!,
-                  email: "${widget.email}",
-                )),
+              type: PageTransitionType.size,
+              alignment: Alignment.bottomCenter,
+              child: NewPassword(
+                manager: _manager!,
+                email: "${widget.email}",
+              ),
+            ),
           );
         }
       } else {

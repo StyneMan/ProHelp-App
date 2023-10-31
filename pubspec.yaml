@@ -19,7 +19,7 @@ version: 1.0.0+1
 
 
 environment:
-  sdk: ">=2.16.2 <3.0.0"
+  sdk: ">=2.16.2 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -37,7 +37,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  intl: ^0.17.0
+  intl: ^0.18.0
   money_formatter: ^0.0.3
   fluttertoast: ^8.1.1
   get: ^4.6.5
@@ -56,10 +56,10 @@ dependencies:
   uuid: ^3.0.6
   url_launcher: ^6.0.20
   # confetti: ^0.6.0
-  flutter_html: ^2.2.1
+  # flutter_html: ^2.2.1
   image_picker: ^0.8.4
   image_cropper: ^3.0.1
-  flutter_paystack: ^1.0.7
+  # flutter_paystack: ^1.0.7
   flutter_countdown_timer: ^4.1.0
   flutter_time_picker_spinner: ^2.0.0
   cached_network_image: ^3.2.0
@@ -80,22 +80,25 @@ dependencies:
   flutter_downloader: ^1.10.4
   currency_text_input_formatter: ^2.1.7
   flutter_staggered_grid_view: ^0.6.2
-  # flutter_localization: ^0.1.10
+  pay_with_paystack: ^1.0.3
+  # flutter_localization: ^0.17.0
 
-  firebase_core: ^1.11.0
-  firebase_auth: ^3.3.7
-  cloud_firestore: ^3.1.8
-  firebase_crashlytics: ^2.5.2
+  firebase_core_platform_interface: 4.8.0
+
+  firebase_analytics: 10.4.2
+  firebase_auth: ^4.6.2
+  firebase_core: 2.13.1
+  firebase_crashlytics: 3.2.0
+  firebase_performance: 0.9.2+2
   google_sign_in: ^6.1.0
 
-  cloud_functions: ^3.2.8
-  firebase_storage: ^10.2.8
-  firebase_messaging: ^11.2.6
-  firebase_analytics: ^9.1.0
+  # cloud_functions: ^3.2.8
+  firebase_storage: ^11.1.0
+  firebase_messaging: ^14.0.0
   path_provider: ^2.0.15
 
 dependency_overrides:
-  firebase_core_platform_interface: 4.5.1
+  # firebase_core_platform_interface: 4.5.1
   modal_bottom_sheet:
     git:
       url: https://github.com/danReynolds/modal_bottom_sheet.git
