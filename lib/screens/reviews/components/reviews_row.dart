@@ -33,7 +33,7 @@ class ReviewRow extends StatelessWidget {
     return Card(
       elevation: 1.0,
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -57,20 +57,21 @@ class ReviewRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(
-                  width: 8.0,
+                  width: 3.0,
                 ),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 2.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           TextPoppins(
                             text: "${data['reviewer']['name']}".capitalize,
-                            fontSize: 16,
+                            fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
                           TextInter(
@@ -102,7 +103,7 @@ class ReviewRow extends StatelessWidget {
                                 const EdgeInsets.symmetric(horizontal: 0.0),
                             itemBuilder: (context, _) => const Icon(
                               Icons.star,
-                              size: 18,
+                              size: 24,
                               color: Colors.amber,
                             ),
                             onRatingUpdate: (rating) {
@@ -116,13 +117,13 @@ class ReviewRow extends StatelessWidget {
                               fontSize: 14,
                             ),
                           ),
-                          const SizedBox(width: 10.0),
+                          const SizedBox(width: 5.0),
                           Text(
                             DateFormat('dd/MM/yy')
                                 .format(DateTime.parse(data['createdAt'])),
                             style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
                             ),
                           )
                         ],
@@ -130,25 +131,13 @@ class ReviewRow extends StatelessWidget {
                       const SizedBox(
                         height: 4.0,
                       ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        child: Wrap(
-                          children: [
-                            TextPoppins(
-                              text: "${data['comment']}",
-                              fontSize: 13,
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                 ),
-                manager.getUser()['id'] == data['reviewer']['id'] ||
-                        (manager.getUser()['id'] == data['userId'] &&
-                            (data['reply'] == null ||
-                                data['reply'].toString().isEmpty ||
-                                data['reply'].toString() == "{}"))
+                (manager.getUser()['id'] == data['userId'] &&
+                        (data['reply'] == null ||
+                            data['reply'].toString().isEmpty ||
+                            data['reply'].toString() == "{}"))
                     ? PopupMenuButton(
                         child: const Icon(
                           CupertinoIcons.ellipsis_vertical,
@@ -164,8 +153,7 @@ class ReviewRow extends StatelessWidget {
                                 ),
                                 content: SizedBox(
                                   width:
-                                      MediaQuery.of(context).size.width * 0.96,
-                                  height: 100,
+                                      MediaQuery.of(context).size.width * 0.99,
                                   child: Column(
                                     children: [
                                       const SizedBox(
@@ -214,7 +202,7 @@ class ReviewRow extends StatelessWidget {
                                             ),
                                             TextSpan(
                                               text:
-                                                  "${userData['bio']['firstname']} ${manager.getUser()['bio']['middlename']} ${manager.getUser()['bio']['lastname']}"
+                                                  "${userData['bio']['firstname']} ${userData['bio']['middlename']} ${userData['bio']['lastname']}"
                                                       .capitalize,
                                               style: const TextStyle(
                                                 color: Colors.black,
@@ -230,7 +218,7 @@ class ReviewRow extends StatelessWidget {
                                 ),
                                 actions: [
                                   Padding(
-                                    padding: const EdgeInsets.all(7.0),
+                                    padding: const EdgeInsets.all(8.0),
                                     child: ElevatedButton(
                                       onPressed: () {
                                         Navigator.pop(context);
@@ -251,7 +239,7 @@ class ReviewRow extends StatelessWidget {
                                       onPressed: () {
                                         // Navigator.pop(context);
                                         // Get.back();
-                                        _removeReview();
+                                        _removeReview(context);
                                       },
                                       child: TextRoboto(
                                         text: "Take Down",
@@ -413,6 +401,18 @@ class ReviewRow extends StatelessWidget {
                     : const SizedBox(),
               ],
             ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              width: MediaQuery.of(context).size.width * 0.5,
+              child: Wrap(
+                children: [
+                  TextPoppins(
+                    text: "${data['comment']}",
+                    fontSize: 13,
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(
               height: 10.0,
             ),
@@ -453,17 +453,14 @@ class ReviewRow extends StatelessWidget {
                           const SizedBox(
                             height: 4.0,
                           ),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: Wrap(
-                              children: [
-                                TextPoppins(
-                                  text: "${data['reply']['message']}",
-                                  fontSize: 13,
-                                  align: TextAlign.end,
-                                ),
-                              ],
-                            ),
+                          Wrap(
+                            children: [
+                              TextPoppins(
+                                text: "${data['reply']['message']}",
+                                fontSize: 13,
+                                align: TextAlign.end,
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -475,7 +472,7 @@ class ReviewRow extends StatelessWidget {
     );
   }
 
-  _removeReview() async {
+  _removeReview(BuildContext context) async {
     // _controller.setLoading(true);
     Map _payload = {
       "userId": data['userId'],
@@ -494,11 +491,12 @@ class ReviewRow extends StatelessWidget {
       );
 
       _controller.setLoading(false);
-      // debugPrint("RES REVIEW DEL >> ${res.body}");
+      debugPrint("RES REVIEW DEL >> ${res.body}");
 
       if (res.statusCode == 200) {
         Map<String, dynamic> map = jsonDecode(res.body);
         Constants.toast(map['message']);
+        Navigator.of(context).pop();
       } else {
         _controller.setLoading(false);
       }

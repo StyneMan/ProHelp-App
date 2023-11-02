@@ -137,29 +137,20 @@ class _ApplyJobStep1State extends State<ApplyJobStep1> {
                     fontSize: 14,
                   ),
                   Wrap(
+                    spacing: 0,
+                    runSpacing: -8,
+                    alignment: WrapAlignment.start,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          for (var e = 0;
-                              e < widget.manager.getUser()['skills']?.length;
-                              e++)
-                            Container(
-                              padding: const EdgeInsets.all(2.0),
-                              margin: const EdgeInsets.all(1.5),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
-                              child: TextPoppins(
-                                text: widget.manager.getUser()['skills'][e]
-                                    ['name'],
-                                fontSize: 12,
-                              ),
-                            ),
-                        ],
-                      ),
+                      for (var e = 0;
+                          e < widget.manager.getUser()['skills']?.length;
+                          e++)
+                        Chip(
+                          label: TextPoppins(
+                            text: widget.manager.getUser()['skills'][e]['name'],
+                            fontSize: 12,
+                          ),
+                        ),
                     ],
                   ),
                 ],

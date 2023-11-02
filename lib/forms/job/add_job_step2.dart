@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:prohelp_app/components/inputfield/customdropdown.dart';
+import 'package:prohelp_app/components/inputfield/profession_dropdown.dart';
 import 'package:prohelp_app/components/inputfield/textarea2.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
@@ -71,10 +72,10 @@ class _AddJobFormStep2State extends State<AddJobFormStep2> {
         const SizedBox(
           height: 21.0,
         ),
-        CustomDropdown(
+        CustomProfessionDropdown(
           onSelected: _onSelected,
           hint: "Select job profession",
-          items: const ['Programming', 'Baking', 'Driving', 'Catering'],
+          items: _controller.allProfessions.value,
           validator: (val) {
             if (val.toString().isEmpty || val == null) {
               return "Job profession is required";

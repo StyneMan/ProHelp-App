@@ -96,7 +96,7 @@ class GuestEducationSection extends StatelessWidget {
                                             TextPoppins(
                                               text: data[e]['stillSchooling']
                                                   ? "Still a student"
-                                                  : "Graduated ${DateFormat('dd/MMM/yyyy').format(DateTime.parse(data[e]['endate']))}",
+                                                  : "Graduated  ${data[e]['endate'].toString().contains("/") ? data[e]['endate'] : DateFormat('dd/MMM/yyyy').format(DateTime.tryParse(data[e]['endate'])!)}",
                                               fontSize: 13,
                                               fontWeight: FontWeight.w400,
                                             ),

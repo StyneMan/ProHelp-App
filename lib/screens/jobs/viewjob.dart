@@ -34,22 +34,34 @@ class _ViewJobState extends State<ViewJob> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _controller = Get.find<StateController>();
   bool _isApplied = false, _isSaved = false;
+  bool _isCountLoaded = false;
+  int _applicationCount = 0;
 
   _checkApplied() {
-    // debugPrint(
-    //     "JOB APP => ${widget.manager.getUser()['myJobApplications']}  CURR ID => ${widget.data['id']}");
-    for (var element in widget.manager.getUser()['myJobApplications']) {
-      if (element.toString() == widget.data['id']) {
-        debugPrint("YESSS >>> ${element.toString()},  ${widget.data['id']}");
+    for (var element in _controller.myJobsApplied.value) {
+      if (element['jobId'] == widget.data['id']) {
         setState(() {
           _isApplied = true;
         });
       }
-      // else {
-      //   setState(() {
-      //     _isApplied = false;
-      //   });
-      // }
+    }
+  }
+
+  _getApplications() async {
+    try {
+      final resp = await APIService().getCurrentJobApplications(
+        email: widget.manager.getUser()['email'],
+        jobId: widget.data['id'],
+      );
+
+      debugPrint("RJNK ${resp.body}");
+      Map<String, dynamic> map = jsonDecode(resp.body);
+      setState(() {
+        _isCountLoaded = true;
+        _applicationCount = map['docs']?.length;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
     }
   }
 
@@ -58,6 +70,7 @@ class _ViewJobState extends State<ViewJob> {
     super.initState();
     _checkApplied();
     _checkSaved();
+    _getApplications();
   }
 
   @override
@@ -204,13 +217,13 @@ class _ViewJobState extends State<ViewJob> {
                     children: [
                       TextPoppins(
                         text:
-                            "${widget.data['applicants']?.length} Applicant${_pluralize(widget.data['applicants']?.length)}",
+                            "${_isCountLoaded ? _applicationCount : 'Loading...'} ${_isCountLoaded ? _pluralize(widget.data['applicants']?.length) : ""}",
                         fontSize: 14,
                       ),
                       const SizedBox(
                         width: 16.0,
                       ),
-                      widget.data['applicants']?.length > 0 &&
+                      _applicationCount > 0 &&
                               widget.manager.getUser()['id'] ==
                                   widget.data['recruiter']['id']
                           ? InkWell(
@@ -441,7 +454,7 @@ class _ViewJobState extends State<ViewJob> {
   }
 
   _pluralize(val) {
-    return val > 1 ? "s" : "";
+    return val > 1 ? "Applicants" : "Applicant";
   }
 
   _saveJob() async {

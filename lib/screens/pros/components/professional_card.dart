@@ -77,10 +77,6 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
         setState(() {
           _isLiked = true;
         });
-      } else {
-        setState(() {
-          _isLiked = false;
-        });
       }
     }
   }

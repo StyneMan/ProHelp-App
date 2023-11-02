@@ -87,20 +87,12 @@ class _JobCardState extends State<JobCard> {
   }
 
   _checkApplied() {
-    // debugPrint(
-    //     "JOB APP => ${widget.manager.getUser()['myJobApplications']}  CURR ID => ${widget.data['id']}");
-    for (var element in widget.manager.getUser()['myJobApplications']) {
-      if (element.toString() == widget.data['id']) {
-        debugPrint("YESSS >>> ${element.toString()},  ${widget.data['id']}");
+    for (var element in _controller.myJobsApplied.value) {
+      if (element['jobId'] == widget.data['id']) {
         setState(() {
           _isApplied = true;
         });
       }
-      // else {
-      //   setState(() {
-      //     _isApplied = false;
-      //   });
-      // }
     }
   }
 
@@ -193,7 +185,7 @@ class _JobCardState extends State<JobCard> {
                 ),
                 IconButton(
                   onPressed: widget.data['recruiter']['id'] ==
-                          widget.manager.getUser()['_id']
+                          widget.manager.getUser()['id']
                       ? () {
                           showCupertinoDialog(
                             context: context,
@@ -220,7 +212,7 @@ class _JobCardState extends State<JobCard> {
                                         children: [
                                           TextSpan(
                                             text:
-                                                "${widget.manager.getUser()['bio']['fullname']}"
+                                                "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['lastname']}"
                                                     .capitalize,
                                             style: const TextStyle(
                                               fontSize: 16,
@@ -359,10 +351,7 @@ class _JobCardState extends State<JobCard> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  flex: widget.data['jobStatus'] == "closed" ||
-                          widget.data['jobStatus'] == "suspended"
-                      ? 4
-                      : 2,
+                  flex: 4,
                   child: CustomButton(
                     bgColor: Colors.transparent,
                     child: TextPoppins(
@@ -387,10 +376,9 @@ class _JobCardState extends State<JobCard> {
                 const SizedBox(
                   width: 8.0,
                 ),
-                widget.manager.getUser()['accountType'] == "recruiter" &&
-                        widget.data['jobStatus'] == "accepting"
+                widget.manager.getUser()['accountType'] == "recruiter"
                     ? Expanded(
-                        flex: 2,
+                        flex: 4,
                         child: CustomButton(
                           bgColor: widget.data['jobStatus'] != "accepting"
                               ? Colors.grey
@@ -398,7 +386,9 @@ class _JobCardState extends State<JobCard> {
                           child: widget.data['recruiter']['id'] ==
                                   widget.manager.getUser()['id']
                               ? TextPoppins(
-                                  text: "Close",
+                                  text: widget.data['jobStatus'] != "accepting"
+                                      ? "Closed"
+                                      : "Close",
                                   fontSize: 16,
                                   color: Colors.white,
                                 )
@@ -526,21 +516,16 @@ class _JobCardState extends State<JobCard> {
                 const SizedBox(
                   width: 8.0,
                 ),
-                Expanded(
-                  flex: 2,
-                  child: CustomButton(
-                    bgColor:
-                        widget.data['jobStatus'] != "accepting" || _isApplied
-                            ? Colors.grey
-                            : Constants.primaryColor,
-                    child: widget.data['recruiter']['id'] ==
-                            widget.manager.getUser()['id']
-                        ? TextPoppins(
-                            text: "Edit",
-                            fontSize: 16,
-                            color: Colors.white,
-                          )
-                        : TextPoppins(
+                widget.data['recruiter']['id'] == widget.manager.getUser()['id']
+                    ? const SizedBox()
+                    : Expanded(
+                        flex: 2,
+                        child: CustomButton(
+                          bgColor: widget.data['jobStatus'] != "accepting" ||
+                                  _isApplied
+                              ? Colors.grey
+                              : Constants.primaryColor,
+                          child: TextPoppins(
                             text: widget.data['jobStatus'] != "accepting"
                                 ? "Closed"
                                 : _isApplied
@@ -549,76 +534,79 @@ class _JobCardState extends State<JobCard> {
                             fontSize: 16,
                             color: Colors.white,
                           ),
-                    borderColor: Colors.transparent,
-                    foreColor: Constants.secondaryColor,
-                    onPressed: widget.data['jobStatus'] != "accepting" ||
-                            _isApplied
-                        ? null
-                        : widget.data['recruiter']['id'] !=
-                                widget.manager.getUser()['id']
-                            ? (_controller.userData.value['wallet']
-                                            ['balance'] ??
-                                        0) >=
-                                    200
-                                ? () {
-                                    //Apply for job here
-                                    Get.to(
-                                      ApplyJob(
-                                        manager: widget.manager,
-                                        data: widget.data,
-                                      ),
-                                      transition: Transition.cupertino,
-                                    );
-                                  }
-                                : () {
-                                    //Show out of coins alert here
-                                    Constants.toast(
-                                        "You are out of coins. Topup to continue posting and connecting!");
-                                    Get.to(
-                                      MyWallet(manager: widget.manager),
-                                      transition: Transition.cupertino,
-                                    );
-                                  }
-                            : () {
-                                showBarModalBottomSheet(
-                                  expand: false,
-                                  context: context,
-                                  topControl: ClipOval(
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Container(
-                                        width: 32,
-                                        height: 32,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                            16,
+                          borderColor: Colors.transparent,
+                          foreColor: Constants.secondaryColor,
+                          onPressed: widget.data['jobStatus'] != "accepting" ||
+                                  _isApplied
+                              ? null
+                              : widget.data['recruiter']['id'] !=
+                                      widget.manager.getUser()['id']
+                                  ? (_controller.userData.value['wallet']
+                                                  ['balance'] ??
+                                              0) >=
+                                          200
+                                      ? () {
+                                          //Apply for job here
+                                          Get.to(
+                                            ApplyJob(
+                                              manager: widget.manager,
+                                              data: widget.data,
+                                            ),
+                                            transition: Transition.cupertino,
+                                          );
+                                        }
+                                      : () {
+                                          //Show out of coins alert here
+                                          Constants.toast(
+                                              "You are out of coins. Topup to continue posting and connecting!");
+                                          Get.to(
+                                            MyWallet(manager: widget.manager),
+                                            transition: Transition.cupertino,
+                                          );
+                                        }
+                                  : () {
+                                      showBarModalBottomSheet(
+                                        expand: false,
+                                        context: context,
+                                        topControl: ClipOval(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Container(
+                                              width: 32,
+                                              height: 32,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  16,
+                                                ),
+                                              ),
+                                              child: const Center(
+                                                child: Icon(
+                                                  Icons.close,
+                                                  size: 24,
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                        child: const Center(
-                                          child: Icon(
-                                            Icons.close,
-                                            size: 24,
-                                          ),
+                                        backgroundColor: Colors.white,
+                                        builder: (context) => SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.86,
+                                          // child: AddJobForm(
+                                          //   manager: manager,
+                                          // ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
-                                  backgroundColor: Colors.white,
-                                  builder: (context) => SizedBox(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.86,
-                                    // child: AddJobForm(
-                                    //   manager: manager,
-                                    // ),
-                                  ),
-                                );
-                              },
-                    variant: "Filled",
-                  ),
-                ),
+                                      );
+                                    },
+                          variant: "Filled",
+                        ),
+                      ),
               ],
             ),
           ],

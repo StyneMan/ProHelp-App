@@ -122,7 +122,7 @@ class _JobsState extends State<Jobs> with SingleTickerProviderStateMixin {
           manager: widget.manager,
         ),
       ),
-      body: widget.manager.getUser()['accountType'] == 'freelancer'
+      body: widget.manager.getUser()['accountType'] == 'professional'
           ? _controller.userData.isEmpty
               ? const SizedBox()
               : Padding(

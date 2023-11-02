@@ -177,9 +177,7 @@ class _DashboardState extends State<Dashboard> {
       // _controller.userData.value = widget.manager.getUser();
 
       // if (widget.manager.getUser()['accountType'] != "freelancer") {
-      APIService()
-          .getFreelancers()
-          .then((value) {
+      APIService().getFreelancers().then((value) {
         debugPrint("STATE GET FREELANCERS >>> ${value.body}");
         Map<String, dynamic> data = jsonDecode(value.body);
         _controller.freelancers.value = data['docs'];
@@ -189,6 +187,22 @@ class _DashboardState extends State<Dashboard> {
           _controller.hasInternetAccess.value = false;
         }
       });
+
+      if (_token.isNotEmpty) {
+        APIService()
+            .getJobApplicationsByUser(
+                accessToken: _token, email: userMap['email'])
+            .then((value) {
+          debugPrint("STATE GET APPLICATIONS >>> ${value.body}");
+          Map<String, dynamic> data = jsonDecode(value.body);
+          _controller.myJobsApplied.value = data['data'];
+        }).catchError((onError) {
+          debugPrint("STATE GET freelancer ERROR >>> $onError");
+          if (onError.toString().contains("rk is unreachable")) {
+            _controller.hasInternetAccess.value = false;
+          }
+        });
+      }
 
       // }
 

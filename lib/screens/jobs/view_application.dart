@@ -168,7 +168,7 @@ class _ViewApplicationState extends State<ViewApplication> {
 
   @override
   Widget build(BuildContext context) {
-    print("RESUME >> ${widget.data['resume']}");
+    // print("RESUME >> ${widget.data['resume']}");
     return Obx(
       () => LoadingOverlayPro(
         isLoading: _controller.isLoading.value,
@@ -286,7 +286,7 @@ class _ViewApplicationState extends State<ViewApplication> {
               const SizedBox(height: 21.0),
               TextPoppins(
                 text: "Job Information",
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.w600,
               ),
               Row(
@@ -447,8 +447,8 @@ class _ViewApplicationState extends State<ViewApplication> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(
-                                  width: MediaQuery.of(context).size.width *
-                                  0.80,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.80,
                                   child: Text(
                                     "${widget.data['answers'][k]['question']}",
                                     style: const TextStyle(
@@ -458,8 +458,8 @@ class _ViewApplicationState extends State<ViewApplication> {
                                   ),
                                 ),
                                 SizedBox(
-                                  width: MediaQuery.of(context).size.width *
-                                      0.80,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.80,
                                   child: Text(
                                       "${widget.data['answers'][k]['answer']}"),
                                 ),

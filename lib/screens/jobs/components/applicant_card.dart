@@ -5,14 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prohelp_app/components/button/custombutton.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
-import 'package:prohelp_app/screens/jobs/apply_job.dart';
 import 'package:prohelp_app/screens/jobs/view_application.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -36,78 +34,11 @@ class ApplicantCard extends StatefulWidget {
 class _ApplicantCardState extends State<ApplicantCard> {
   final _controller = Get.find<StateController>();
 
-  bool _isSaved = false, triggerHire = false, _isApplied = false;
-  double? _rating = 0.0;
-
-  // _saveJob() async {
-  //   _controller.setLoading(true);
-  //   Map _payload = {
-  //     "jobId": "${widget.data['id']}",
-  //     "userId": "${widget.manager.getUser()['_id']}",
-  //   };
-  //   try {
-  //     final resp = await APIService().saveJob(_payload,
-  //         widget.manager.getAccessToken(), widget.manager.getUser()['email']);
-  //     debugPrint("SAVE JOB RESPONSE >> ${resp.body}");
-  //     _controller.setLoading(false);
-  //     if (resp.statusCode == 200) {
-  //       Map<String, dynamic> map = jsonDecode(resp.body);
-  //       Constants.toast(map['message']);
-  //       if (map['message'].toString().contains("unliked")) {
-  //         setState(() {
-  //           _isSaved = false;
-  //         });
-  //       } else {
-  //         setState(() {
-  //           _isSaved = true;
-  //         });
-  //       }
-  //       _controller.userData.value = map['data'];
-  //       String userStr = jsonEncode(map['data']);
-  //       widget.manager.setUserData(userStr);
-  //     }
-  //   } catch (e) {
-  //     _controller.setLoading(false);
-  //     debugPrint("ERROR LIKING >>> $e");
-  //   }
-  // }
-
-  _checkSaved() {
-    for (var element in widget.manager.getUser()['savedJobs']) {
-      if (element == widget.data['id']) {
-        setState(() {
-          _isSaved = true;
-        });
-      } else {
-        setState(() {
-          _isSaved = false;
-        });
-      }
-    }
-  }
-
-  _checkApplied() {
-    // debugPrint(
-    //     "JOB APP => ${widget.manager.getUser()['myJobApplications']}  CURR ID => ${widget.data['id']}");
-    for (var element in widget.manager.getUser()['myJobApplications']) {
-      if (element == widget.data['id']) {
-        // debugPrint("YESSS >>> ${element},  ${widget.data['id']}");
-        setState(() {
-          _isApplied = true;
-        });
-      } else {
-        setState(() {
-          _isApplied = false;
-        });
-      }
-    }
-  }
+  bool triggerHire = false;
 
   @override
   void initState() {
     super.initState();
-    // _checkApplied();
-    // _checkSaved();
   }
 
   String timeUntil(DateTime date) {
@@ -176,19 +107,13 @@ class _ApplicantCardState extends State<ApplicantCard> {
                                 .replaceAll("minute", "min"),
                         fontSize: 13,
                       ),
-                      // TextPoppins(
-                      //   text:
-                      //       "${widget.data['Applied']} (${widget.data['workplaceType']})"
-                      //           .capitalize,
-                      //   fontSize: 14,
-                      // ),
                     ],
                   ),
                 ),
               ],
             ),
             const SizedBox(
-              height: 5.0,
+              height: 8.0,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -229,16 +154,13 @@ class _ApplicantCardState extends State<ApplicantCard> {
                           bgColor: widget.data['status'] != "submitted"
                               ? Colors.grey
                               : Constants.primaryColor,
-                          child: widget.data['job']['recruiter']['id'] ==
-                                  widget.manager.getUser()['id']
-                              ? TextPoppins(
-                                  text: widget.data['status'] == "submitted"
-                                      ? "Accept"
-                                      : "${widget.data['status']}".capitalize,
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                )
-                              : const SizedBox(),
+                          child: TextPoppins(
+                            text: widget.data['status'] == "submitted"
+                                ? "Accept"
+                                : "${widget.data['status']}".capitalize,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
                           borderColor: Colors.transparent,
                           foreColor: Constants.secondaryColor,
                           onPressed: widget.data['status'] != "submitted"
@@ -255,7 +177,6 @@ class _ApplicantCardState extends State<ApplicantCard> {
                                         width:
                                             MediaQuery.of(context).size.width *
                                                 0.96,
-                                        height: 130,
                                         child: Column(
                                           children: [
                                             const SizedBox(
@@ -271,7 +192,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
                                                 children: [
                                                   TextSpan(
                                                     text:
-                                                        "${widget.manager.getUser()['bio']['fullname']}"
+                                                        "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['lastname']}"
                                                             .capitalize,
                                                     style: const TextStyle(
                                                       fontSize: 16,
@@ -362,7 +283,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
                 Expanded(
                   flex: 2,
                   child: CustomButton(
-                    bgColor: Colors.green,
+                    bgColor: Color(0xFF4CAF50),
                     child: TextPoppins(
                       text: "Contact",
                       fontSize: 16,
@@ -370,58 +291,9 @@ class _ApplicantCardState extends State<ApplicantCard> {
                     ),
                     borderColor: Colors.transparent,
                     foreColor: Constants.secondaryColor,
-                    onPressed: widget.data['status'] != "accepting"
-                        ? null
-                        : widget.data['job']['recruiter']['id'] !=
-                                widget.manager.getUser()['id']
-                            ? () {
-                                //Apply for job here
-                                Get.to(
-                                  ApplyJob(
-                                    manager: widget.manager,
-                                    data: widget.data,
-                                  ),
-                                  transition: Transition.cupertino,
-                                );
-                              }
-                            : () {
-                                showBarModalBottomSheet(
-                                  expand: false,
-                                  context: context,
-                                  topControl: ClipOval(
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Container(
-                                        width: 32,
-                                        height: 32,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                            16,
-                                          ),
-                                        ),
-                                        child: const Center(
-                                          child: Icon(
-                                            Icons.close,
-                                            size: 24,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  backgroundColor: Colors.white,
-                                  builder: (context) => SizedBox(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.86,
-                                    // child: AddJobForm(
-                                    //   manager: manager,
-                                    // ),
-                                  ),
-                                );
-
-                              },
+                    onPressed: () {
+                      print("DATA RIOS :: ${widget.data['id']}");
+                    },
                     variant: "Filled",
                   ),
                 ),
@@ -433,29 +305,11 @@ class _ApplicantCardState extends State<ApplicantCard> {
     );
   }
 
-  _deleteJob() async {
-    _controller.setLoading(true);
-    try {
-      final resp = await APIService().deleteJob(
-          accessToken: widget.manager.getAccessToken(),
-          email: widget.manager.getUser()['email'],
-          jobId: widget.data['_id']);
-      _controller.setLoading(false);
-      debugPrint("DEL JOBS RESPONSE ==> ${resp.body}");
-      if (resp.statusCode == 200) {
-        Map<String, dynamic> map = jsonDecode(resp.body);
-        Constants.toast(map['message']);
-        _controller.onInit();
-      }
-    } catch (e) {
-      _controller.setLoading(false);
-    }
-  }
-
   _acceptApplication() async {
     _controller.setLoading(true);
+    debugPrint("DATA RIOS :: ${widget.data}");
     Map _payload = {
-      "applicationId": widget.data['_id'],
+      "applicationId": widget.data['id'],
       "jobId": widget.data['jobId']
     };
     try {
@@ -466,6 +320,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
       );
 
       _controller.setLoading(false);
+      Navigator.pop(context);
       debugPrint("ACCEPT JOB APPLICATION RESPONSE ==> ${resp.body}");
       if (resp.statusCode == 200) {
         Map<String, dynamic> map = jsonDecode(resp.body);

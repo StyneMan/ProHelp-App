@@ -557,21 +557,17 @@ class _UserProfile2State extends State<UserProfile2> {
                         const SizedBox(
                           height: 8.0,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                        Wrap(
+                          spacing: 0,
+                          runSpacing: -8,
+                          alignment: WrapAlignment.start,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             for (var e = 0;
                                 e < map['data']['skills']?.length;
                                 e++)
-                              Container(
-                                padding: const EdgeInsets.all(2.0),
-                                margin: const EdgeInsets.all(1.5),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
-                                  borderRadius: BorderRadius.circular(4.0),
-                                ),
-                                child: TextPoppins(
+                              Chip(
+                                label: TextPoppins(
                                   text: map['data']['skills'][e]['name'],
                                   fontSize: 12,
                                 ),

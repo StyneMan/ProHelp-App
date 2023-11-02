@@ -311,8 +311,10 @@ class _UserProfileState extends State<MyProfile> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Wrap(
-                                  // mainAxisAlignment: MainAxisAlignment.start,
-                                  // crossAxisAlignment: CrossAxisAlignment.center,
+                                  spacing: 0,
+                                  runSpacing: -8,
+                                  alignment: WrapAlignment.start,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
                                   children: _controller
                                           .userData.value['skills']?.isEmpty
                                       ? const [
@@ -330,16 +332,8 @@ class _UserProfileState extends State<MyProfile> {
                                                   _controller.userData
                                                       .value['skills']?.length;
                                               m++)
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.all(3.0),
-                                              margin: const EdgeInsets.all(1.5),
-                                              decoration: BoxDecoration(
-                                                color: Colors.grey.shade200,
-                                                borderRadius:
-                                                    BorderRadius.circular(4.0),
-                                              ),
-                                              child: TextPoppins(
+                                            Chip(
+                                              label: TextPoppins(
                                                 text:
                                                     "${_controller.userData.value['skills'][m]['name']}"
                                                         .capitalize,

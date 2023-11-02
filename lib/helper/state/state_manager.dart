@@ -50,6 +50,7 @@ class StateController extends GetxController {
   var isConversationLoading = true.obs;
   var myChats = [].obs;
   var myJobs = [].obs;
+  var myJobsApplied = [].obs;
   var savedJobs = [].obs;
   var allJobs = [].obs;
 

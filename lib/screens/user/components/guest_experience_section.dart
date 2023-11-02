@@ -52,7 +52,7 @@ class GuestExperienceSection extends StatelessWidget {
                                   width: 100,
                                   height: 200,
                                   child: Image.network(
-                                    data[e]['companyLogo'],
+                                    "${data[e]['companyLogo']}",
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -78,7 +78,7 @@ class GuestExperienceSection extends StatelessWidget {
                                       ),
                                       TextPoppins(
                                         text:
-                                            "${DateFormat('dd/MMM/yyyy').format(DateTime.parse(data[e]['startDate']))} - ${data[e]['stillHere'] ? "Present" : DateFormat('dd/MMM/yyyy').format(DateTime.parse(data[e]['endate']))}",
+                                            "${data[e]['startDate'].toString().contains("/") ? data[e]['startDate'] : DateFormat('dd/MMM/yyyy').format(DateTime.parse(data[e]['startDate']))} - ${data[e]['stillHere'] ? "Present" : data[e]['endate'].toString().contains("/") ? data[e]['endate'] : DateFormat('dd/MMM/yyyy').format(DateTime.parse(data[e]['endate']))}",
                                         fontSize: 13,
                                         fontWeight: FontWeight.w400,
                                       ),

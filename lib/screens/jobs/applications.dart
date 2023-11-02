@@ -33,7 +33,7 @@ class _JobApplicationsState extends State<JobApplications> {
   @override
   void initState() {
     super.initState();
-    debugPrint("JOB ID ${widget.data['id']} ,  ${widget.data['_id']}");
+    debugPrint("JOB ID ${widget.data['id']} ,  ${widget.data['id']}");
   }
 
   Stream<List<dynamic>> fetchDataStream() {
@@ -42,9 +42,11 @@ class _JobApplicationsState extends State<JobApplications> {
         .getJobApplicationsStreamed(
             accessToken: widget.manager.getAccessToken(),
             email: widget.manager.getUser()['email'],
-            jobId: widget.data['_id'])
-        .then((resp) => controller.add(resp))
-        .catchError((error) => controller.addError(error));
+            jobId: widget.data['id'])
+        .then((resp) {
+      debugPrint("DEBUG PRINT :: ${resp}");
+      return controller.add(resp);
+    }).catchError((error) => controller.addError(error));
     return controller.stream;
   }
 
@@ -171,7 +173,7 @@ class _JobApplicationsState extends State<JobApplications> {
                   } else {
                     final mdata = snapshot.data!;
                     debugPrint("APPLICAT DATA  $mdata");
-            
+
                     return ListView.separated(
                       shrinkWrap: true,
                       itemBuilder: (context, index) {

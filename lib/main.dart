@@ -13,6 +13,7 @@ import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/helper/theme/app_theme.dart';
+import 'package:prohelp_app/screens/jobs/applications.dart';
 import 'package:prohelp_app/screens/network/no_internet.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -209,6 +210,57 @@ class _MyAppState extends State<MyApp> {
       );
 
       socket.on(
+        "new-review",
+        (data) {
+          debugPrint("DATA FROM  REVIEW NOW !!! >> ${jsonEncode(data)}");
+          // debugPrint("USER ID >> ${data['userId']}");
+          if (data['data']['email'] == _userMap['email']) {
+            //For me
+            debugPrint("FOR ME !! ");
+            _prefs.setString('user', data['data']);
+            _controller.userData.value = data['data'];
+          } else {
+            // Not for me
+            debugPrint("NOT FOR ME !! ");
+          }
+        },
+      );
+
+      socket.on(
+        "review-updated",
+        (data) {
+          debugPrint("DATA FROM  REVIEW NOW !!! >> ${jsonEncode(data)}");
+          // debugPrint("USER ID >> ${data['userId']}");
+          if (data['data']['email'] == _userMap['email']) {
+            //For me
+            debugPrint("FOR ME !! ");
+            _prefs.setString('user', data['data']);
+            _controller.userData.value = data['data'];
+          } else {
+            // Not for me
+            debugPrint("NOT FOR ME !! ");
+          }
+        },
+      );
+
+      socket.on(
+        "review-reply",
+        (data) {
+          debugPrint("DATA FROM REVIEW REPLY !!! >> ${jsonEncode(data)}");
+          // debugPrint("USER ID >> ${data['userId']}");
+          if (data['data']['email'] == _userMap['email']) {
+            //For me
+            debugPrint("FOR ME !! ");
+            _prefs.setString('user', data['data']);
+            _controller.userData.value = data['data'];
+          } else {
+            // Not for me
+            debugPrint("NOT FOR ME !! ");
+          }
+        },
+      );
+
+      socket.on(
         "isOnline",
         (data) => debugPrint("DATA FROM  >> $data"),
       );
@@ -218,6 +270,24 @@ class _MyAppState extends State<MyApp> {
         (data) {
           debugPrint("JOB POSTED NOW!! >> $data");
           _controller.onInit();
+        },
+      );
+
+      socket.on(
+        "job-application-accepted",
+        (data) {
+          debugPrint("DATA FROM APPLICATION ACCEPTANCE !!! >> ${data}");
+          // debugPrint("USER ID >> ${data['userId']}");
+          if (data['applicant']['email'] == _userMap['email']) {
+            //For me
+            debugPrint("FOR ME !! ");
+            // fetchDataStream();
+            // _prefs.setString('user', data['data']);
+            // _controller.userData.value = data['data'];
+          } else {
+            // Not for me
+            debugPrint("NOT FOR ME !! ");
+          }
         },
       );
 

@@ -107,11 +107,10 @@ class _ViewReviewsState extends State<ViewReviews> {
               fontWeight: FontWeight.w500,
               color: Constants.secondaryColor,
             ),
-            centerTitle:
-                (widget.manager.getUser()['id'] == widget.data['id'] ||
-                        _isReviewed)
-                    ? true
-                    : false,
+            centerTitle: (widget.manager.getUser()['id'] == widget.data['id'] ||
+                    _isReviewed)
+                ? true
+                : false,
             actions: [
               (widget.manager.getUser()['id'] == widget.data['id'] ||
                       _isReviewed)
@@ -148,19 +147,64 @@ class _ViewReviewsState extends State<ViewReviews> {
               if (snapshot.hasData) {
                 // Data is available, use it to build the UI
                 final mdata = snapshot.data!;
-                debugPrint("REVIEWS DATA  $mdata");
-                return ListView.separated(
-                  itemCount: mdata.length,
-                  padding: const EdgeInsets.all(10.0),
-                  separatorBuilder: (context, index) => const Divider(),
-                  itemBuilder: (context, index) {
-                    final item = mdata[index];
-                    return ReviewRow(
-                      manager: widget.manager,
-                      data: item,
-                      userData: widget.data,
-                    );
-                  },
+                debugPrint("REVIEWS DATA  ${mdata.length}");
+                if (mdata.length > 0) {
+                  return ListView.separated(
+                    itemCount: mdata.length,
+                    padding: const EdgeInsets.all(10.0),
+                    separatorBuilder: (context, index) => const Divider(),
+                    itemBuilder: (context, index) {
+                      final item = mdata[index];
+                      return ReviewRow(
+                        manager: widget.manager,
+                        data: item,
+                        userData: widget.data,
+                      );
+                    },
+                  );
+                }
+                return Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  padding: const EdgeInsets.all(16.0),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset('assets/images/empty.png'),
+                        const TextInter(text: "No reviews found", fontSize: 16),
+                        widget.manager.getUser()['id'] == widget.data['id']
+                            ? const SizedBox()
+                            : TextButton.icon(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return SizedBox(
+                                        // height: 300,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.98,
+                                        child: InfoDialog(
+                                          body: WriteReview(
+                                            data: widget.data,
+                                            manager: widget.manager,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                                icon: const Icon(
+                                  Icons.edit_document,
+                                  size: 16,
+                                ),
+                                label: const Text("Write review"),
+                              ),
+                      ],
+                    ),
+                  ),
                 );
               } else if (snapshot.hasError) {
                 // Error occurred while fetching data
@@ -176,7 +220,7 @@ class _ViewReviewsState extends State<ViewReviews> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                         Image.asset('assets/images/empty.png'),
+                        Image.asset('assets/images/empty.png'),
                         const TextInter(text: "No reviews found", fontSize: 16),
                         widget.manager.getUser()['id'] == widget.data['id']
                             ? const SizedBox()

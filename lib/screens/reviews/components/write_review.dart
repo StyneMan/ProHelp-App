@@ -182,6 +182,9 @@ class _WriteReviewState extends State<WriteReview> {
       "rating": "$_rating".contains(".") ? _rating : _rating.toDouble(),
       "comment": _reviewController.text,
       "userId": widget.data['id'],
+      "fullname": widget.data['bio']['firstname'] +
+          " " +
+          widget.data['bio']['lastname'],
       "reviewer": {
         "id": widget.manager.getUser()['id'],
         "name": widget.manager.getUser()['bio']['firstname'] +
@@ -203,6 +206,8 @@ class _WriteReviewState extends State<WriteReview> {
       if (resp.statusCode == 200) {
         Map<String, dynamic> map = jsonDecode(resp.body);
         Constants.toast(map['message']);
+
+        _controller.onInit();
       }
     } catch (e) {
       _controller.setLoading(false);

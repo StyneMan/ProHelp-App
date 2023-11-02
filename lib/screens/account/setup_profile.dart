@@ -92,7 +92,7 @@ class _SetupProfileState extends State<SetupProfile> {
   _saveProfile(context, url) async {
     _controller.setLoading(true);
     Map _payload = {
-      "accountType": "freelancer",
+      "accountType": "professional",
       "bio": {
         "firstname": _step1Payload['firstname'].toLowerCase() ??
             _controller.firstname.value.toLowerCase(),
