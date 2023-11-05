@@ -24,6 +24,8 @@ class Messages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("MYCHAT CONTENT :: ${_controller.myChats.value}");
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -84,7 +86,7 @@ class Messages extends StatelessWidget {
       ),
       body: Container(
         padding: const EdgeInsets.all(16.0),
-        child: _controller.myChats.isEmpty || _controller.myChats.value.isEmpty
+        child: _controller.myChats.isEmpty
             ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -95,7 +97,7 @@ class Messages extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 48.0),
                       child: TextInter(
                         text:
-                            "Not chats found. Connect with ${manager.getUser()['accountType'] == "recruiter" ? "professionals" : "job recruiters"} and start chatting!",
+                            "No chats found. Connect with ${manager.getUser()['accountType'] == "recruiter" ? "professionals" : "job recruiters"} and start chatting!",
                         fontSize: 16,
                         align: TextAlign.center,
                       ),
@@ -120,19 +122,18 @@ class Messages extends StatelessWidget {
                   const SizedBox(
                     height: 21.0,
                   ),
-                  Expanded(
-                    child: Obx(
-                      () => ListView.separated(
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) => MessageRow(
-                          manager: manager,
-                          data: _controller.myChats.value.elementAt(index),
-                        ),
-                        separatorBuilder: (context, index) => const SizedBox(
-                          height: 16.0,
-                        ),
-                        itemCount: _controller.myChats.value.length,
+                  Obx(
+                    () => ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) => MessageRow(
+                        manager: manager,
+                        data: _controller.myChats.value.elementAt(index),
                       ),
+                      separatorBuilder: (context, index) => const SizedBox(
+                        height: 16.0,
+                      ),
+                      itemCount: _controller.myChats.value.length,
                     ),
                   ),
                 ],

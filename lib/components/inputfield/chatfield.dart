@@ -67,7 +67,7 @@ class ChatInputField extends StatelessWidget {
         ),
         filled: false,
         hintText: placeholder ?? hintText,
-        labelText: hintText,
+        // labelText: hintText,
         focusColor: Constants.accentColor,
         hintStyle: const TextStyle(
           fontFamily: "Poppins",

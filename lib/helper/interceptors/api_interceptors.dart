@@ -26,7 +26,7 @@ class MyApiInterceptor implements InterceptorContract {
       data.headers[HttpHeaders.authorizationHeader] =
           "Bearer " + cache.getString("accessToken")!;
     } on SocketException catch (_) {
-      _controller.setLoading(false);
+      _controller.isLoading.value = false;
       Fluttertoast.showToast(
         msg: "Check your internet connection!",
         toastLength: Toast.LENGTH_LONG,

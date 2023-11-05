@@ -53,7 +53,7 @@ class _GuestMessageBoxState extends State<GuestMessageBox> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextInter(text: widget.data['message'], fontSize: 16),
+                  TextInter(text: widget.data['content'], fontSize: 16),
                   const SizedBox(
                     height: 8.0,
                   ),
@@ -63,7 +63,8 @@ class _GuestMessageBoxState extends State<GuestMessageBox> {
                     children: [
                       Text(
                         _formattedDate,
-                        style: const TextStyle(fontSize: 13, color: Colors.black54),
+                        style: const TextStyle(
+                            fontSize: 13, color: Colors.black54),
                       ),
                       const SizedBox(
                         width: 8.0,

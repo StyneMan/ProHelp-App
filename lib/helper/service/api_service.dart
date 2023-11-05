@@ -239,10 +239,21 @@ class APIService {
     );
   }
 
-  Future<http.Response> getUsersChats(
-      {var accessToken, var email, var userId}) async {
+  Future<http.Response> initChat(
+      {var accessToken, var email, var payload}) async {
+    return await client.put(
+      Uri.parse('${Constants.baseURL}/api/chat/init/$email'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+      body: jsonEncode(payload),
+    );
+  }
+
+  Future<http.Response> getUsersChats({var accessToken, var email}) async {
     return await client.get(
-      Uri.parse('${Constants.baseURL}/api/chat/all/$email?userId=$userId'),
+      Uri.parse('${Constants.baseURL}/api/chat/allChats/$email'),
       headers: {
         "Content-type": "application/json",
         "Authorization": "Bearer " + accessToken,
@@ -253,7 +264,7 @@ class APIService {
   Future<http.Response> postMessage(
       {var accessToken, var email, var payload}) async {
     return await client.post(
-      Uri.parse('${Constants.baseURL}/api/chat/message/new/$email'),
+      Uri.parse('${Constants.baseURL}/api/chat/message/post/$email'),
       headers: {
         "Content-type": "application/json",
         "Authorization": "Bearer " + accessToken,
@@ -277,8 +288,7 @@ class APIService {
   Future<http.Response> getConversationsByChatId(
       {var accessToken, var email, var chatId}) async {
     return await client.get(
-      Uri.parse(
-          '${Constants.baseURL}/api/chat/message/all/$email?chatId=$chatId'),
+      Uri.parse('${Constants.baseURL}/api/chat/messages/$email/$chatId'),
       headers: {
         "Content-type": "application/json",
         "Authorization": "Bearer " + accessToken,

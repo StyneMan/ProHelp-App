@@ -12,12 +12,11 @@ class SocketManager {
   SocketManager._internal() {
     // Initialize the Socket.IO instance here
     // socket = IO.io('your_socket_server_url');
-    socket = IO.io('${Constants.baseURL}/', <String, dynamic>{
+    socket = IO.io(Constants.baseURL, <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false
     });
 
-    
     socket.connect();
   }
 }

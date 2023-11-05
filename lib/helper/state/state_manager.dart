@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -49,6 +50,8 @@ class StateController extends GetxController {
   var currentConversation = [].obs;
   var isConversationLoading = true.obs;
   var myChats = [].obs;
+  var currentMessages = [].obs;
+  var selectedConversation = {}.obs;
   var myJobs = [].obs;
   var myJobsApplied = [].obs;
   var savedJobs = [].obs;
@@ -121,6 +124,14 @@ class StateController extends GetxController {
   String _token = "";
   RxString dbItem = 'Awaiting data'.obs;
 
+  final Connectivity _connectivity = Connectivity();
+
+  Future<void> initDao() async {
+    // instantiate Dao only if null (i.e. not supplied in constructor)
+    myDao = await Dao.createAsync();
+    dbItem.value = myDao!.dbValue;
+  }
+
   _init() async {
     try {
       final response = await APIService().getProfessions();
@@ -146,17 +157,6 @@ class StateController extends GetxController {
 
     _init();
 
-    // APIService().getProfessions().then((value) {
-    //   debugPrint("STATE GET PROFESSIONS >>> ${value.body}");
-    //   Map<String, dynamic> data = jsonDecode(value.body);
-    //   // allJobs.value = data['docs'];
-    // }).catchError((onError) {
-    //   debugPrint("STATE GET jobs ERROR >>> $onError");
-    //   if (onError.toString().contains("rk is unreachable")) {
-    //     hasInternetAccess.value = false;
-    //   }
-    // });
-
     if (_token.isNotEmpty) {
       //Get User Profile
       APIService().getProfile(_token, map['email']).then((value) {
@@ -173,49 +173,85 @@ class StateController extends GetxController {
         }
       });
 
-      // if (map['accountType'] != "freelancer") {
-      APIService().getFreelancers().then((value) {
-        debugPrint("STATE GET FREELANCERS >>> ${value.body}");
-        Map<String, dynamic> data = jsonDecode(value.body);
-        freelancers.value = data['docs'];
-      }).catchError((onError) {
-        if (onError.toString().contains("rk is unreachable")) {
-          hasInternetAccess.value = false;
+      if (_token.isNotEmpty) {
+        //Get User Profile
+        APIService()
+            .getUsersChats(accessToken: _token, email: map['email'])
+            .then((value) {
+          debugPrint("STATE GET CHATS >>> ${value.body}");
+          Map<String, dynamic> data = jsonDecode(value.body);
+          myChats.value = data['data'];
+          // _prefs.setString("user", jsonEncode(data['data']));
+
+          //Update preference here
+        }).catchError((onError) {
+          debugPrint("STATE GET MYCHATS ERROR>>> $onError");
+          if (onError.toString().contains("rk is unreachable")) {
+            hasInternetAccess.value = false;
+          }
+        });
+
+        // if (map['accountType'] != "freelancer") {
+        APIService().getFreelancers().then((value) {
+          debugPrint("STATE GET FREELANCERS >>> ${value.body}");
+          Map<String, dynamic> data = jsonDecode(value.body);
+          freelancers.value = data['docs'];
+        }).catchError((onError) {
+          if (onError.toString().contains("rk is unreachable")) {
+            hasInternetAccess.value = false;
+          }
+          debugPrint("STATE GET freelancer ERROR >>> $onError");
+        });
+
+        APIService().getAllJobs().then((value) {
+          debugPrint("STATE GET JOBS >>> ${value.body}");
+          Map<String, dynamic> data = jsonDecode(value.body);
+          allJobs.value = data['docs'];
+        }).catchError((onError) {
+          debugPrint("STATE GET jobs ERROR >>> $onError");
+          if (onError.toString().contains("rk is unreachable")) {
+            hasInternetAccess.value = false;
+          }
+        });
+
+        // myJobs.value = [];
+
+        final myJobsResp = await APIService().getUserJobs(
+          accessToken: _token,
+          email: map['email'],
+          userId: map['id'],
+        );
+
+        debugPrint("MY JOBS RESPONSE >> ${myJobsResp.body}");
+
+        if (myJobsResp.statusCode == 200) {
+          Map<String, dynamic> jobMap = jsonDecode(myJobsResp.body);
+          myJobs.value = jobMap['docs'];
         }
-        debugPrint("STATE GET freelancer ERROR >>> $onError");
-      });
-
-      APIService().getAllJobs().then((value) {
-        debugPrint("STATE GET JOBS >>> ${value.body}");
-        Map<String, dynamic> data = jsonDecode(value.body);
-        allJobs.value = data['docs'];
-      }).catchError((onError) {
-        debugPrint("STATE GET jobs ERROR >>> $onError");
-        if (onError.toString().contains("rk is unreachable")) {
-          hasInternetAccess.value = false;
-        }
-      });
-
-      // myJobs.value = [];
-
-      final myJobsResp = await APIService().getUserJobs(
-        accessToken: _token,
-        email: map['email'],
-        userId: map['id'],
-      );
-      debugPrint("MY JOBS RESPONSE >> ${myJobsResp.body}");
-
-      if (myJobsResp.statusCode == 200) {
-        Map<String, dynamic> jobMap = jsonDecode(myJobsResp.body);
-        myJobs.value = jobMap['docs'];
       }
     }
   }
 
-  Future<void> initDao() async {
-    // instantiate Dao only if null (i.e. not supplied in constructor)
-    myDao = await Dao.createAsync();
-    dbItem.value = myDao!.dbValue;
+  void _updateConnectionStatus(ConnectivityResult connectivityResult) {
+    if (connectivityResult == ConnectivityResult.none) {
+      Get.rawSnackbar(
+          messageText: const Text('PLEASE CONNECT TO THE INTERNET',
+              style: TextStyle(color: Colors.white, fontSize: 14)),
+          isDismissible: false,
+          duration: const Duration(days: 1),
+          backgroundColor: Colors.red[400]!,
+          icon: const Icon(
+            Icons.wifi_off,
+            color: Colors.white,
+            size: 35,
+          ),
+          margin: EdgeInsets.zero,
+          snackStyle: SnackStyle.GROUNDED);
+    } else {
+      if (Get.isSnackbarOpen) {
+        Get.closeCurrentSnackbar();
+      }
+    }
   }
 
   Widget currentScreen = const SizedBox();
@@ -318,7 +354,7 @@ class StateController extends GetxController {
     // tabController.jumpToTab(pos);
   }
 
-  void setLoading(bool state) {
+  setLoading(bool state) {
     isLoading.value = state;
   }
 

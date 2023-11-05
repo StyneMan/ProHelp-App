@@ -146,8 +146,6 @@ class _MyAppState extends State<MyApp> {
   PreferenceManager? _manager;
   bool _authenticated = false;
 
-  // late IO.Socket socket;
-
   _init() async {
     // print("FROM MAIN DART ::::");
     try {
@@ -166,12 +164,13 @@ class _MyAppState extends State<MyApp> {
       final chatResp = await APIService().getUsersChats(
         accessToken: _token,
         email: userMap['email'],
-        userId: userMap['id'],
+        // userId: userMap['id'],
       );
       debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
       if (chatResp.statusCode == 200) {
         Map<String, dynamic> chatMap = jsonDecode(chatResp.body);
         _controller.myChats.value = chatMap['data'];
+        ;
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -329,23 +328,9 @@ class _MyAppState extends State<MyApp> {
     _connectSocket();
   }
 
-  _initAgain() async {
-    // await FirebaseFirestore.instance
-    //     .collection("users")
-    //     .doc(_user?.uid)
-    //     .get()
-    //     .then(
-    //       (value) => _controller.setUserData(
-    //         value.data(),
-    //       ),
-    //     );
-  }
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    _initAgain();
-
     return FutureBuilder(
       future: Init.instance.initialize(),
       builder: (context, AsyncSnapshot snapshot) {

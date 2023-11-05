@@ -96,6 +96,7 @@ dependencies:
   firebase_storage: ^11.1.0
   firebase_messaging: ^14.0.0
   path_provider: ^2.0.15
+  connectivity_plus: ^2.1.0
 
 dependency_overrides:
   # firebase_core_platform_interface: 4.5.1

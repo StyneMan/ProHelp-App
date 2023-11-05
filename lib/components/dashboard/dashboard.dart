@@ -206,18 +206,18 @@ class _DashboardState extends State<Dashboard> {
 
       // }
 
-      _controller.myChats.value = [];
+      // _controller.myChats.value = [];
 
-      final chatResp = await APIService().getUsersChats(
-        accessToken: _token,
-        email: userMap['email'],
-        userId: userMap['id'],
-      );
-      // debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
-      if (chatResp.statusCode == 200) {
-        Map<String, dynamic> chatMap = jsonDecode(chatResp.body);
-        _controller.myChats.value = chatMap['data'];
-      }
+      // final chatResp = await APIService().getUsersChats(
+      //   accessToken: _token,
+      //   email: userMap['email'],
+      //   // userId: userMap['id'],
+      // );
+      // // debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
+      // if (chatResp.statusCode == 200) {
+      //   Map<String, dynamic> chatMap = jsonDecode(chatResp.body);
+      //   _controller.myChats.value = chatResp.body as List;
+      // }
     } catch (e) {
       debugPrint(e.toString());
       if (e.toString().contains("rk is unreachable")) {

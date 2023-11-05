@@ -7,7 +7,6 @@ import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:get/instance_manager.dart';
 import 'package:loading_overlay_pro/loading_overlay_pro.dart';
 
 class NoInternet extends StatefulWidget {
@@ -18,35 +17,23 @@ class NoInternet extends StatefulWidget {
 }
 
 class _NoInternetState extends State<NoInternet> {
-  bool? _isConnectionSuccessful;
   final _controller = Get.find<StateController>();
 
   Future<void> _tryConnection() async {
     _controller.setLoading(true);
 
     try {
-      final response = await InternetAddress.lookup('www.google.com');
-      setState(() {
-        _isConnectionSuccessful = response.isNotEmpty;
-      });
+      await InternetAddress.lookup('www.google.com');
 
       _controller.setLoading(false);
       _controller.hasInternetAccess.value = true;
       //Now go to where necessary from here...
       Future.delayed(const Duration(milliseconds: 50), () {
         Get.off(MyApp(), transition: Transition.cupertino);
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => MyApp(),
-        //   ),
-        // );
       });
     } on SocketException catch (e) {
       _controller.setLoading(false);
-      setState(() {
-        _isConnectionSuccessful = false;
-      });
+
       Constants.toast("Check your internet connection.");
     }
   }

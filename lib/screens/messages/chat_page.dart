@@ -1,3 +1,5 @@
+// import 'dart:convert';
+
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -11,8 +13,8 @@ import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/socket/socket_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
-import 'package:prohelp_app/screens/user/profile2.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+import 'package:socket_io_client/socket_io_client.dart';
 // import 'package:http/http.dart' as http;
 
 import 'components/guest_message_box.dart';
@@ -41,142 +43,188 @@ class _ChatPageState extends State<ChatPage> {
   final _formKey = GlobalKey<FormState>();
   final _scrollController = ScrollController();
   final _focusNode = FocusNode();
+  var _guestData, _selectedConversationCompare;
+  bool _refresh = false;
 
-  bool isTyping = false;
-  String _myId = "", senderId = "";
-  String user1Id = "", user2Id = "";
-  // String _guestName = "", _guestId = "", _guestPhoto = "";
+  bool isTyping = false,
+      typing = false,
+      loading = true,
+      socketConnected = false;
+  var messages;
+  late Socket socket;
 
   _init() async {
-    try {
-      final res = await APIService().getConversationsByChatId(
-        accessToken: widget.manager.getAccessToken(),
-        email: widget.manager.getUser()['email'],
-        chatId: widget.caller == "profile"
-            ? widget.data['chatId']
-            : widget.data['_id'],
-      );
+    socket = SocketManager().socket;
+    socket.emit("setup", widget.manager.getUser());
+    socket.on("userConnected", (va) {
+      setState(() => socketConnected = true);
+    });
+    socket.on("typing", (val) => setState(() => isTyping = true));
+    socket.on("stop typing", (val) => setState(() => isTyping = false));
 
-      _controller.isConversationLoading.value = false;
-
-      setState(() {
-        _myId = widget.manager.getUser()['id'];
-      });
-      if (res.statusCode == 200) {
-        Map<String, dynamic> map = jsonDecode(res.body);
-        // debugPrint("SENDER ID >> ${map['conversation'][0]['sender']['id']}");
-        // debugPrint(
-        //     "RECEIVER ID >> ${map['conversation'][0]['receiver']['id']}");
-        // debugPrint("MY USERID >> ${widget.manager.getUser()['_id']}");
-
-        _controller.currentConversation.value = map['conversation'];
-
+    for (var element in widget.data['users']) {
+      if (element['_id'] != widget.manager.getUser()['id']) {
         setState(() {
-          // _guestName = map['conversation'][0]['receiver']['name'];
-          // _guestPhoto = map['conversation'][0]['receiver']['photo'];
-          // senderId  = map['conversation'][0]['sender']['photo'];
-          // _guestId = map['conversation'][0]['receiver']['id'];
-          user1Id = map['users'][0]['id'];
-          user2Id = map['users'][1]['id'];
+          _guestData = element;
         });
       }
-    } catch (e) {
-      _controller.isConversationLoading.value = false;
     }
   }
 
-  _getOtherUserName() {
-    return widget.manager.getUser()['id'] == widget.data['initiator']['id']
-        ? widget.data['receiver']['name']
-        : widget.data['initiator']['name'];
-  }
+  _fetchMessage() async {
+    if (_controller.selectedConversation.value.isNotEmpty) {
+      try {
+        setState(() {
+          loading = true;
+        });
 
-  _getOtherUserPhoto() {
-    return widget.manager.getUser()['id'] == widget.data['initiator']['id']
-        ? widget.data['receiver']['photo']
-        : widget.data['initiator']['photo'];
-  }
+        final response = await APIService().getConversationsByChatId(
+            accessToken: widget.manager.getAccessToken(),
+            chatId: _controller.selectedConversation.value['id'],
+            email: widget.manager.getUser()['email']);
 
-  _getOtherUserId() {
-    return widget.manager.getUser()['id'] == widget.data['initiator']['id']
-        ? widget.data['receiver']['id']
-        : widget.data['initiator']['id'];
-  }
+        debugPrint("THE RESPONSE ::>>:: ${response.body}");
+        if (response.statusCode == 200) {
+          debugPrint("REACHED HERE LIKE THIS >>> ");
+          //  jsonData = json.decode(response.body);
+          // dataController.data.value = jsonData;
+          // final List<Map<String, dynamic>> map = json.decode(response.body);
+          debugPrint("THE RESPONSE MAPPED ::>>:: ");
 
-  _getOtherUserEmail() {
-    return widget.manager.getUser()['id'] == widget.data['initiator']['id']
-        ? widget.data['receiver']['email']
-        : widget.data['initiator']['email'];
-  }
+          setState(() {
+            loading = false;
+            messages = response.body;
+          });
 
-  _markAsRead() {
-    final socket = SocketManager().socket;
-    if (socket.disconnected) {
-      socket.connect();
-      socket.emit('isRead', {
-        'reader': widget.manager.getUser()['id'],
-        'readerName':
-            "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['middlename']} ${widget.manager.getUser()['bio']['lastname']}",
-        'otherUser': _getOtherUserId(),
-        'chatId': widget.caller == "profile"
-            ? widget.data['chatId']
-            : widget.data['_id'],
-      });
-    } else {
-      socket.emit('isRead', {
-        'reader': widget.manager.getUser()['id'],
-        'readerName':
-            "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['middlename']} ${widget.manager.getUser()['bio']['lastname']}",
-        'otherUser': _getOtherUserId(),
-        'chatId': widget.caller == "profile"
-            ? widget.data['chatId']
-            : widget.data['_id'],
-      });
-    }
+          _controller.currentMessages.value = response.body as List;
+        }
 
-    //Already on the chat page
-    socket.on('new-message', (data) {
-      if (data['senderId'] != widget.manager.getUser()['id']) {
-        socket.emit('isRead', {
-          'reader': widget.manager.getUser()['id'],
-          'readerName':
-              "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['middlename']} ${widget.manager.getUser()['bio']['lastname']}",
-          'otherUser': _getOtherUserId(),
-          'chatId': widget.caller == "profile"
-              ? widget.data['chatId']
-              : widget.data['_id'],
+        socket.emit("join chat", _controller.selectedConversation.value['id']);
+      } catch (e) {
+        setState(() {
+          loading = false;
         });
       }
-    });
-
-    socket.on('message-read', (data) {
-      debugPrint("IS READ NOTICE ===>>>, $data");
-    });
+    }
   }
 
   @override
   void initState() {
     super.initState();
     _init();
+    _fetchMessage();
     _focusNode.addListener(_scrollToBottom);
 
-    _markAsRead();
+    _selectedConversationCompare = _controller.selectedConversation.value;
 
-    Future.delayed(const Duration(seconds: 3), () {
-      debugPrint(
-          "CHAT PAGE ROUTE NAME >> ${ModalRoute.of(context)?.settings.name}");
+    socket.on("message recieved", (newMessageRecieved) {
+      // debugPrint("LOGGING RECEIVED MSG :: $newMessageRecieved");
+      // debugPrint("LOGGING 2 :: ${messages}");
+      // debugPrint("LOGGING 3 :: ${jsonEncode(newMessageRecieved)}");
+
+      // debugPrint(
+      //     "LOGGING RECEIVED MSG ENC :: ${jsonDecode(newMessageRecieved)}");
+
+      // if ( _controller.selectedConversation.value['id']  || // if chat is not selected or doesn't match current chat
+      //     _controller.selectedConversation.value['id'] !=
+      //         newMessageRecieved['chat']['id']) {
+      //   // if (!notification.includes(newMessageRecieved)) {
+      //   //   setNotification([newMessageRecieved, ...notification]);
+      //   // //   setFetchAgain(!fetchAgain);
+      //   // }
+      // } else {
+      var rawfied = [...jsonDecode(messages), (newMessageRecieved)];
+
+      setState(() {
+        messages = jsonEncode(rawfied);
+        _refresh = true;
+      });
+
+      // }
     });
   }
 
+  @override
+  void didUpdateWidget(covariant ChatPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_selectedConversationCompare !=
+        _controller.selectedConversation.value) {
+      // Fetch messages when the selectedConversation changes
+      _fetchMessage();
+      _selectedConversationCompare = _controller.selectedConversation.value;
+    }
+  }
+
   void _scrollToBottom() {
-    if (_focusNode.hasFocus) {
-      // final position = _scrollController.position.maxScrollExtent;
-      // _scrollController.jumpTo(position);
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+    print("CUUR POSITION ::: ${_scrollController.position.maxScrollExtent}");
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+  }
+
+  _postMessage() async {
+    _scrollController.animateTo(
+      _scrollController.position.minScrollExtent,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+    if (_inputController.text.isNotEmpty) {
+      socket.emit("stop typing", _controller.selectedConversation.value['id']);
+      final Map _payload = {
+        "content": _inputController.text,
+        "chatId": _controller.selectedConversation.value['id'],
+      };
+
+      try {
+        _inputController.clear();
+        final response = await APIService().postMessage(
+          accessToken: widget.manager.getAccessToken(),
+          email: widget.manager.getUser()['email'],
+          payload: _payload,
+        );
+        debugPrint("THE RESPONSE ::: ${response.body}");
+
+        socket.emit("new message", jsonDecode(response.body));
+        var rawfied = [...jsonDecode(messages), jsonDecode(response.body)];
+
+        setState(() {
+          messages = jsonEncode(rawfied);
+        });
+
+        // _controller.currentMessages.value = jsonEncode(rawfied) as List;
+
+        _scrollToBottom();
+        // setMessages([...messages, resp.data]);
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+    }
+  }
+
+  _typingHandler(var val) {
+    if (!socketConnected) return;
+
+    if (!typing) {
+      setState(() {
+        typing = true;
+      });
+
+      socket.emit("typing", _controller.selectedConversation.value['id']);
+
+      var lastTypingTime = DateTime.now().millisecondsSinceEpoch;
+      var timerLength = 2000;
+
+      Future.delayed(Duration(milliseconds: timerLength), () {
+        var timeNow = DateTime.now().millisecondsSinceEpoch;
+        var timeDiff = timeNow - lastTypingTime;
+
+        if (timeDiff >= timerLength && typing) {
+          socket.emit(
+              "stop typing", _controller.selectedConversation.value['id']);
+          setState(() {
+            typing = false;
+          });
+        }
+      });
     }
   }
 
@@ -190,7 +238,8 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    _markAsRead();
+    print("REFRESH :: $_refresh");
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -213,24 +262,23 @@ class _ChatPageState extends State<ChatPage> {
             const SizedBox(
               width: 16.0,
             ),
-            TextButton(
-              onPressed: () {
-                Get.to(
-                  UserProfile2(
-                    manager: widget.manager,
-                    name: _getOtherUserName(),
-                    image: _getOtherUserPhoto(),
-                    userId: _getOtherUserId(),
-                    email: _getOtherUserEmail(),
-                  ),
-                );
-              },
-              child: Row(
-                children: [
-                  ClipOval(
-                    child: _getOtherUserPhoto().isEmpty
-                        ? const SizedBox()
-                        : Container(
+            _guestData != null
+                ? TextButton(
+                    onPressed: () {
+                      // Get.to(
+                      //   UserProfile2(
+                      //     manager: widget.manager,
+                      //     name: _getOtherUserName(),
+                      //     image: _getOtherUserPhoto(),
+                      //     userId: _getOtherUserId(),
+                      //     email: _getOtherUserEmail(),
+                      //   ),
+                      // );
+                    },
+                    child: Row(
+                      children: [
+                        ClipOval(
+                          child: Container(
                             width: 28,
                             height: 28,
                             decoration: BoxDecoration(
@@ -242,7 +290,7 @@ class _ChatPageState extends State<ChatPage> {
                             ),
                             child: Center(
                               child: Image.network(
-                                _getOtherUserPhoto() ?? "",
+                                _guestData['bio']['image'] ?? "",
                                 errorBuilder: (context, error, stackTrace) =>
                                     const SizedBox(),
                                 width: 24,
@@ -251,354 +299,200 @@ class _ChatPageState extends State<ChatPage> {
                               ),
                             ),
                           ),
-                  ),
-                  const SizedBox(
-                    width: 5.0,
-                  ),
-                  TextPoppins(
-                    text: "${_getOtherUserName()}".capitalize,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: Constants.secondaryColor,
-                  ),
-                ],
-              ),
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.all(0.5),
-              ),
-            ),
+                        ),
+                        const SizedBox(
+                          width: 5.0,
+                        ),
+                        TextPoppins(
+                          text:
+                              "${_guestData['bio']['firstname']} ${_guestData['bio']['lastname']}"
+                                  .capitalize,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: Constants.secondaryColor,
+                        ),
+                      ],
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.all(0.5),
+                    ),
+                  )
+                : const SizedBox(),
           ],
         ),
         centerTitle: true,
         actions: [
-          PopupMenuButton(
-            icon: const Icon(
-              CupertinoIcons.ellipsis_vertical,
-            ),
-            onSelected: (result) {
-              if (result == 0) {
-                Get.to(
-                  UserProfile2(
-                    manager: widget.manager,
-                    name: _getOtherUserName(),
-                    image: _getOtherUserPhoto(),
-                    userId: _getOtherUserId(),
-                    email: _getOtherUserEmail(),
-                  ),
-                );
-              } else {
-                showCupertinoDialog(
-                  context: context,
-                  builder: (context) => CupertinoAlertDialog(
-                    title: TextPoppins(
-                      text: "Clear Chat",
-                      fontSize: 18,
+          isTyping
+              ? const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: null,
+                      child: Text(
+                        "Typing...",
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontStyle: FontStyle.italic,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                    content: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.96,
-                      height: 100,
-                      child: Column(
-                        children: [
-                          const SizedBox(
-                            height: 24,
+                  ],
+                )
+              : const SizedBox(),
+        ],
+      ),
+      body: Stack(
+        children: [
+          loading
+              ? ListView.separated(
+                  itemBuilder: (context, index) => SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: index % 2 == 0
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                height: 40,
+                                child: const BannerShimmer(),
+                              )
+                            ],
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                height: 50,
+                                child: const BannerShimmer(),
+                              )
+                            ],
                           ),
-                          RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              text: "I ",
-                              style: const TextStyle(
-                                color: Colors.black45,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text:
-                                      "${widget.manager.getUser()['bio']['fullname']}",
-                                  style: const TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const TextSpan(
-                                  text: " confirm that I to clear this chat ",
-                                  style: TextStyle(
-                                    color: Colors.black45,
-                                  ),
-                                ),
-                              ],
-                            ),
+                  ),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 21.0),
+                  itemCount: 5,
+                )
+              : messages == null
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.asset('assets/images/empty.png'),
+                          const TextInter(
+                            text: "No messages found",
+                            fontSize: 16,
                           ),
                         ],
                       ),
-                    ),
-                    actions: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: TextRoboto(
-                            text: "Cancel",
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _clearChat();
-                          },
-                          child: TextRoboto(
-                            text: "Proceed",
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-            },
-            itemBuilder: (BuildContext bc) {
-              return widget.data['initiator']['id'] ==
-                      widget.manager.getUser()['id']
-                  ? [
-                      const PopupMenuItem(
-                        child: Text("User profile"),
-                        value: 0,
-                      ),
-                      const PopupMenuItem(
-                        child: Text("Clear conversation"),
-                        value: 1,
-                      ),
-                    ]
-                  : [
-                      const PopupMenuItem(
-                        child: Text("User profile"),
-                        value: 0,
-                      ),
-                    ];
-            },
-          ),
-        ],
-      ),
-      body: Obx(
-        () => Stack(
-          children: [
-            _controller.isConversationLoading.value
-                ? ListView.separated(
-                    itemBuilder: (context, index) => index % 2 == 0
-                        ? Align(
-                            alignment: Alignment.centerRight,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.6,
-                                  height: 40,
-                                  child: const BannerShimmer(),
-                                )
-                              ],
-                            ),
-                          )
-                        : Align(
-                            alignment: Alignment.centerLeft,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.6,
-                                  height: 50,
-                                  child: const BannerShimmer(),
-                                )
-                              ],
-                            ),
-                          ),
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 21.0),
-                    itemCount: 5,
-                  )
-                : _controller.currentConversation.value.isEmpty
-                    ? const Center(
-                        child: TextInter(
-                          text: "No conversation found",
-                          fontSize: 16,
-                        ),
-                      )
-                    : Column(
-                        children: [
-                          Expanded(
+                    )
+                  : Column(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            reverse: true,
+                            controller: _scrollController,
                             child: ListView.separated(
                               padding: const EdgeInsets.all(10.0),
                               shrinkWrap: true,
-                              controller: _scrollController,
+                              physics: const NeverScrollableScrollPhysics(),
                               itemBuilder: (context, index) {
-                                return _controller.currentConversation
-                                            .value[index]['sender']['id'] ==
+                                final item = jsonDecode(messages)[index];
+                                final sender = item['sender'];
+                                // final chat = item['chat'];
+                                return sender['id'] ==
                                         widget.manager.getUser()['id']
                                     ? Align(
                                         alignment: Alignment.centerRight,
                                         child: OwnMessageBox(
-                                          data: _controller
-                                              .currentConversation.value[index],
+                                          data: item,
                                         ),
                                       )
-                                    : _controller.currentConversation
-                                                    .value[index]['receiver']
-                                                ['id'] ==
-                                            widget.manager.getUser()['id']
-                                        ? Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: GuestMessageBox(
-                                              data: _controller
-                                                  .currentConversation
-                                                  .value[index],
-                                            ),
-                                          )
-                                        : const SizedBox();
+                                    : Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: GuestMessageBox(
+                                          data: item,
+                                        ),
+                                      );
                               },
                               separatorBuilder: (context, index) =>
                                   const SizedBox(
                                 height: 21,
                               ),
-                              itemCount:
-                                  _controller.currentConversation.value.length,
+                              itemCount: jsonDecode(messages)?.length,
                             ),
                           ),
-                          const SizedBox(height: 75),
-                        ],
-                      ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Form(
-                key: _formKey,
-                child: Container(
-                  padding: const EdgeInsets.all(12.0),
-                  width: MediaQuery.of(context).size.width * 0.94,
-                  color: Colors.white,
-                  child: ChatInputField(
-                    hintText: '',
-                    focusNode: _focusNode,
-                    placeholder: "Your message",
-                    onChanged: (val) {
-                      if (val.length > 1) {
-                        setState(() {
-                          isTyping = true;
-                        });
-                      } else {
-                        setState(() {
-                          isTyping = false;
-                        });
-                      }
-                    },
-                    controller: _inputController,
-                    validator: (value) {},
-                    inputType: TextInputType.text,
-                    endIcon: IconButton(
-                      onPressed: !isTyping
-                          ? null
-                          : () {
-                              _postMessage();
-                            },
-                      icon: Icon(
-                        Icons.send,
-                        color: !isTyping
-                            ? Colors.grey.withOpacity(0.5)
-                            : Constants.primaryColor,
-                      ),
+                        ),
+                        const SizedBox(height: 75),
+                      ],
                     ),
-                  ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Form(
+              key: _formKey,
+              child: Container(
+                padding: const EdgeInsets.all(12.0),
+                width: MediaQuery.of(context).size.width * 0.94,
+                color: Colors.white,
+                child: ChatInputField(
+                  hintText: 'Your message',
+                  focusNode: _focusNode,
+                  placeholder: "Your message",
+                  onChanged: (val) {
+                    _scrollController.animateTo(
+                      _scrollController.position.minScrollExtent,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                    _typingHandler(val);
+                  },
+                  controller: _inputController,
+                  validator: (value) {},
+                  inputType: TextInputType.text,
+                  endIcon: _inputController.text.isEmpty
+                      ? const SizedBox()
+                      : IconButton(
+                          onPressed: () {
+                            _postMessage();
+                          },
+                          icon: const Icon(
+                            Icons.telegram,
+                          ),
+                        ),
                 ),
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }
 
-  _refreshChatList() async {
-    try {
-      final _prefs = await SharedPreferences.getInstance();
-      final _token = _prefs.getString("accessToken") ?? "";
-      final _user = _prefs.getString("user") ?? "";
-      Map<String, dynamic> userMap = jsonDecode(_user);
+  // _refreshChatList() async {
+  //   try {
+  //     final _prefs = await SharedPreferences.getInstance();
+  //     final _token = _prefs.getString("accessToken") ?? "";
+  //     final _user = _prefs.getString("user") ?? "";
+  //     Map<String, dynamic> userMap = jsonDecode(_user);
 
-      final chatResp = await APIService().getUsersChats(
-        accessToken: _token,
-        email: userMap['email'],
-        userId: userMap['id'],
-      );
-      debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
-      if (chatResp.statusCode == 200) {
-        Map<String, dynamic> chatMap = jsonDecode(chatResp.body);
-        _controller.myChats.value = chatMap['data'];
-      }
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
-  _postMessage() async {
-    Map _body = {
-      "message": _inputController.text,
-      "chatId": widget.data['chatId'],
-      "receiver": {
-        "id": user1Id == widget.manager.getUser()['id'] ? user2Id : user1Id,
-        "name": _getOtherUserName(),
-        "photo": _getOtherUserPhoto(),
-      },
-      "sender": {
-        "id": widget.manager.getUser()['id'],
-        "name":
-            "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['middlename']} ${widget.manager.getUser()['bio']['lastname']}",
-        "photo": widget.manager.getUser()['bio']['image'],
-      }
-    };
-
-    Map _body2 = {
-      "message": _inputController.text,
-      "chatId": widget.data['_id'],
-      "receiver": {
-        "id": user1Id == widget.manager.getUser()['id'] ? user2Id : user1Id,
-        "name": _getOtherUserName(),
-        "photo": _getOtherUserPhoto(),
-      },
-      "sender": {
-        "id": widget.manager.getUser()['id'],
-        "name": "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['middlename']} ${widget.manager.getUser()['bio']['lastname']}",
-        "photo": widget.manager.getUser()['bio']['image'],
-      }
-    };
-
-    try {
-      final res = await APIService().postMessage(
-          accessToken: widget.manager.getAccessToken(),
-          email: widget.manager.getUser()['email'],
-          payload: widget.caller == "profile" ? _body : _body2);
-
-      if (res.statusCode == 200) {
-        Map<String, dynamic> map = jsonDecode(res.body);
-        _controller.currentConversation.add(map['post']);
-        _refreshChatList();
-
-        setState(() {
-          _inputController.text = "";
-          isTyping = false;
-        });
-      }
-
-      debugPrint("DATA >> <<>> ${res.body}");
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
+  //     final chatResp = await APIService().getUsersChats(
+  //       accessToken: _token,
+  //       email: userMap['email'],
+  //     );
+  //     debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
+  //     if (chatResp.statusCode == 200) {
+  //       Map<String, dynamic> chatMap = jsonDecode(chatResp.body);
+  //       _controller.myChats.value = chatMap['data'];
+  //     }
+  //   } catch (e) {
+  //     debugPrint(e.toString());
+  //   }
+  // }
 
   _clearChat() {}
 }
