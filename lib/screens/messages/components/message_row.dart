@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -26,34 +28,11 @@ class _MessageRowState extends State<MessageRow> {
   var socket;
   var guestData;
 
-  // _getOtherUserName() {
-  //   return widget.manager.getUser()['id'] == widget.data['initiator']['id']
-  //       ? widget.data['receiver']['name']
-  //       : widget.data['initiator']['name'];
-  // }
-
-  // _getOtherUserPhoto() {
-  //   return widget.manager.getUser()['id'] == widget.data['initiator']['id']
-  //       ? widget.data['receiver']['photo']
-  //       : widget.data['initiator']['photo'];
-  // }
-
-  // _getOtherUserId() {
-  //   return widget.manager.getUser()['id'] == widget.data['initiator']['id']
-  //       ? widget.data['receiver']['id']
-  //       : widget.data['initiator']['id'];
-  // }
-
-  // _getOtherUserEmail() {
-  //   return widget.manager.getUser()['id'] == widget.data['initiator']['id']
-  //       ? widget.data['receiver']['email']
-  //       : widget.data['initiator']['email'];
-  // }
-
   @override
   void initState() {
     super.initState();
 
+    print("DATA INSPECTION :::  ${jsonEncode(widget.data)}");
     // if (widget.data) {
     widget.data['users']?.forEach((element) => {
           if (element['_id'] != widget.manager.getUser()['id'])
@@ -81,7 +60,7 @@ class _MessageRowState extends State<MessageRow> {
   build(BuildContext context) {
     return InkWell(
       onTap: () {
-        debugPrint("CHAT ID >> ${widget.data['id']}");
+        // debugPrint("CHAT ID >> ${widget.data['id']}");
 
         _controller.selectedConversation.value = widget.data;
 
@@ -106,14 +85,14 @@ class _MessageRowState extends State<MessageRow> {
                     ClipOval(
                       child: Image.network(
                         guestData['bio']['image'],
-                        width: 56,
-                        height: 56,
+                        width: 48,
+                        height: 48,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) =>
                             SvgPicture.asset(
                           "assets/images/personal.svg",
-                          width: 56,
-                          height: 56,
+                          width: 48,
+                          height: 48,
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -132,15 +111,17 @@ class _MessageRowState extends State<MessageRow> {
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
                         ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.6,
-                          child: Text(
-                            "${widget.data['latestMessage']['content'].length > 24 ? "${widget.data['latestMessage']['content']?.toString().substring(0, 24)}..." : widget.data['latestMessage']['content']}",
-                            style: const TextStyle(
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
+                        widget.data['latestMessage'] == null
+                            ? const SizedBox()
+                            : SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                child: Text(
+                                  "${widget.data['latestMessage']['content'].length > 24 ? "${widget.data['latestMessage']['content']?.toString().substring(0, 24)}..." : widget.data['latestMessage']['content']}",
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
                       ],
                     )
                   ],
@@ -148,25 +129,6 @@ class _MessageRowState extends State<MessageRow> {
                 const SizedBox(
                   width: 10.0,
                 ),
-                // widget.data['unreadMsgs']?.length > 0
-                //     ? ClipOval(
-                //         child: Container(
-                //           width: 20,
-                //           height: 20,
-                //           decoration: BoxDecoration(
-                //             borderRadius: BorderRadius.circular(10),
-                //             color: Constants.primaryColor,
-                //           ),
-                //           child: Center(
-                //             child: Text(
-                //               "${widget.data['unreadMsgs']?.length}",
-                //               style: const TextStyle(
-                //                   color: Colors.white, fontSize: 11),
-                //             ),
-                //           ),
-                //         ),
-                //       )
-                //     : const SizedBox(),
               ],
             ),
     );

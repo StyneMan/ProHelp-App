@@ -525,7 +525,8 @@ class _SetupProfileState extends State<SetupProfile> {
                                                       ),
                                                       padding:
                                                           const EdgeInsets.all(
-                                                              16.0),
+                                                        16.0,
+                                                      ),
                                                       child: Row(
                                                         mainAxisAlignment:
                                                             MainAxisAlignment
@@ -582,12 +583,12 @@ class _SetupProfileState extends State<SetupProfile> {
                                                                           Colors
                                                                               .transparent,
                                                                       child:
-                                                                          Row(
+                                                                          const Row(
                                                                         mainAxisAlignment:
                                                                             MainAxisAlignment.center,
                                                                         crossAxisAlignment:
                                                                             CrossAxisAlignment.center,
-                                                                        children: const [
+                                                                        children: [
                                                                           TextInter(
                                                                             text:
                                                                                 "Skip",
@@ -613,7 +614,9 @@ class _SetupProfileState extends State<SetupProfile> {
                                                                         Future
                                                                             .delayed(
                                                                           const Duration(
-                                                                              milliseconds: 500),
+                                                                            milliseconds:
+                                                                                500,
+                                                                          ),
                                                                           () =>
                                                                               _saveProfile(
                                                                             context,
@@ -635,12 +638,12 @@ class _SetupProfileState extends State<SetupProfile> {
                                                                           Constants
                                                                               .primaryColor,
                                                                       child:
-                                                                          Row(
+                                                                          const Row(
                                                                         mainAxisAlignment:
                                                                             MainAxisAlignment.center,
                                                                         crossAxisAlignment:
                                                                             CrossAxisAlignment.center,
-                                                                        children: const [
+                                                                        children: [
                                                                           TextInter(
                                                                             text:
                                                                                 "Continue",

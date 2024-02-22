@@ -12,6 +12,7 @@ class ChatInputField extends StatelessWidget {
   var validator;
   final double borderRadius;
   final Widget endIcon;
+  final Widget prefix;
   final String? placeholder;
   final FocusNode? focusNode;
   final int maxLines;
@@ -28,6 +29,7 @@ class ChatInputField extends StatelessWidget {
     required this.inputType,
     this.borderRadius = 36.0,
     this.endIcon = const SizedBox(),
+    this.prefix = const SizedBox(),
     this.placeholder = "",
     this.focusNode,
     this.maxLines = 8,
@@ -81,6 +83,7 @@ class ChatInputField extends StatelessWidget {
           fontSize: 18,
         ),
         suffixIcon: endIcon,
+        prefix: prefix,
       ),
       keyboardType: inputType,
       textCapitalization: capitalization,

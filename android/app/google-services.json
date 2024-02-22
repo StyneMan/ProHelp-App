@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "964741321159-c0hcfbf27c9v5mub4vadpau1o5rerqqe.apps.googleusercontent.com",
+          "client_id": "964741321159-gop8gbrnalg6edcuu0pmqjuvkrrb4p24.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.prohelp.app",
-            "certificate_hash": "18841580a4c2bb85b5e2d2db08c0656e38d7e38d"
+            "certificate_hash": "722a69f4e9ec77ee2793d6645f892df18462dc5b"
           }
         },
         {

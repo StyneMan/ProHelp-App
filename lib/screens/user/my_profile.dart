@@ -33,9 +33,25 @@ class MyProfile extends StatefulWidget {
 class _UserProfileState extends State<MyProfile> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _controller = Get.find<StateController>();
+  var currentProfession;
+
+  _init() {
+    print("PROFESSIONS ::: ${_controller.allProfessions.value}");
+    if (_controller.allProfessions.value.isNotEmpty) {
+      final result = _controller.allProfessions.value.where((p0) =>
+          p0?['name']?.toLowerCase() ==
+          widget.manager.getUser()['profession']?.toLowerCase());
+
+      print("PROFESIIOSN DATA JKD  ::: ${result.first}");
+      setState(() {
+        currentProfession = result.first;
+      });
+    }
+  }
 
   @override
   void initState() {
+    _init();
     super.initState();
   }
 
@@ -352,6 +368,7 @@ class _UserProfileState extends State<MyProfile> {
                                           manager: widget.manager,
                                           skills: _controller
                                               .userData.value['skills'],
+                                          profession: currentProfession,
                                         ),
                                       ),
                                     );

@@ -25,6 +25,7 @@ class StateController extends GetxController {
   var hasInternetAccess = true.obs;
 
   var allProfessions = [].obs;
+  var allAlerts = [].obs;
 
   var currentUser = FirebaseAuth.instance.currentUser;
   var croppedPic = "".obs;
@@ -46,6 +47,8 @@ class StateController extends GetxController {
   var searchData = [].obs;
   var freelancers = [].obs;
   var recruiters = [].obs;
+  var homeBanners = [].obs;
+  var categories = [].obs;
   var conversationData = {}.obs;
   var currentConversation = [].obs;
   var isConversationLoading = true.obs;
@@ -132,6 +135,8 @@ class StateController extends GetxController {
     dbItem.value = myDao!.dbValue;
   }
 
+  RxList get getAlerts => allAlerts;
+
   _init() async {
     try {
       final response = await APIService().getProfessions();
@@ -139,6 +144,25 @@ class StateController extends GetxController {
       Map<String, dynamic> map = jsonDecode(response.body);
       debugPrint("RESPONS  ==>> ${map['docs']}");
       allProfessions.value = map['docs'];
+
+      final bannerResponse = await APIService().getBanners();
+      debugPrint("RESPONSI BANNERS ==>> ${bannerResponse.body}");
+      Map<String, dynamic> _bannerMap = jsonDecode(bannerResponse.body);
+      final lis = _bannerMap['docs'];
+      final filterd = lis.where((item) => item['page'] == "home").toList();
+      // where((item) => item['page'] == "home") as List
+      homeBanners.value = filterd;
+
+      debugPrint("BANNER HOME LISTS  ==>> $lis");
+      debugPrint("BANNER HOME LISTS  ==>> $filterd");
+
+      //  final bannerResponse = await APIService().getBanners();
+      // debugPrint("RESPONSI BANNERS ==>> ${bannerResponse.body}");
+      // Map<String, dynamic> _bannerMap = jsonDecode(bannerResponse.body);
+      // final lis = _bannerMap['docs'];
+      // final filterd = lis.where((item) => item['page'] == "home").toList();
+      // // where((item) => item['page'] == "home") as List
+      // homeBanners.value = filterd;
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -154,12 +178,11 @@ class StateController extends GetxController {
     var _token = _prefs.getString("accessToken") ?? "";
     Map<String, dynamic> map = jsonDecode(user);
     // debugDebugPrintdebugPrint("US EMIA >> ${map['email']}");
-
     _init();
 
     if (_token.isNotEmpty) {
       //Get User Profile
-      APIService().getProfile(_token, map['email']).then((value) {
+      APIService().getProfile(_token, "${map['email']}").then((value) {
         // debugDebugPrintdebugPrint("STATE GET PROFILE >>> ${value.body}");
         Map<String, dynamic> data = jsonDecode(value.body);
         userData.value = data['data'];
@@ -173,61 +196,75 @@ class StateController extends GetxController {
         }
       });
 
-      if (_token.isNotEmpty) {
-        //Get User Profile
-        APIService()
-            .getUsersChats(accessToken: _token, email: map['email'])
-            .then((value) {
-          debugPrint("STATE GET CHATS >>> ${value.body}");
-          Map<String, dynamic> data = jsonDecode(value.body);
-          myChats.value = data['data'];
-          // _prefs.setString("user", jsonEncode(data['data']));
+      //Get User Chats
+      APIService()
+          .getUsersChats(accessToken: _token, email: "${map['email']}")
+          .then((value) {
+        debugPrint("STATE GET CHATS >>> ${value.body}");
+        Map<String, dynamic> data = jsonDecode(value.body);
+        myChats.value = data['data'];
+        // _prefs.setString("user", jsonEncode(data['data']));
 
-          //Update preference here
-        }).catchError((onError) {
-          debugPrint("STATE GET MYCHATS ERROR>>> $onError");
-          if (onError.toString().contains("rk is unreachable")) {
-            hasInternetAccess.value = false;
-          }
-        });
-
-        // if (map['accountType'] != "freelancer") {
-        APIService().getFreelancers().then((value) {
-          debugPrint("STATE GET FREELANCERS >>> ${value.body}");
-          Map<String, dynamic> data = jsonDecode(value.body);
-          freelancers.value = data['docs'];
-        }).catchError((onError) {
-          if (onError.toString().contains("rk is unreachable")) {
-            hasInternetAccess.value = false;
-          }
-          debugPrint("STATE GET freelancer ERROR >>> $onError");
-        });
-
-        APIService().getAllJobs().then((value) {
-          debugPrint("STATE GET JOBS >>> ${value.body}");
-          Map<String, dynamic> data = jsonDecode(value.body);
-          allJobs.value = data['docs'];
-        }).catchError((onError) {
-          debugPrint("STATE GET jobs ERROR >>> $onError");
-          if (onError.toString().contains("rk is unreachable")) {
-            hasInternetAccess.value = false;
-          }
-        });
-
-        // myJobs.value = [];
-
-        final myJobsResp = await APIService().getUserJobs(
-          accessToken: _token,
-          email: map['email'],
-          userId: map['id'],
-        );
-
-        debugPrint("MY JOBS RESPONSE >> ${myJobsResp.body}");
-
-        if (myJobsResp.statusCode == 200) {
-          Map<String, dynamic> jobMap = jsonDecode(myJobsResp.body);
-          myJobs.value = jobMap['docs'];
+        //Update preference here
+      }).catchError((onError) {
+        debugPrint("STATE GET MYCHATS ERROR>>> $onError");
+        if (onError.toString().contains("rk is unreachable")) {
+          hasInternetAccess.value = false;
         }
+      });
+
+      //Get User Alerts
+      APIService()
+          .getAlerts(accessToken: _token, email: "${map['email']}")
+          .then((value) {
+        debugPrint("STATE GET ALERTS >>> ${value.body}");
+        Map<String, dynamic> data = jsonDecode(value.body);
+        allAlerts.value = data['docs'];
+
+        //Update preference here
+      }).catchError((onError) {
+        debugPrint("STATE GET MYCHATS ERROR>>> $onError");
+        if (onError.toString().contains("rk is unreachable")) {
+          hasInternetAccess.value = false;
+        }
+      });
+
+      // if (map['accountType'] != "freelancer") {
+      APIService().getFreelancers().then((value) {
+        debugPrint("STATE GET FREELANCERS >>> ${value.body}");
+        Map<String, dynamic> data = jsonDecode(value.body);
+        freelancers.value = data['docs'];
+      }).catchError((onError) {
+        if (onError.toString().contains("rk is unreachable")) {
+          hasInternetAccess.value = false;
+        }
+        debugPrint("STATE GET freelancer ERROR >>> $onError");
+      });
+
+      APIService().getAllJobs().then((value) {
+        debugPrint("STATE GET JOBS >>> ${value.body}");
+        Map<String, dynamic> data = jsonDecode(value.body);
+        allJobs.value = data['docs'];
+      }).catchError((onError) {
+        debugPrint("STATE GET jobs ERROR >>> $onError");
+        if (onError.toString().contains("rk is unreachable")) {
+          hasInternetAccess.value = false;
+        }
+      });
+
+      // myJobs.value = [];
+
+      final myJobsResp = await APIService().getUserJobs(
+        accessToken: _token,
+        email: map['email'],
+        userId: map['id'],
+      );
+
+      debugPrint("MY JOBS RESPONSE >> ${myJobsResp.body}");
+
+      if (myJobsResp.statusCode == 200) {
+        Map<String, dynamic> jobMap = jsonDecode(myJobsResp.body);
+        myJobs.value = jobMap['docs'];
       }
     }
   }

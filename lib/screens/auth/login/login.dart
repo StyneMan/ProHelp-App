@@ -47,23 +47,30 @@ class _LoginState extends State<Login> {
       final GoogleSignInAccount? googleUser = await GoogleSignIn(
         scopes: [
           'email',
-          // 'https://www.googleapis.com/auth/contacts.readonly',
         ],
       ).signIn();
 
-      debugPrint("GOOGLE USER RESP >> ${googleUser}");
+      debugPrint("GOOGLE USER RESP >> $googleUser");
 
-      // Obtain the auth details from the request
-      final googleAuth = await googleUser?.authentication;
-      debugPrint("Google ID TOKEN >> ${googleAuth?.idToken}");
-      final resp = await APIService().googleAuth("${googleAuth?.idToken}");
+      Map _payload = {
+        "name": googleUser?.displayName,
+        "email": googleUser?.email,
+        "firstname": googleUser?.displayName?.split(' ')[0],
+        "lastname": googleUser!.displayName!.contains(' ')
+            ? googleUser.displayName?.split(' ')[1]
+            : "",
+        "picture": googleUser.photoUrl,
+        "id": googleUser.id,
+      };
+
+      final resp = await APIService().googleAuth(_payload);
 
       debugPrint("Google Server Respone >> ${resp.body}");
 
       Map<String, dynamic> map = jsonDecode(resp.body);
       _manager!.saveAccessToken(map['token']);
-      _controller.firstname.value = "${map['data']['bio']['fullname']}".split(" ")[0].capitalize!;
-      _controller.lastname.value = "${map['data']['bio']['fullname']}".split(" ")[1].capitalize!;
+      _controller.firstname.value = "${map['data']['bio']['firstname']}";
+      _controller.lastname.value = "${map['data']['bio']['lastname']}";
 
       if (map['message'].contains("Account created")) {
         //New account so now select user type recruiter or freelancer
@@ -74,7 +81,8 @@ class _LoginState extends State<Login> {
             child: AccountType(
               isSocial: true,
               email: map['data']['email'],
-              name: map['data']['bio']['fullname'],
+              name:
+                  "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
             ),
           ),
         );
@@ -85,18 +93,20 @@ class _LoginState extends State<Login> {
               type: PageTransitionType.size,
               alignment: Alignment.bottomCenter,
               child: map['data']["accountType"].toString().toLowerCase() ==
-                      "freelancer"
+                      "professional"
                   ? SetupProfile(
                       manager: _manager!,
                       isSocial: true,
                       email: map['data']['email'],
-                      name: map['data']['bio']['fullname'],
+                      name:
+                          "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
                     )
                   : SetupProfileEmployer(
                       manager: _manager!,
                       isSocial: true,
                       email: map['data']['email'],
-                      name: map['data']['bio']['fullname'],
+                      name:
+                          "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
                     ),
             ),
           );

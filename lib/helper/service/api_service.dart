@@ -100,6 +100,15 @@ class APIService {
     );
   }
 
+  Future<http.Response> getProfessionalsByCategory({var category}) async {
+    return await client.get(
+      Uri.parse('${Constants.baseURL}/api/freelancers/' + category),
+      headers: {
+        "Content-type": "application/json",
+      },
+    );
+  }
+
   Future<http.Response> getRecruiters(String accessToken, String email) async {
     return await client.get(
       Uri.parse('${Constants.baseURL}/api/recruiters/$email'),
@@ -217,27 +226,27 @@ class APIService {
     );
   }
 
-  Future<http.Response> googleAuth(String idToken) async {
+  Future<http.Response> googleAuth(Map payload) async {
     return await http.post(
-      Uri.parse('${Constants.baseURL}/api/auth/google'),
+      Uri.parse('${Constants.baseURL}/api/auth/google/web'),
       headers: {
         "Content-type": "application/json",
-      },
-      body: jsonEncode({"token": idToken}),
-    );
-  }
-
-  Future<http.Response> initiateChat(
-      {var accessToken, var email, var payload}) async {
-    return await client.post(
-      Uri.parse('${Constants.baseURL}/api/chat/initiate/$email'),
-      headers: {
-        "Content-type": "application/json",
-        "Authorization": "Bearer " + accessToken,
       },
       body: jsonEncode(payload),
     );
   }
+
+  // Future<http.Response> initiateChat(
+  //     {var accessToken, var email, var payload}) async {
+  //   return await client.post(
+  //     Uri.parse('${Constants.baseURL}/api/chat/initiate/$email'),
+  //     headers: {
+  //       "Content-type": "application/json",
+  //       "Authorization": "Bearer " + accessToken,
+  //     },
+  //     body: jsonEncode(payload),
+  //   );
+  // }
 
   Future<http.Response> initChat(
       {var accessToken, var email, var payload}) async {
@@ -554,6 +563,26 @@ class APIService {
         "Authorization": "Bearer " + accessToken,
       },
       body: jsonEncode(body),
+    );
+  }
+
+  Future<http.Response> getAlerts(
+      {required String accessToken, required String email}) async {
+    return await client.get(
+      Uri.parse('${Constants.baseURL}/api/alerts/all/$email'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+    );
+  }
+
+  Future<http.Response> getBanners() async {
+    return await client.get(
+      Uri.parse('${Constants.baseURL}/api/banners/all/'),
+      headers: {
+        "Content-type": "application/json",
+      },
     );
   }
 }

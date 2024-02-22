@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:prohelp_app/components/inputfield/customautocomplete.dart';
 import 'package:prohelp_app/components/inputfield/customdropdown.dart';
-import 'package:prohelp_app/components/inputfield/textfield.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/data/disablility/disbilities.dart';
 import 'package:prohelp_app/data/languages/languages.dart';
@@ -23,10 +22,10 @@ class SetupStep4 extends StatefulWidget {
 }
 
 class _SetupStep4State extends State<SetupStep4> {
-  final _disabilityController = TextEditingController();
+  // final _disabilityController = TextEditingController();
 
-  final _title1Controller = TextEditingController();
-  final _title2Controller = TextEditingController();
+  // final _title1Controller = TextEditingController();
+  // final _title2Controller = TextEditingController();
 
   final _controller = Get.find<StateController>();
   // List<String> _selectedLanguages = [];
@@ -222,7 +221,7 @@ class _SetupStep4State extends State<SetupStep4> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              TextPoppins(text: 'Do you have disabilities? ', fontSize: 15),
+              TextPoppins(text: 'Do you have disabilities? ', fontSize: 14),
               Checkbox(
                 value: !_isDisablity,
                 onChanged: (val) {
@@ -231,7 +230,7 @@ class _SetupStep4State extends State<SetupStep4> {
                   });
                 },
               ),
-              const Text("NO"),
+              TextPoppins(text: 'No ', fontSize: 12),
               Checkbox(
                 value: _isDisablity,
                 onChanged: (val) {
@@ -240,7 +239,7 @@ class _SetupStep4State extends State<SetupStep4> {
                   });
                 },
               ),
-              const Text("YES"),
+              TextPoppins(text: 'Yes ', fontSize: 12),
             ],
           ),
           const SizedBox(

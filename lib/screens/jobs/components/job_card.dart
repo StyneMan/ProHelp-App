@@ -20,12 +20,14 @@ class JobCard extends StatefulWidget {
   var data;
   final int index;
   final String type;
+  final String? usecase;
   final PreferenceManager manager;
   JobCard(
       {Key? key,
       required this.data,
       required this.index,
       required this.manager,
+      this.usecase,
       this.type = ""})
       : super(key: key);
 
@@ -87,6 +89,13 @@ class _JobCardState extends State<JobCard> {
   }
 
   _checkApplied() {
+    if (widget.usecase != null) {
+      if (widget.usecase!.isNotEmpty) {
+        setState(() {
+          _isApplied = true;
+        });
+      }
+    }
     for (var element in _controller.myJobsApplied.value) {
       if (element['jobId'] == widget.data['id']) {
         setState(() {
@@ -125,7 +134,7 @@ class _JobCardState extends State<JobCard> {
                   children: [
                     ClipOval(
                       child: Image.network(
-                        widget.data['recruiter']['photo'],
+                        widget.data['recruiter']['bio']['image'],
                         width: 64,
                         height: 64,
                         fit: BoxFit.cover,
@@ -151,10 +160,12 @@ class _JobCardState extends State<JobCard> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          TextPoppins(
-                            text: "${widget.data['jobTitle']}".capitalize,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                          Expanded(
+                            child: TextPoppins(
+                              text: "${widget.data['jobTitle']}".capitalize,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                           const SizedBox(
                             width: 3.0,
@@ -184,7 +195,7 @@ class _JobCardState extends State<JobCard> {
                   ),
                 ),
                 IconButton(
-                  onPressed: widget.data['recruiter']['id'] ==
+                  onPressed: widget.data['recruiter']['_id'] ==
                           widget.manager.getUser()['id']
                       ? () {
                           showCupertinoDialog(
@@ -286,7 +297,7 @@ class _JobCardState extends State<JobCard> {
                       : () {
                           _saveJob();
                         },
-                  icon: widget.data['recruiter']['id'] ==
+                  icon: widget.data['recruiter']['_id'] ==
                           widget.manager.getUser()['id']
                       ? const Icon(
                           CupertinoIcons.delete_simple,
@@ -380,10 +391,11 @@ class _JobCardState extends State<JobCard> {
                     ? Expanded(
                         flex: 4,
                         child: CustomButton(
-                          bgColor: widget.data['jobStatus'] != "accepting"
+                          bgColor: widget.data['jobStatus'] != "accepting" ||
+                                  _isApplied
                               ? Colors.grey
                               : Constants.primaryColor,
-                          child: widget.data['recruiter']['id'] ==
+                          child: widget.data['recruiter']['_id'] ==
                                   widget.manager.getUser()['id']
                               ? TextPoppins(
                                   text: widget.data['jobStatus'] != "accepting"
@@ -516,7 +528,8 @@ class _JobCardState extends State<JobCard> {
                 const SizedBox(
                   width: 8.0,
                 ),
-                widget.data['recruiter']['id'] == widget.manager.getUser()['id']
+                widget.data['recruiter']['_id'] ==
+                        widget.manager.getUser()['id']
                     ? const SizedBox()
                     : Expanded(
                         flex: 2,
@@ -539,9 +552,9 @@ class _JobCardState extends State<JobCard> {
                           onPressed: widget.data['jobStatus'] != "accepting" ||
                                   _isApplied
                               ? null
-                              : widget.data['recruiter']['id'] !=
+                              : widget.data['recruiter']['_id'] !=
                                       widget.manager.getUser()['id']
-                                  ? (_controller.userData.value['wallet']
+                                  ? (widget.manager.getUser()['wallet']
                                                   ['balance'] ??
                                               0) >=
                                           200

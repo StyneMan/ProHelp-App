@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
@@ -114,18 +115,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
         widget.manager.setIsLoggedIn(false);
         widget.manager.clearProfile();
 
-        Get.offAll(const Welcome());
+        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-        // Future.delayed(const Duration(seconds: 1), () {
-        // Navigator.pushReplacement(context, Mater)
-        // Navigator.pushReplacement(
-        //   PageTransition(
-        //     type: PageTransitionType.size,
-        //     alignment: Alignment.bottomCenter,
-        //     child: const Welcome(),
-        //   ),
-        // );
-        // });
+        if (googleUser != null) {
+          await GoogleSignIn().signOut();
+        }
+
+        Get.offAll(const Welcome());
       } else {
         Map<String, dynamic> map = jsonDecode(res.body);
         Constants.toast(map['message']);

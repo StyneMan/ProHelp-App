@@ -45,18 +45,20 @@ class Account extends StatelessWidget {
             const SizedBox(
               width: 16.0,
             ),
-            ClipOval(
-              child: Image.network(
-                manager.getUser()['bio']['image'] ?? "",
-                errorBuilder: (context, error, stackTrace) => const Icon(
-                    CupertinoIcons.person_alt,
-                    size: 21,
-                    color: Colors.white),
-                width: 36,
-                height: 36,
-                fit: BoxFit.cover,
-              ),
-            ),
+            manager.getUser().isEmpty
+                ? const SizedBox()
+                : ClipOval(
+                    child: Image.network(
+                      "${manager.getUser()['bio']['image'] ?? ""}",
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                          CupertinoIcons.person_alt,
+                          size: 21,
+                          color: Colors.white),
+                      width: 36,
+                      height: 36,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
             const SizedBox(
               width: 4.0,
             ),
@@ -89,287 +91,97 @@ class Account extends StatelessWidget {
           manager: manager,
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          Center(
-            child: ClipOval(
-              child: Image.network(
-                manager.getUser()['bio']['image'],
-                errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
-                  "assets/images/personal.svg",
-                  fit: BoxFit.cover,
-                  width: MediaQuery.of(context).size.width * 0.36,
-                  height: MediaQuery.of(context).size.width * 0.36,
-                ),
-                fit: BoxFit.cover,
-                width: MediaQuery.of(context).size.width * 0.36,
-                height: MediaQuery.of(context).size.width * 0.36,
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 4.0,
-          ),
-          Center(
-            child: Column(
+      body: manager.getUser().isEmpty || _controller.userData.value.isEmpty
+          ? const SizedBox()
+          : ListView(
+              padding: const EdgeInsets.all(16.0),
               children: [
-                TextPoppins(
-                  text:
-                      "${manager.getUser()['bio']['firstname']} ${manager.getUser()['bio']['middlename']} ${manager.getUser()['bio']['lastname']}"
-                          .capitalize,
-                  fontSize: 21,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                Center(
+                  child: ClipOval(
+                    child: Image.network(
+                      manager.getUser()['bio']['image'],
+                      errorBuilder: (context, error, stackTrace) =>
+                          SvgPicture.asset(
+                        "assets/images/personal.svg",
+                        fit: BoxFit.cover,
+                        width: MediaQuery.of(context).size.width * 0.36,
+                        height: MediaQuery.of(context).size.width * 0.36,
+                      ),
+                      fit: BoxFit.cover,
+                      width: MediaQuery.of(context).size.width * 0.36,
+                      height: MediaQuery.of(context).size.width * 0.36,
+                    ),
+                  ),
                 ),
                 const SizedBox(
-                  height: 1.0,
+                  height: 4.0,
                 ),
-                TextPoppins(
-                  text: manager.getUser()['accountType'] == "freelancer"
-                      ? "Professional".toUpperCase()
-                      : manager
-                          .getUser()['accountType']
-                          .toString()
-                          .toUpperCase(),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Constants.primaryColor,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // TextPoppins(
-                    //   text: "Balance:",
-                    //   fontSize: 16,
-                    //   fontWeight: FontWeight.w600,
-                    // ),
-                    Image.asset(
-                      "assets/images/coin_gold.png",
-                      width: 32,
-                    ),
-                    Text(
-                      " ${Constants.formatMoney(_controller.userData.value['wallet']['balance'])} coin${_pluralize(manager.getUser()['wallet']['balance'])}",
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 8.0,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      PageTransition(
-                        type: PageTransitionType.size,
-                        alignment: Alignment.bottomCenter,
-                        child: PersonalInfo(
-                          manager: manager,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                Center(
+                  child: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset("assets/images/personal_icon.svg"),
-                          const SizedBox(
-                            width: 16.0,
-                          ),
-                          TextPoppins(
-                            text: "Personal Information",
-                            fontSize: 13,
-                            color: Colors.black87,
-                          )
-                        ],
+                      TextPoppins(
+                        text:
+                            "${manager.getUser()['bio']['firstname']} ${manager.getUser()['bio']['middlename']} ${manager.getUser()['bio']['lastname']}"
+                                .capitalize,
+                        fontSize: 21,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
                       ),
                       const SizedBox(
-                        width: 10.0,
+                        height: 1.0,
                       ),
-                      const Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: Color(0xFFB1B5C5),
+                      TextPoppins(
+                        text: manager.getUser()['accountType'] == "freelancer"
+                            ? "Professional".toUpperCase()
+                            : manager
+                                .getUser()['accountType']
+                                .toString()
+                                .toUpperCase(),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Constants.primaryColor,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // TextPoppins(
+                          //   text: "Balance:",
+                          //   fontSize: 16,
+                          //   fontWeight: FontWeight.w600,
+                          // ),
+                          Image.asset(
+                            "assets/images/coin_gold.png",
+                            width: 32,
+                          ),
+                          Text(
+                            " ${Constants.formatMoney(_controller.userData.value['wallet']['balance'])} coin${_pluralize(manager.getUser()['wallet']['balance'])}",
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.all(16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4.0),
-                      side: const BorderSide(
-                        color: Color(0xFFB1B5C5),
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
                 ),
                 const SizedBox(
-                  height: 10.0,
+                  height: 8.0,
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      PageTransition(
-                        type: PageTransitionType.size,
-                        alignment: Alignment.bottomCenter,
-                        child: AccountSecurity(
-                          manager: manager,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset("assets/images/security_icon.svg"),
-                          const SizedBox(
-                            width: 16.0,
-                          ),
-                          TextPoppins(
-                            text: "Security",
-                            fontSize: 13,
-                            color: Colors.black87,
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        width: 10.0,
-                      ),
-                      const Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: Color(0xFFB1B5C5),
-                      ),
-                    ],
-                  ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.all(16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4.0),
-                      side: const BorderSide(
-                        color: Color(0xFFB1B5C5),
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 10.0,
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      PageTransition(
-                        type: PageTransitionType.size,
-                        alignment: Alignment.bottomCenter,
-                        child: ContactSupport(
-                          manager: manager,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset("assets/images/support_icon.svg"),
-                          const SizedBox(
-                            width: 16.0,
-                          ),
-                          TextPoppins(
-                            text: "Contact support",
-                            fontSize: 13,
-                            color: Colors.black87,
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        width: 10.0,
-                      ),
-                      const Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: Color(0xFFB1B5C5),
-                      ),
-                    ],
-                  ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.all(16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4.0),
-                      side: const BorderSide(
-                        color: Color(0xFFB1B5C5),
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 10.0,
-                ),
-                manager.getUser()['accountType'].toString().toLowerCase() ==
-                        "recruiter"
-                    ? const SizedBox()
-                    : TextButton(
+                      TextButton(
                         onPressed: () {
-                          Get.to(
-                            VerifyDocs(manager: manager),
-                            transition: Transition.cupertino,
+                          Navigator.of(context).push(
+                            PageTransition(
+                              type: PageTransitionType.size,
+                              alignment: Alignment.bottomCenter,
+                              child: PersonalInfo(
+                                manager: manager,
+                              ),
+                            ),
                           );
-                          // showBarModalBottomSheet(
-                          //   expand: true,
-                          //   context: context,
-                          //   useRootNavigator: true,
-                          //   backgroundColor: Colors.white,
-                          //   topControl: ClipOval(
-                          //     child: GestureDetector(
-                          //       onTap: () {
-                          //         Navigator.of(context).pop();
-                          //       },
-                          //       child: Container(
-                          //         width: 32,
-                          //         height: 32,
-                          //         decoration: BoxDecoration(
-                          //           color: Colors.white,
-                          //           borderRadius: BorderRadius.circular(
-                          //             16,
-                          //           ),
-                          //         ),
-                          //         child: const Center(
-                          //           child: Icon(
-                          //             Icons.close,
-                          //             size: 24,
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ),
-                          //   builder: (context) => SizedBox(
-                          //     // height: MediaQuery.of(context).size.height * 0.75,
-                          //     child:
-                          //   ),
-                          // );
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -385,7 +197,7 @@ class Account extends StatelessWidget {
                                   width: 16.0,
                                 ),
                                 TextPoppins(
-                                  text: "Verify Documents",
+                                  text: "Personal Information",
                                   fontSize: 13,
                                   color: Colors.black87,
                                 )
@@ -411,63 +223,265 @@ class Account extends StatelessWidget {
                           ),
                         ),
                       ),
-                const SizedBox(
-                  height: 10.0,
-                ),
-                TextButton(
-                  onPressed: () {
-                    Get.to(
-                      // SetupProfile(manager: manager, email: 'ezege@gmail.com'),
-                      MyWallet(
-                        manager: manager,
+                      const SizedBox(
+                        height: 10.0,
                       ),
-                      transition: Transition.cupertino,
-                    );
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset("assets/images/personal_icon.svg"),
-                          const SizedBox(
-                            width: 16.0,
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            PageTransition(
+                              type: PageTransitionType.size,
+                              alignment: Alignment.bottomCenter,
+                              child: AccountSecurity(
+                                manager: manager,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                    "assets/images/security_icon.svg"),
+                                const SizedBox(
+                                  width: 16.0,
+                                ),
+                                TextPoppins(
+                                  text: "Security",
+                                  fontSize: 13,
+                                  color: Colors.black87,
+                                )
+                              ],
+                            ),
+                            const SizedBox(
+                              width: 10.0,
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Color(0xFFB1B5C5),
+                            ),
+                          ],
+                        ),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.all(16.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4.0),
+                            side: const BorderSide(
+                              color: Color(0xFFB1B5C5),
+                              width: 1.0,
+                            ),
                           ),
-                          TextPoppins(
-                            text: "My Wallet",
-                            fontSize: 13,
-                            color: Colors.black87,
-                          )
-                        ],
+                        ),
                       ),
                       const SizedBox(
-                        width: 10.0,
+                        height: 10.0,
                       ),
-                      const Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: Color(0xFFB1B5C5),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            PageTransition(
+                              type: PageTransitionType.size,
+                              alignment: Alignment.bottomCenter,
+                              child: ContactSupport(
+                                manager: manager,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                    "assets/images/support_icon.svg"),
+                                const SizedBox(
+                                  width: 16.0,
+                                ),
+                                TextPoppins(
+                                  text: "Contact support",
+                                  fontSize: 13,
+                                  color: Colors.black87,
+                                )
+                              ],
+                            ),
+                            const SizedBox(
+                              width: 10.0,
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Color(0xFFB1B5C5),
+                            ),
+                          ],
+                        ),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.all(16.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4.0),
+                            side: const BorderSide(
+                              color: Color(0xFFB1B5C5),
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
                       ),
+                      const SizedBox(
+                        height: 10.0,
+                      ),
+                      manager
+                                  .getUser()['accountType']
+                                  .toString()
+                                  .toLowerCase() ==
+                              "recruiter"
+                          ? const SizedBox()
+                          : TextButton(
+                              onPressed: () {
+                                Get.to(
+                                  VerifyDocs(manager: manager),
+                                  transition: Transition.cupertino,
+                                );
+                                // showBarModalBottomSheet(
+                                //   expand: true,
+                                //   context: context,
+                                //   useRootNavigator: true,
+                                //   backgroundColor: Colors.white,
+                                //   topControl: ClipOval(
+                                //     child: GestureDetector(
+                                //       onTap: () {
+                                //         Navigator.of(context).pop();
+                                //       },
+                                //       child: Container(
+                                //         width: 32,
+                                //         height: 32,
+                                //         decoration: BoxDecoration(
+                                //           color: Colors.white,
+                                //           borderRadius: BorderRadius.circular(
+                                //             16,
+                                //           ),
+                                //         ),
+                                //         child: const Center(
+                                //           child: Icon(
+                                //             Icons.close,
+                                //             size: 24,
+                                //           ),
+                                //         ),
+                                //       ),
+                                //     ),
+                                //   ),
+                                //   builder: (context) => SizedBox(
+                                //     // height: MediaQuery.of(context).size.height * 0.75,
+                                //     child:
+                                //   ),
+                                // );
+                              },
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      SvgPicture.asset(
+                                          "assets/images/personal_icon.svg"),
+                                      const SizedBox(
+                                        width: 16.0,
+                                      ),
+                                      TextPoppins(
+                                        text: "Verify Documents",
+                                        fontSize: 13,
+                                        color: Colors.black87,
+                                      )
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    width: 10.0,
+                                  ),
+                                  const Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    color: Color(0xFFB1B5C5),
+                                  ),
+                                ],
+                              ),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.all(16.0),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4.0),
+                                  side: const BorderSide(
+                                    color: Color(0xFFB1B5C5),
+                                    width: 1.0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                      const SizedBox(
+                        height: 10.0,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Get.to(
+                            // SetupProfile(manager: manager, email: 'ezege@gmail.com'),
+                            MyWallet(
+                              manager: manager,
+                            ),
+                            transition: Transition.cupertino,
+                          );
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                    "assets/images/personal_icon.svg"),
+                                const SizedBox(
+                                  width: 16.0,
+                                ),
+                                TextPoppins(
+                                  text: "My Wallet",
+                                  fontSize: 13,
+                                  color: Colors.black87,
+                                )
+                              ],
+                            ),
+                            const SizedBox(
+                              width: 10.0,
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Color(0xFFB1B5C5),
+                            ),
+                          ],
+                        ),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.all(16.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4.0),
+                            side: const BorderSide(
+                              color: Color(0xFFB1B5C5),
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
+                      )
                     ],
                   ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.all(16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4.0),
-                      side: const BorderSide(
-                        color: Color(0xFFB1B5C5),
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                )
+                ),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }

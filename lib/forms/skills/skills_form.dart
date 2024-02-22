@@ -1,10 +1,12 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
-import 'package:prohelp_app/components/inputfield/customautocomplete.dart';
+// import 'package:prohelp_app/components/inputfield/customautocomplete.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
@@ -12,11 +14,18 @@ import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
+typedef InitCallback = Function(bool state);
+
 class SkillsForm extends StatefulWidget {
   final PreferenceManager manager;
-  const SkillsForm({
+  final InitCallback isAnyChecked;
+  List<dynamic> skills;
+
+  SkillsForm({
     Key? key,
+    required this.isAnyChecked,
     required this.manager,
+    required this.skills,
   }) : super(key: key);
 
   @override
@@ -31,11 +40,14 @@ class _SkillsFormState extends State<SkillsForm> {
 
   List<String> _selectedSkills = [];
   var _filteredList = [];
+  bool _showTextField = false, _isActive = false;
   double _proficiency1 = 0,
       _proficiency2 = 0,
       _proficiency3 = 0,
       _proficiency4 = 0,
       _proficiency5 = 0;
+
+  List<bool> _selections = [];
 
   _initSkills() {
     for (var i = 0; i < widget.manager.getUser()['skills']?.length; i++) {
@@ -80,12 +92,30 @@ class _SkillsFormState extends State<SkillsForm> {
 
   @override
   void initState() {
+    _selections = List.generate((widget.skills.length), (_) => false);
     super.initState();
     _initSkills();
   }
 
+  onChanged(value) {
+    setState(() {
+      _isActive = value;
+    });
+    widget.isAnyChecked(value);
+    // print("CURR:: $value");
+  }
+
+  _check(value) {
+    widget.isAnyChecked(value);
+  }
+
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+    const double itemHeight = kToolbarHeight;
+    final double itemWidth = size.width * 0.42;
+
+    var counter = 0;
     return Form(
       key: _formKey,
       child: ListView(
@@ -113,32 +143,86 @@ class _SkillsFormState extends State<SkillsForm> {
           const SizedBox(
             height: 24.0,
           ),
-          CustomAutoComplete(
-            data: const [
-              "Design",
-              "Art Work",
-              "Driving",
-              "Chef",
-              "Financial Analysis",
-              "Baking",
-              "Programming"
-            ],
-            onItemSelected: (val) {
-              debugPrint("VALUE SELECTED:: $val");
-              FocusManager.instance.primaryFocus?.unfocus();
-              if (_selectedSkills.length < 6) {
-                if (!_selectedSkills.contains(val)) {
-                  setState(() {
-                    _selectedSkills.add(val);
-                  });
-                } else {
-                  Constants.toast("Skill already selected!");
-                }
-              } else {
-                Constants.toast("Maximum number of skills reached!!");
-              }
-            },
-            hintText: "Search skills",
+          // CustomAutoComplete(
+          //   data: const [
+          //     "Design",
+          //     "Art Work",
+          //     "Driving",
+          //     "Chef",
+          //     "Financial Analysis",
+          //     "Baking",
+          //     "Programming"
+          //   ],
+          //   onItemSelected: (val) {
+          //     debugPrint("VALUE SELECTED:: $val");
+          //     FocusManager.instance.primaryFocus?.unfocus();
+          //     if (_selectedSkills.length < 6) {
+          //       if (!_selectedSkills.contains(val)) {
+          //         setState(() {
+          //           _selectedSkills.add(val);
+          //         });
+          //       } else {
+          //         Constants.toast("Skill already selected!");
+          //       }
+          //     } else {
+          //       Constants.toast("Maximum number of skills reached!!");
+          //     }
+          //   },
+          //   hintText: "Search skills",
+          // ),
+          GridView.count(
+            shrinkWrap: true,
+            crossAxisCount: 2,
+            mainAxisSpacing: 12.0,
+            crossAxisSpacing: 12.0,
+            childAspectRatio: (itemWidth / itemHeight),
+            children: [
+              for (var i = 0; i < widget.skills.length; i++)
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.35,
+                  height: 275,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          widget.skills[i],
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+            ].asMap().entries.map((
+              widg,
+            ) {
+              final index = ++counter - 1;
+
+              return ToggleButtons(
+                selectedColor: Constants.primaryColor,
+                isSelected: [_selections[widg.key]],
+                onPressed: (int index) => setState(() {
+                  _selections[widg.key] = !_selections[widg.key];
+                  _check(_selections[widg.key]);
+
+                  print("SELECTED ITEM KJD ::: ${_selections[widg.key]}");
+                  print("SELECTED ITEM KJD ::: ${widget.skills[widg.key]}");
+
+                  if (_selectedSkills.length < 6) {
+                    if (!_selectedSkills.contains(widget.skills[widg.key])) {
+                      setState(() {
+                        _selectedSkills.add(widget.skills[widg.key]);
+                      });
+                    } else {
+                      Constants.toast("Skill already selected!");
+                    }
+                  } else {
+                    Constants.toast("Maximum number of skills reached!!");
+                  }
+                }),
+                children: [widg.value],
+              );
+            }).toList(),
           ),
           const SizedBox(
             height: 24.0,
@@ -284,7 +368,6 @@ class _SkillsFormState extends State<SkillsForm> {
         String userData = jsonEncode(map['data']);
         widget.manager.setUserData(userData);
         _controller.userData.value = map['data'];
-
       } else {
         Map<String, dynamic> map = jsonDecode(resp.body);
         Constants.toast(map['message']);

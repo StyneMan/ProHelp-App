@@ -6,19 +6,18 @@ import 'package:prohelp_app/helper/preference/preference_manager.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:prohelp_app/helper/service/api_service.dart';
+import 'package:prohelp_app/screens/jobs/components/job_card.dart';
 
-import 'professional_card.dart';
-
-class SavedProfessionals extends StatelessWidget {
+class AppliedJobs extends StatelessWidget {
   final PreferenceManager manager;
-  const SavedProfessionals({
+  const AppliedJobs({
     Key? key,
     required this.manager,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return manager.getUser()['savedPros'].isEmpty
+    return manager.getUser()['myJobApplications'].isEmpty
         ? Container(
             padding: const EdgeInsets.all(16.0),
             width: double.infinity,
@@ -30,7 +29,7 @@ class SavedProfessionals extends StatelessWidget {
                 children: [
                   Image.asset('assets/images/empty.png'),
                   const Text(
-                    "No saved professionals found",
+                    "No applied jobs found",
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -38,9 +37,9 @@ class SavedProfessionals extends StatelessWidget {
             ),
           )
         : FutureBuilder<http.Response>(
-            future: APIService().getSavedPros(
-              manager.getAccessToken(),
-              manager.getUser()['email'],
+            future: APIService().getJobApplicationsByUser(
+              accessToken: manager.getAccessToken(),
+              email: manager.getUser()['email'],
             ),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -59,7 +58,7 @@ class SavedProfessionals extends StatelessWidget {
               if (snapshot.hasError) {
                 return const Center(
                   child: Text(
-                    "An error occurred. Check your internet and try again.",
+                    "An error occurred. Checkyour internet and try again.",
                   ),
                 );
               }
@@ -75,7 +74,7 @@ class SavedProfessionals extends StatelessWidget {
                       children: [
                         Image.asset('assets/images/empty.png'),
                         const Text(
-                          "No saved professionals found",
+                          "No applied jobs found",
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -86,19 +85,20 @@ class SavedProfessionals extends StatelessWidget {
 
               final data = snapshot.data;
               Map<String, dynamic> map = jsonDecode(data!.body);
-              debugPrint("SAVED PROS RESPONSE >>> ${data.body}");
+              debugPrint("APPLIED JOBS RESPONSE >>> ${data.body}");
 
               return ListView.separated(
                 shrinkWrap: true,
-                itemBuilder: (context, i) => ProfessionalsCard(
-                  data: map['data'][i],
+                itemBuilder: (context, i) => JobCard(
+                  data: map['data']['docs'][i]['job'],
                   manager: manager,
+                  usecase: "applied",
                   index: i,
                 ),
                 separatorBuilder: (context, i) => const SizedBox(
                   height: 16.0,
                 ),
-                itemCount: map['data']?.length,
+                itemCount: map['data']['docs']?.length,
               );
             },
           );

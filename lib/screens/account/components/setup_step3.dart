@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:prohelp_app/components/inputfield/customdropdown.dart';
 import 'package:prohelp_app/components/inputfield/datefield.dart';
-import 'package:prohelp_app/components/inputfield/llinedtextfield.dart';
 import 'package:prohelp_app/components/inputfield/textfield.dart';
-import 'package:prohelp_app/components/text_components.dart';
-import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 
 typedef void InitCallback(Map data);

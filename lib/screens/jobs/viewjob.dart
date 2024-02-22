@@ -161,7 +161,7 @@ class _ViewJobState extends State<ViewJob> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10.0),
                     child: Image.network(
-                      widget.data['recruiter']['photo'],
+                      widget.data['recruiter']['bio']['image'],
                       width: 50,
                       height: 50,
                       fit: BoxFit.cover,
@@ -180,7 +180,8 @@ class _ViewJobState extends State<ViewJob> {
                     children: [
                       TextPoppins(
                           text:
-                              "${widget.data['recruiter']['name']}".capitalize,
+                              "${widget.data['recruiter']['bio']['firstname']} ${widget.data['recruiter']['bio']['lastname']}"
+                                  .capitalize,
                           fontSize: 16),
                       const SizedBox(height: 2.0),
                       TextPoppins(
@@ -225,7 +226,7 @@ class _ViewJobState extends State<ViewJob> {
                       ),
                       _applicationCount > 0 &&
                               widget.manager.getUser()['id'] ==
-                                  widget.data['recruiter']['id']
+                                  widget.data['recruiter']['_id']
                           ? InkWell(
                               onTap: () {
                                 Get.to(
@@ -338,7 +339,7 @@ class _ViewJobState extends State<ViewJob> {
                   ),
                 ),
               const SizedBox(height: 21.0),
-              widget.data['recruiter']['id'] == widget.manager.getUser()['id']
+              widget.data['recruiter']['_id'] == widget.manager.getUser()['id']
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

@@ -59,7 +59,10 @@ class _ChatPageState extends State<ChatPage> {
     socket.on("userConnected", (va) {
       setState(() => socketConnected = true);
     });
-    socket.on("typing", (val) => setState(() => isTyping = true));
+    socket.on("typing", (val) {
+      setState(() => isTyping = true);
+      debugPrint("WEB TYPING NOW!!!}");
+    });
     socket.on("stop typing", (val) => setState(() => isTyping = false));
 
     for (var element in widget.data['users']) {
@@ -210,6 +213,8 @@ class _ChatPageState extends State<ChatPage> {
 
       socket.emit("typing", _controller.selectedConversation.value['id']);
 
+      print("HELLO START EJKJD");
+
       var lastTypingTime = DateTime.now().millisecondsSinceEpoch;
       var timerLength = 2000;
 
@@ -223,6 +228,8 @@ class _ChatPageState extends State<ChatPage> {
           setState(() {
             typing = false;
           });
+
+          print("STOP EJKJD");
         }
       });
     }
@@ -256,7 +263,7 @@ class _ChatPageState extends State<ChatPage> {
                 Navigator.pop(context);
               },
               child: const Icon(
-                CupertinoIcons.arrow_left_circle,
+                CupertinoIcons.back,
               ),
             ),
             const SizedBox(
@@ -278,25 +285,14 @@ class _ChatPageState extends State<ChatPage> {
                     child: Row(
                       children: [
                         ClipOval(
-                          child: Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 1.5,
-                              ),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: Center(
-                              child: Image.network(
-                                _guestData['bio']['image'] ?? "",
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const SizedBox(),
-                                width: 24,
-                                height: 24,
-                                fit: BoxFit.cover,
-                              ),
+                          child: Center(
+                            child: Image.network(
+                              _guestData['bio']['image'] ?? "",
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const SizedBox(),
+                              width: 24,
+                              height: 24,
+                              fit: BoxFit.cover,
                             ),
                           ),
                         ),
@@ -327,15 +323,12 @@ class _ChatPageState extends State<ChatPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    TextButton(
-                      onPressed: null,
-                      child: Text(
-                        "Typing...",
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontStyle: FontStyle.italic,
-                          color: Colors.white,
-                        ),
+                    Text(
+                      "Typing...",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -444,16 +437,17 @@ class _ChatPageState extends State<ChatPage> {
                   focusNode: _focusNode,
                   placeholder: "Your message",
                   onChanged: (val) {
+                    _typingHandler(val);
                     _scrollController.animateTo(
                       _scrollController.position.minScrollExtent,
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                     );
-                    _typingHandler(val);
                   },
                   controller: _inputController,
                   validator: (value) {},
                   inputType: TextInputType.text,
+                  prefix: isTyping ? Text("...") : const SizedBox(),
                   endIcon: _inputController.text.isEmpty
                       ? const SizedBox()
                       : IconButton(

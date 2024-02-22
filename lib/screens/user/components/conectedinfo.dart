@@ -153,10 +153,10 @@ class _ConnectedInfoContentState extends State<ConnectedInfoContent> {
                     ),
                     child: RoundedButton(
                       bgColor: Colors.transparent,
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(
                             CupertinoIcons.chat_bubble_2_fill,
                           ),
@@ -203,25 +203,10 @@ class _ConnectedInfoContentState extends State<ConnectedInfoContent> {
 
     _controller.setLoading(true);
     Map _data = {
-      "userIds": [widget.guestData['id'], widget.manager.getUser()['id']],
-      "chatInitiator": widget.manager.getUser()['id'],
-      "receiver": {
-        "name":
-            "${widget.guestData['bio']['firstname']} ${widget.guestData['bio']['middlename']} ${widget.guestData['bio']['lastname']}",
-        "id": widget.guestData['id'],
-        "photo": widget.guestData['bio']['image'],
-        "email": widget.guestData['email'],
-      },
-      "initiator": {
-        "name":
-            "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['middlename']} ${widget.manager.getUser()['bio']['lastname']}",
-        "id": widget.manager.getUser()['id'],
-        "email": widget.manager.getUser()['email'],
-        "photo": widget.manager.getUser()['bio']['image'],
-      }
+      "userId": widget.guestData['id'],
     };
     try {
-      final resp = await APIService().initiateChat(
+      final resp = await APIService().initChat(
         accessToken: widget.manager.getAccessToken(),
         email: widget.manager.getUser()['email'],
         payload: _data,
@@ -232,12 +217,24 @@ class _ConnectedInfoContentState extends State<ConnectedInfoContent> {
       if (resp.statusCode == 200) {
         Map<String, dynamic> map = jsonDecode(resp.body);
 
-        socket.emit(
-            "subscribe",
-            ({
-              "room": map['data']['chatId'],
-              "otherUser": widget.guestData['id']
-            }));
+        final _allChatsResponse = await APIService().getUsersChats(
+          accessToken: widget.manager.getAccessToken(),
+          email: widget.manager.getUser()['email'],
+        );
+
+        if (_allChatsResponse.statusCode == 200) {
+          debugPrint("ALL CHATS RESPONSE >> ${_allChatsResponse.body}");
+          Map<String, dynamic> _mapper = jsonDecode(_allChatsResponse.body);
+          // Now update GetX state
+          _controller.myChats.value = _mapper['data'];
+        }
+
+        // socket.emit(
+        //     "subscribe",
+        //     ({
+        //       "room": map['data']['chatId'],
+        //       "otherUser": widget.guestData['id']
+        //     }));
 
         Get.to(
           ChatPage(

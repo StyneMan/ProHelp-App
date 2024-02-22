@@ -90,14 +90,14 @@ class SavedJobs extends StatelessWidget {
               return ListView.separated(
                 shrinkWrap: true,
                 itemBuilder: (context, i) => JobCard(
-                  data: map['data'][i],
+                  data: map['data']['docs'][i],
                   manager: manager,
                   index: i,
                 ),
                 separatorBuilder: (context, i) => const SizedBox(
                   height: 16.0,
                 ),
-                itemCount: map['data']?.length,
+                itemCount: map['data']['docs']?.length,
               );
             },
           );

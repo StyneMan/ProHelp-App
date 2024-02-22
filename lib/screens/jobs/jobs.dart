@@ -14,9 +14,10 @@ import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/account/components/wallet.dart';
 import 'package:prohelp_app/screens/jobs/components/all_jobs.dart';
 import 'package:prohelp_app/screens/jobs/components/job_card.dart';
-import 'package:prohelp_app/screens/jobs/components/recommended_jobs.dart';
 import 'package:prohelp_app/screens/jobs/components/saved_jobs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'components/applied_jobs.dart';
 
 class Jobs extends StatefulWidget {
   final PreferenceManager manager;
@@ -60,10 +61,6 @@ class _JobsState extends State<Jobs> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // _init();
-    // debugPrint("USER D >>> ${_controller.userData['email']}");
-
-    // _controller.setLoading(false);
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -123,7 +120,7 @@ class _JobsState extends State<Jobs> with SingleTickerProviderStateMixin {
         ),
       ),
       body: widget.manager.getUser()['accountType'] == 'professional'
-          ? _controller.userData.isEmpty
+          ? widget.manager.getUser().isEmpty
               ? const SizedBox()
               : Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -158,7 +155,7 @@ class _JobsState extends State<Jobs> with SingleTickerProviderStateMixin {
                                   ),
                                   Tab(
                                     child: TextPoppins(
-                                        text: "Recommended", fontSize: 13),
+                                        text: "Applied", fontSize: 13),
                                   ),
                                   Tab(
                                     child: TextPoppins(
@@ -182,7 +179,7 @@ class _JobsState extends State<Jobs> with SingleTickerProviderStateMixin {
                             AllJobs(
                               manager: widget.manager,
                             ),
-                            RecommendedJobs(
+                            AppliedJobs(
                               manager: widget.manager,
                             ),
                             SavedJobs(

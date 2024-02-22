@@ -46,6 +46,7 @@ class _SignupFormState extends State<SignupForm> {
     Map _payload = {
       "email": _emailController.text,
       "password": _passwordController.text,
+      "accountType": _controller.accountType.value,
     };
 
     try {

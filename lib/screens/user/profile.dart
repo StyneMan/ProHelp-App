@@ -53,7 +53,7 @@ class _UserProfileState extends State<UserProfile> {
     _controller.setLoading(true);
     Map _payload = {
       "guestId": "${widget.data['id']}",
-      "guestName": "${widget.data['bio']['fullname']}",
+      "guestName": "${widget.data['bio']['firstname']}",
       "userId": "${widget.manager.getUser()['id']}",
     };
     try {
@@ -98,7 +98,7 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   _checkConnection() {
-    for (var element in _controller.userData.value['connections']) {
+    for (var element in widget.manager.getUser()['connections']) {
       if (element == widget.data['id']) {
         setState(() {
           _isConnected = true;
@@ -242,7 +242,7 @@ class _UserProfileState extends State<UserProfile> {
                           child: CachedNetworkImage(
                             imageUrl: widget.data['bio']['image'],
                             placeholder: (context, url) =>
-                                CircularProgressIndicator(),
+                                const CircularProgressIndicator(),
                             errorWidget: (context, url, error) =>
                                 SvgPicture.asset(
                               "assets/images/personal_icon.svg",
@@ -588,7 +588,7 @@ class _UserProfileState extends State<UserProfile> {
                                           width: 5.0,
                                         ),
                                         TextPoppins(
-                                          text: "Report/Block",
+                                          text: "Block",
                                           fontSize: 11,
                                         )
                                       ],

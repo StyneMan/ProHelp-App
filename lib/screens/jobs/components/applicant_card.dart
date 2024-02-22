@@ -63,7 +63,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
                   children: [
                     ClipOval(
                       child: Image.network(
-                        widget.data['applicant']['photo'],
+                        widget.data['applicant']['bio']['image'],
                         width: 64,
                         height: 64,
                         fit: BoxFit.cover,
@@ -90,8 +90,9 @@ class _ApplicantCardState extends State<ApplicantCard> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           TextPoppins(
-                            text: "${widget.data['applicant']['name']}"
-                                .capitalize,
+                            text:
+                                "${widget.data['applicant']['bio']['firstname']} ${widget.data['applicant']['bio']['lastname']}"
+                                    .capitalize,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -125,7 +126,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
                     bgColor: Colors.transparent,
                     child: TextPoppins(
                       text: "View",
-                      fontSize: 16,
+                      fontSize: 13,
                       color: Constants.primaryColor,
                     ),
                     borderColor: Constants.primaryColor,
@@ -146,7 +147,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
                   width: 8.0,
                 ),
                 widget.manager.getUser()['accountType'] == "recruiter" &&
-                        widget.data['job']['recruiter']['id'] ==
+                        widget.data['job']['recruiter']['_id'] ==
                             widget.manager.getUser()['id']
                     ? Expanded(
                         flex: 2,
@@ -158,7 +159,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
                             text: widget.data['status'] == "submitted"
                                 ? "Accept"
                                 : "${widget.data['status']}".capitalize,
-                            fontSize: 16,
+                            fontSize: 13,
                             color: Colors.white,
                           ),
                           borderColor: Colors.transparent,
@@ -219,7 +220,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
                                                   ),
                                                   TextSpan(
                                                     text:
-                                                        "${widget.data['applicant']['name']}'s"
+                                                        "${widget.data['applicant']['bio']['firstname']}'s"
                                                             .capitalize,
                                                     style: const TextStyle(
                                                       color: Colors.black,
@@ -283,10 +284,10 @@ class _ApplicantCardState extends State<ApplicantCard> {
                 Expanded(
                   flex: 2,
                   child: CustomButton(
-                    bgColor: Color(0xFF4CAF50),
+                    bgColor: const Color(0xFF4CAF50),
                     child: TextPoppins(
                       text: "Contact",
-                      fontSize: 16,
+                      fontSize: 13,
                       color: Colors.white,
                     ),
                     borderColor: Colors.transparent,

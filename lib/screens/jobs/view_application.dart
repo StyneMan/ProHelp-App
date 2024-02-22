@@ -235,8 +235,8 @@ class _ViewApplicationState extends State<ViewApplication> {
               const SizedBox(height: 10.0),
               TextPoppins(
                 text: "${widget.data['job']['jobTitle']}".toUpperCase(),
-                fontSize: 25,
-                fontWeight: FontWeight.w500,
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
               ),
               const SizedBox(height: 16.0),
               Row(
@@ -246,15 +246,15 @@ class _ViewApplicationState extends State<ViewApplication> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10.0),
                     child: Image.network(
-                      widget.data['applicant']['photo'],
-                      width: 50,
-                      height: 50,
+                      widget.data['applicant']['bio']['image'],
+                      width: 56,
+                      height: 56,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) =>
                           SvgPicture.asset(
                         "assets/images/personal_icon.svg",
-                        width: 50,
-                        height: 50,
+                        width: 56,
+                        height: 56,
                       ),
                     ),
                   ),
@@ -264,12 +264,18 @@ class _ViewApplicationState extends State<ViewApplication> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextPoppins(
-                          text:
-                              "${widget.data['applicant']['name']}".capitalize,
-                          fontSize: 16),
+                        text:
+                            "${widget.data['applicant']['bio']['firstname']} ${widget.data['applicant']['bio']['lastname']}"
+                                .capitalize,
+                        fontSize: 13,
+                      ),
                       TextPoppins(
                         text: "${widget.data['applicant']['email']}",
-                        fontSize: 16,
+                        fontSize: 12,
+                      ),
+                      TextPoppins(
+                        text: "${widget.data['applicant']['bio']['phone']}",
+                        fontSize: 12,
                       ),
                     ],
                   ),
@@ -286,8 +292,8 @@ class _ViewApplicationState extends State<ViewApplication> {
               const SizedBox(height: 21.0),
               TextPoppins(
                 text: "Job Information",
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -329,8 +335,8 @@ class _ViewApplicationState extends State<ViewApplication> {
               const SizedBox(height: 8.0),
               TextPoppins(
                 text: "Description",
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
               ),
               Text(
                 "${widget.data['job']['description']}".capitalizeFirst!,
@@ -338,8 +344,8 @@ class _ViewApplicationState extends State<ViewApplication> {
               const SizedBox(height: 21.0),
               TextPoppins(
                 text: "Minimun qualification",
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
               ),
               Text(
                 "${widget.data['job']['minimumQualification']}"
@@ -348,8 +354,8 @@ class _ViewApplicationState extends State<ViewApplication> {
               const SizedBox(height: 21.0),
               TextPoppins(
                 text: "Applicant's Resume",
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
               ),
               Row(
                 children: [
@@ -397,8 +403,9 @@ class _ViewApplicationState extends State<ViewApplication> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         TextPoppins(
-                          text: "${widget.data['applicant']['name']}'s Resume"
-                              .capitalize,
+                          text:
+                              "${widget.data['applicant']['bio']['firstname']}'s Resume"
+                                  .capitalize,
                           fontSize: 14,
                         ),
                         IconButton(
@@ -421,8 +428,8 @@ class _ViewApplicationState extends State<ViewApplication> {
               const SizedBox(height: 21.0),
               TextPoppins(
                 text: "Screening Answers",
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
               ),
               Column(
                 children: [
@@ -461,7 +468,8 @@ class _ViewApplicationState extends State<ViewApplication> {
                                   width:
                                       MediaQuery.of(context).size.width * 0.80,
                                   child: Text(
-                                      "${widget.data['answers'][k]['answer']}"),
+                                    "${widget.data['answers'][k]['answer']}",
+                                  ),
                                 ),
                               ],
                             ),

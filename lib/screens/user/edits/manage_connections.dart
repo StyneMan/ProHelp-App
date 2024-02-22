@@ -79,13 +79,15 @@ class ManageConnections extends StatelessWidget {
                   width: double.infinity,
                   height: double.infinity,
                   child: const Center(
-                    child: Text("Not data found"),
+                    child: Text("No data found"),
                   ),
                 )
               : FutureBuilder<http.Response>(
                   future: APIService().getConnections(
                     manager.getAccessToken(),
-                    caller == "guest" ? data['email'] : manager.getUser()['email'],
+                    caller == "guest"
+                        ? data['email']
+                        : manager.getUser()['email'],
                   ),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {

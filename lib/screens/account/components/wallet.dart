@@ -115,9 +115,6 @@ class _MyWalletState extends State<MyWallet> {
                       const SizedBox(
                         height: 16.0,
                       ),
-                      const SizedBox(
-                        height: 16.0,
-                      ),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -164,7 +161,7 @@ class _MyWalletState extends State<MyWallet> {
                             ],
                           ),
                           const SizedBox(
-                            height: 24.0,
+                            height: 21.0,
                           ),
                           _isClicked
                               ? const SizedBox()
@@ -348,7 +345,7 @@ class _MyWalletState extends State<MyWallet> {
                                 ),
                         ],
                       ),
-                      const SizedBox(height: 21),
+                      const SizedBox(height: 16),
                       TextPoppins(
                         text: "Transactions",
                         fontSize: 17,

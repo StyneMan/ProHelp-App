@@ -20,10 +20,9 @@ class Constants {
   static const Color shimmerBaseColor = Color.fromARGB(255, 203, 203, 203);
   static const Color shimmerHighlightColor = Colors.white;
 
-  static const baseURL = "https://my-prohelp-server.vercel.app";
-  //   "http://192.168.1.26:8082";
+  static const baseURL =
+      "https://my-prohelp-server.vercel.app"; // "http://192.168.1.24:8082"; //
 
-  //  "https://pro-help-api.vercel.app"; //"http://192.168.1.103:8080";
   static String pstk = "pk_test_40f544aec0415695c9fae0ba0819ee5bebcb6a5e";
   // "pk_test_40f544aec0415695c9fae0ba0819ee5bebcb6a5e"; //"pk_test_043683268da92cd71e0d30f9d72396396f2dfb1f";
 

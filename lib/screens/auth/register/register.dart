@@ -15,6 +15,7 @@ import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/screens/account/setup_profile.dart';
 import 'package:prohelp_app/screens/account/setup_profile_employer.dart';
 import 'package:prohelp_app/screens/auth/account_type/account_type.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../../../components/text_components.dart';
@@ -45,30 +46,35 @@ class _RegisterState extends State<Register> {
   _signInWithGoogle() async {
     try {
       // Trigger the authentication flow
-      final GoogleSignInAccount? googleUser = await GoogleSignIn(
-        scopes: [
-          'email',
-          // 'https://www.googleapis.com/auth/contacts.readonly',
-        ],
-      ).signIn();
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-      // debugPrint("GOOGLE USER RESP >> ${googleUser}");
+      debugPrint("GOOGLE USER RESP >> ${googleUser}");
+      Map _payload = {
+        "name": googleUser?.displayName,
+        "email": googleUser?.email,
+        "firstname": googleUser?.displayName?.split(' ')[0],
+        "lastname": googleUser?.displayName?.split(' ')[1] ?? "",
+        "picture": googleUser?.photoUrl,
+        "id": googleUser?.id,
+      };
 
-      // Obtain the auth details from the request
-      final googleAuth = await googleUser?.authentication;
-      // debugPrint("Google ID TOKEN >> ${googleAuth?.idToken}");
-      final resp = await APIService().googleAuth("${googleAuth?.idToken}");
+      final resp = await APIService().googleAuth(_payload);
+
+      debugPrint("Google Server Respone >> ${resp.body}");
+      final _prefs = await SharedPreferences.getInstance();
 
       debugPrint("Google Server Respone >> ${resp.body}");
 
       Map<String, dynamic> map = jsonDecode(resp.body);
-      _manager!.saveAccessToken(map['token']);
-      _controller.firstname.value =
-          "${map['data']['bio']['fullname']}".split(" ")[0].capitalize!;
-      _controller.lastname.value =
-          "${map['data']['bio']['fullname']}".split(" ")[1].capitalize!;
 
-      if (map['message'].contains("Account created")) {
+      _prefs.setString('accessToken', "${map['token']}");
+      // _manager!.saveAccessToken(map['token']);
+      _controller.firstname.value = "${map['data']['bio']['firstname']}";
+      _controller.lastname.value = "${map['data']['bio']['lastname']}";
+
+      if (map['message'].contains("Account created") ||
+          resp.statusCode == 200) {
+        debugPrint("AAA");
         //New account so now select user type recruiter or freelancer
         Navigator.of(context).pushReplacement(
           PageTransition(
@@ -77,33 +83,39 @@ class _RegisterState extends State<Register> {
             child: AccountType(
               isSocial: true,
               email: map['data']['email'],
-              name: map['data']['bio']['fullname'],
+              name:
+                  "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
             ),
           ),
         );
       } else {
+        debugPrint("BBB");
         if (!map['data']["hasProfile"]) {
+          debugPrint("BBB1");
           Navigator.of(context).pushReplacement(
             PageTransition(
               type: PageTransitionType.size,
               alignment: Alignment.bottomCenter,
-              child: map['data']["accountType"].toString().toLowerCase() ==
+              child: map['data']["accountType"]?.toString().toLowerCase() ==
                       "professional"
                   ? SetupProfile(
                       manager: _manager!,
                       isSocial: true,
                       email: map['data']['email'],
-                      name: map['data']['bio']['fullname'],
+                      name:
+                          "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
                     )
                   : SetupProfileEmployer(
                       manager: _manager!,
                       isSocial: true,
                       email: map['data']['email'],
-                      name: map['data']['bio']['fullname'],
+                      name:
+                          "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
                     ),
             ),
           );
         } else {
+          debugPrint("BBB2");
           String userData = jsonEncode(map['data']);
           _manager!.setUserData(userData);
           _manager!.setIsLoggedIn(true);
@@ -121,7 +133,7 @@ class _RegisterState extends State<Register> {
         }
       }
     } catch (e) {
-      debugPrint("ERR >> $e");
+      debugPrint("ERR >> ${e}");
     }
   }
 

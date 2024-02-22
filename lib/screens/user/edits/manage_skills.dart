@@ -10,20 +10,30 @@ import 'package:prohelp_app/helper/state/state_manager.dart';
 
 class ManageSkills extends StatelessWidget {
   final List skills;
+  var profession;
   final PreferenceManager manager;
   ManageSkills({
     Key? key,
     required this.skills,
     required this.manager,
+    required this.profession,
   }) : super(key: key);
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final _controller = Get.find<StateController>();
 
+  _step2Check(bool value) {
+    // setState(() {
+    //   _isstep2AnyActive = value;
+    // });
+  }
+
   // bool _isClicked = false;
   @override
   Widget build(BuildContext context) {
+    // print("SKILLSC:::---::: ${skills}");
+
     return Obx(
       () => LoadingOverlayPro(
         isLoading: _controller.isLoading.value,
@@ -92,6 +102,8 @@ class ManageSkills extends StatelessWidget {
                 )
               : SkillsForm(
                   manager: manager,
+                  skills: profession['skills'],
+                  isAnyChecked: _step2Check,
                 ),
         ),
       ),

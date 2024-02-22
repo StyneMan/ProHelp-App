@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:get/instance_manager.dart';
 import 'package:loading_overlay_pro/loading_overlay_pro.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prohelp_app/components/drawer/custom_drawer.dart';
@@ -15,7 +14,6 @@ import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/account/components/nok.dart';
 import 'package:prohelp_app/screens/account/components/personal.dart';
-
 
 class PersonalInfo extends StatefulWidget {
   final PreferenceManager manager;

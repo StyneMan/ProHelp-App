@@ -32,6 +32,7 @@ class _ViewReviewsState extends State<ViewReviews> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _controller = Get.find<StateController>();
   bool _isReviewed = false;
+  bool _isConnected = false;
 
   Stream<List<dynamic>> fetchDataStream() {
     final controller = StreamController<List<dynamic>>();
@@ -60,10 +61,21 @@ class _ViewReviewsState extends State<ViewReviews> {
     }
   }
 
+  _checkConnection() {
+    for (var element in widget.manager.getUser()['connections']) {
+      if (element == widget.data['id']) {
+        setState(() {
+          _isConnected = true;
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _checkReviewed();
+    _checkConnection();
   }
 
   // bool _isClicked = false;
@@ -115,30 +127,33 @@ class _ViewReviewsState extends State<ViewReviews> {
               (widget.manager.getUser()['id'] == widget.data['id'] ||
                       _isReviewed)
                   ? const SizedBox()
-                  : TextButton.icon(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return SizedBox(
-                              // height: 300,
-                              width: MediaQuery.of(context).size.width * 0.98,
-                              child: InfoDialog(
-                                body: WriteReview(
-                                  data: widget.data,
-                                  manager: widget.manager,
-                                ),
-                              ),
+                  : !_isConnected
+                      ? const SizedBox()
+                      : TextButton.icon(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return SizedBox(
+                                  // height: 300,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.98,
+                                  child: InfoDialog(
+                                    body: WriteReview(
+                                      data: widget.data,
+                                      manager: widget.manager,
+                                    ),
+                                  ),
+                                );
+                              },
                             );
                           },
-                        );
-                      },
-                      icon: const Icon(Icons.edit_document),
-                      label: const Text("Add"),
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.white,
-                      ),
-                    )
+                          icon: const Icon(Icons.edit_document),
+                          label: const Text("Add"),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white,
+                          ),
+                        )
             ],
           ),
           body: StreamBuilder<List<dynamic>>(
@@ -174,7 +189,8 @@ class _ViewReviewsState extends State<ViewReviews> {
                       children: [
                         Image.asset('assets/images/empty.png'),
                         const TextInter(text: "No reviews found", fontSize: 16),
-                        widget.manager.getUser()['id'] == widget.data['id']
+                        widget.manager.getUser()['id'] == widget.data['id'] ||
+                                !_isConnected
                             ? const SizedBox()
                             : TextButton.icon(
                                 onPressed: () {

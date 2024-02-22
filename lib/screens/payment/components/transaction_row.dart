@@ -18,7 +18,6 @@ class TransactionRow extends StatefulWidget {
 }
 
 class _TransactionRowState extends State<TransactionRow> {
-  
   String timeUntil(DateTime date) {
     return timeago.format(date, locale: "en", allowFromNow: true);
   }
@@ -65,14 +64,17 @@ class _TransactionRowState extends State<TransactionRow> {
                   "${widget.data['type']} @ ${Constants.formatMoney(widget.data['amount'])} coins"
                       .replaceAll("_", " ")
                       .capitalize,
-              fontSize: 17,
+              fontSize: 15,
               fontWeight: FontWeight.w500,
             ),
             Wrap(
               children: [
                 SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.76,
-                  child: Text("${widget.data['summary']}"),
+                  width: MediaQuery.of(context).size.width * 0.72,
+                  child: Text(
+                    "${widget.data['summary']}",
+                    style: const TextStyle(fontSize: 13),
+                  ),
                 ),
               ],
             ),

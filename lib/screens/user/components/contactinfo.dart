@@ -29,7 +29,7 @@ class ContactInfoContent extends StatelessWidget {
     var part1 =
         phone.length > 11 ? phone.substring(0, 6) : phone.substring(0, 4);
     var part2 =
-        phone.length > 11 ? phone.substring(11, 14) : phone.substring(8, 11);
+        phone.length > 11 ? phone.substring(10, 13) : phone.substring(8, 11);
 
     return part1 + "xxxxx" + part2;
   }
@@ -149,10 +149,10 @@ class ContactInfoContent extends StatelessWidget {
                     ),
                     child: RoundedButton(
                       bgColor: Colors.transparent,
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(
                             CupertinoIcons.eye_slash,
                           ),
