@@ -89,7 +89,7 @@ class _ApplyJobStep2State extends State<ApplyJobStep2> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _isUploaded
+            _isUploaded && _pickedFile != null
                 ? Row(
                     children: [
                       _pickedFile.extension.toString().endsWith('png')

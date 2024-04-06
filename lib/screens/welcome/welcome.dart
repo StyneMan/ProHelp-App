@@ -27,7 +27,7 @@ class _WelcomeState extends State<Welcome> {
   @override
   void initState() {
     super.initState();
-    _clearPreferences();
+    // _clearPreferences();
   }
 
   @override
@@ -63,7 +63,7 @@ class _WelcomeState extends State<Welcome> {
                       PageTransition(
                         type: PageTransitionType.size,
                         alignment: Alignment.bottomCenter,
-                        child: const  AccountType(),
+                        child: const AccountType(),
                       ),
                     );
                   },

@@ -5,8 +5,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/instance_manager.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
+import 'package:prohelp_app/components/dialog/custom_dialog.dart';
 import 'package:prohelp_app/components/inputfield/datefield.dart';
 import 'package:prohelp_app/components/inputfield/textfield.dart';
 import 'package:prohelp_app/components/picker/img_picker.dart';
@@ -38,6 +40,7 @@ class _NewEducationFormState extends State<NewEducationForm> {
 
   final double _kItemExtent = 32.0;
   bool _stillHere = false;
+  bool _done = false;
 
   bool _isImagePicked = false;
   var _croppedFile;
@@ -364,8 +367,76 @@ class _NewEducationFormState extends State<NewEducationForm> {
 
           _controller.onInit();
 
-          Navigator.of(context).pop();
-          Navigator.of(context).pop();
+          setState(() {
+            _done = true;
+          });
+
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => SizedBox(
+              height: MediaQuery.of(context).size.height * 0.4,
+              width: MediaQuery.of(context).size.width * 0.98,
+              child: CustomDialog(
+                ripple: SvgPicture.asset(
+                  "assets/images/check_effect.svg",
+                  width: (Constants.avatarRadius + 20),
+                  height: (Constants.avatarRadius + 20),
+                ),
+                avtrBg: Colors.transparent,
+                avtrChild: Image.asset(
+                  "assets/images/checked.png",
+                ), //const Icon(CupertinoIcons.check_mark, size: 50,),
+                body: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16.0,
+                    horizontal: 36.0,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      TextPoppins(
+                        text: "Profile Update",
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      const SizedBox(
+                        height: 5.0,
+                      ),
+                      TextPoppins(
+                        text: "Education added successfully",
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      const SizedBox(
+                        height: 21,
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.36,
+                        child: RoundedButton(
+                          bgColor: Constants.primaryColor,
+                          child: TextPoppins(
+                            text: "CLOSE",
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                          ),
+                          borderColor: Colors.transparent,
+                          foreColor: Colors.white,
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          },
+                          variant: "Filled",
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
         } else {
           Map<String, dynamic> _map = jsonDecode(resp.body);
           Constants.toast(_map['message']);

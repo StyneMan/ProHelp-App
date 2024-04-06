@@ -13,9 +13,11 @@ import 'package:prohelp_app/screens/messages/components/message_row.dart';
 
 class Messages extends StatelessWidget {
   final PreferenceManager manager;
+  var stateController;
   Messages({
     Key? key,
     required this.manager,
+    required this.stateController,
   }) : super(key: key);
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();

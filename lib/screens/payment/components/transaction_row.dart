@@ -18,10 +18,6 @@ class TransactionRow extends StatefulWidget {
 }
 
 class _TransactionRowState extends State<TransactionRow> {
-  String timeUntil(DateTime date) {
-    return timeago.format(date, locale: "en", allowFromNow: true);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -30,8 +26,8 @@ class _TransactionRowState extends State<TransactionRow> {
       children: [
         ClipOval(
           child: Container(
-            width: 48,
-            height: 48,
+            width: 42,
+            height: 42,
             padding: const EdgeInsets.all(2.0),
             decoration: BoxDecoration(
               color: Constants.primaryColor.withOpacity(0.3),
@@ -70,7 +66,7 @@ class _TransactionRowState extends State<TransactionRow> {
             Wrap(
               children: [
                 SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.72,
+                  width: MediaQuery.of(context).size.width * 0.70,
                   child: Text(
                     "${widget.data['summary']}",
                     style: const TextStyle(fontSize: 13),
@@ -80,7 +76,7 @@ class _TransactionRowState extends State<TransactionRow> {
             ),
             TextPoppins(
               text:
-                  "Initiated on ${DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.data['createdAt']))} (${timeUntil(DateTime.parse("${widget.data['createdAt']}"))})"
+                  "${DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.data['createdAt']))} (${Constants.timeUntil(DateTime.parse("${widget.data['createdAt']}"))})"
                       .replaceAll("about", "")
                       .replaceAll("minute", "min"),
               fontSize: 12,

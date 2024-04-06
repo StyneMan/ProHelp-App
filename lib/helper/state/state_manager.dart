@@ -56,9 +56,10 @@ class StateController extends GetxController {
   var currentMessages = [].obs;
   var selectedConversation = {}.obs;
   var myJobs = [].obs;
-  var myJobsApplied = [].obs;
+  var myJobApplications = [].obs;
   var savedJobs = [].obs;
   var allJobs = [].obs;
+  var savedPros = [].obs;
 
   // ****** ALL Clearable Jobs Data ******
   var jobQuestions = [].obs;
@@ -156,13 +157,11 @@ class StateController extends GetxController {
       debugPrint("BANNER HOME LISTS  ==>> $lis");
       debugPrint("BANNER HOME LISTS  ==>> $filterd");
 
-      //  final bannerResponse = await APIService().getBanners();
-      // debugPrint("RESPONSI BANNERS ==>> ${bannerResponse.body}");
-      // Map<String, dynamic> _bannerMap = jsonDecode(bannerResponse.body);
-      // final lis = _bannerMap['docs'];
-      // final filterd = lis.where((item) => item['page'] == "home").toList();
-      // // where((item) => item['page'] == "home") as List
-      // homeBanners.value = filterd;
+      final jobResponse = await APIService().getAllJobs();
+      debugPrint("RESPONSI JOBS ==>> ${jobResponse.body}");
+      Map<String, dynamic> _jobMap = jsonDecode(jobResponse.body);
+      // final jobs = _jobMap['docs'];
+      allJobs.value = _jobMap['docs'];
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -191,7 +190,7 @@ class StateController extends GetxController {
         //Update preference here
       }).catchError((onError) {
         debugPrint("STATE GET PROFILE ERROR >>> $onError");
-        if (onError.toString().contains("rk is unreachable")) {
+        if (onError.toString().contains("ork is unreachable")) {
           hasInternetAccess.value = false;
         }
       });
@@ -230,16 +229,16 @@ class StateController extends GetxController {
       });
 
       // if (map['accountType'] != "freelancer") {
-      APIService().getFreelancers().then((value) {
-        debugPrint("STATE GET FREELANCERS >>> ${value.body}");
-        Map<String, dynamic> data = jsonDecode(value.body);
-        freelancers.value = data['docs'];
-      }).catchError((onError) {
-        if (onError.toString().contains("rk is unreachable")) {
-          hasInternetAccess.value = false;
-        }
-        debugPrint("STATE GET freelancer ERROR >>> $onError");
-      });
+      // APIService().getFreelancers().then((value) {
+      //   debugPrint("STATE GET FREELANCERS >>> ${value.body}");
+      //   Map<String, dynamic> data = jsonDecode(value.body);
+      //   freelancers.value = data['docs'];
+      // }).catchError((onError) {
+      //   if (onError.toString().contains("rk is unreachable")) {
+      //     hasInternetAccess.value = false;
+      //   }
+      //   debugPrint("STATE GET freelancer ERROR >>> $onError");
+      // });
 
       APIService().getAllJobs().then((value) {
         debugPrint("STATE GET JOBS >>> ${value.body}");

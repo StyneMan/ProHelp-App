@@ -1,13 +1,23 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:prohelp_app/components/button/custombutton.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
+import 'package:prohelp_app/helper/preference/preference_manager.dart';
+import 'package:prohelp_app/helper/service/api_service.dart';
+import 'package:prohelp_app/helper/state/state_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BlockReport extends StatefulWidget {
   var data;
-  // final bool _
-  BlockReport({Key? key, required this.data}) : super(key: key);
+  final PreferenceManager manager;
+  BlockReport({
+    Key? key,
+    required this.data,
+    required this.manager,
+  }) : super(key: key);
 
   @override
   State<BlockReport> createState() => _BlockReportState();
@@ -15,6 +25,7 @@ class BlockReport extends StatefulWidget {
 
 class _BlockReportState extends State<BlockReport> {
   bool _reportOnly = false;
+  final _controller = Get.find<StateController>();
 
   @override
   Widget build(BuildContext context) {
@@ -144,5 +155,52 @@ class _BlockReportState extends State<BlockReport> {
     );
   }
 
-  _reportBlock() async {}
+  _reportBlock() async {
+    try {
+      _controller.setLoading(true);
+      Get.back();
+      if (_reportOnly) {
+        Map _payload = {
+          "userId": widget.data['id'] ?? widget.data['_id'],
+          "reason":
+              "I wish to report this user to you. Please admin take note of this"
+        };
+
+        final _response = await APIService().reportUser(
+          accessToken: widget.manager.getAccessToken(),
+          email: widget.manager.getUser()['email'],
+          payload: _payload,
+        );
+        print('REPORT USER RESPONSE :: ${_response.body}');
+
+        _controller.setLoading(false);
+
+        if (_response.statusCode == 200) {
+          Map<String, dynamic> map = jsonDecode(_response.body);
+          Constants.toast("${map['message']}");
+        }
+      } else {
+        Map _payload = {
+          "userId": widget.data['id'] ?? widget.data['_id'],
+        };
+
+        final _response = await APIService().blockUser(
+          accessToken: widget.manager.getAccessToken(),
+          email: widget.manager.getUser()['email'],
+          payload: _payload,
+        );
+        print('BLOCK USER RESPONSE :: ${_response.body}');
+
+        _controller.setLoading(false);
+
+        if (_response.statusCode == 200) {
+          Map<String, dynamic> map = jsonDecode(_response.body);
+          Constants.toast("${map['message']}");
+        }
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      _controller.setLoading(false);
+    }
+  }
 }

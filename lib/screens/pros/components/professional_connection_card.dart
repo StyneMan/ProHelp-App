@@ -6,32 +6,36 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:prohelp_app/components/button/custombutton.dart';
+import 'package:prohelp_app/components/dialog/info_dialog.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
-import 'package:prohelp_app/screens/user/my_profile.dart';
-import 'package:prohelp_app/screens/user/profile.dart';
+import 'package:prohelp_app/screens/user/profile_connected.dart';
 
-class ProfessionalsCard extends StatefulWidget {
+class ProfessionalsConnectionCard extends StatefulWidget {
   var data;
   final int index;
   final String type;
+  var connectionId;
   final PreferenceManager manager;
-  ProfessionalsCard(
-      {Key? key,
-      required this.data,
-      required this.index,
-      required this.manager,
-      this.type = ""})
-      : super(key: key);
+  ProfessionalsConnectionCard({
+    Key? key,
+    required this.data,
+    required this.index,
+    required this.manager,
+    required this.connectionId,
+    this.type = "",
+  }) : super(key: key);
 
   @override
-  State<ProfessionalsCard> createState() => _ProfessionalsCardState();
+  State<ProfessionalsConnectionCard> createState() =>
+      _ProfessionalsConnectionCardState();
 }
 
-class _ProfessionalsCardState extends State<ProfessionalsCard> {
+class _ProfessionalsConnectionCardState
+    extends State<ProfessionalsConnectionCard> {
   final _controller = Get.find<StateController>();
 
   bool _isLiked = false, triggerHire = false, _isConnected = false;
@@ -314,80 +318,60 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    flex: 4,
+                    flex: 2,
                     child: CustomButton(
                       bgColor: Colors.transparent,
                       child: TextPoppins(
-                        text: "View Profile",
-                        fontSize: 16,
+                        text: widget.data['accountType'] == "recruiter"
+                            ? "View"
+                            : "View",
+                        fontSize: 14,
                         color: Constants.primaryColor,
                       ),
                       borderColor: Constants.primaryColor,
                       foreColor: Constants.primaryColor,
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => widget.data['id'] ==
-                                    controller.userData.value['id']
-                                ? MyProfile(
-                                    manager: _prefManager,
-                                  )
-                                : UserProfile(
-                                    manager: _prefManager,
-                                    triggerHire: triggerHire,
-                                    data: widget.data,
-                                  ),
+                        Get.to(
+                          UserProfileConnected(
+                            manager: widget.manager,
+                            triggerHire: triggerHire,
+                            data: widget.data,
                           ),
+                          transition: Transition.cupertino,
                         );
                       },
                       variant: "Outlined",
+                    ),
+                  ),
+                  const SizedBox(width: 10.0),
+                  Expanded(
+                    flex: 2,
+                    child: CustomButton(
+                      bgColor: Constants.primaryColor,
+                      child: TextPoppins(
+                        text: "Disconnect",
+                        fontSize: 14,
+                        color: Colors.white,
+                      ),
+                      borderColor: Constants.primaryColor,
+                      foreColor: Colors.white,
+                      onPressed: () {
+                        Constants.showConfirmDialog(
+                          context: context,
+                          message:
+                              "Are you sure you want to disconnect from this connection? ",
+                          onPressed: () {
+                            _disconnectRequest();
+                          },
+                        );
+                      },
+                      variant: "Filled",
                     ),
                   ),
                   widget.data['accountType'] == "recruiter"
                       ? const SizedBox()
                       : const SizedBox(
                           width: 8.0,
-                        ),
-                  widget.data['accountType'] == "recruiter" ||
-                          controller.userData.value['accountType'] !=
-                              "recruiter"
-                      ? const SizedBox()
-                      : Expanded(
-                          flex: 2,
-                          child: CustomButton(
-                            bgColor: Constants.primaryColor,
-                            child: TextPoppins(
-                              text: "Hire ${widget.type}",
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                            borderColor: Colors.transparent,
-                            foreColor: Constants.secondaryColor,
-                            onPressed: () {
-                              setState(() {
-                                triggerHire = true;
-                              });
-
-                              Future.delayed(const Duration(milliseconds: 500),
-                                  () {
-                                Get.to(
-                                  widget.data['id'] ==
-                                          controller.userData.value['id']
-                                      ? MyProfile(
-                                          manager: _prefManager,
-                                        )
-                                      : UserProfile(
-                                          manager: _prefManager,
-                                          triggerHire: triggerHire,
-                                          data: widget.data,
-                                        ),
-                                  transition: Transition.cupertino,
-                                );
-                              });
-                            },
-                            variant: "Filled",
-                          ),
                         ),
                 ],
               ),
@@ -396,5 +380,34 @@ class _ProfessionalsCardState extends State<ProfessionalsCard> {
         ),
       );
     });
+  }
+
+  _disconnectRequest() async {
+    _controller.setLoading(true);
+    Get.back();
+    try {
+      print("PAYJKD :: ${widget.data}");
+      Map _payload = {
+        'userId': widget.data['_id'],
+      };
+
+      final resp = await APIService().disconnectConnection(
+        accessToken: widget.manager.getAccessToken(),
+        email: widget.manager.getUser()['email'],
+        payload: _payload,
+        connectionId: widget.connectionId,
+      );
+      print("DISCONNECTION RESPONSE :::  ${resp.body}");
+
+      _controller.setLoading(false);
+
+      if (resp.statusCode == 200) {
+        Map<String, dynamic> map = jsonDecode(resp.body);
+        Constants.toast(map['message']);
+      }
+    } catch (e) {
+      print("$e");
+      _controller.setLoading(false);
+    }
   }
 }

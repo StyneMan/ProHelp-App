@@ -44,15 +44,15 @@ class ReviewRow extends StatelessWidget {
               children: [
                 ClipOval(
                   child: Image.network(
-                    data['reviewer']['photo'],
-                    width: 64,
-                    height: 64,
+                    data['reviewer']['bio']['image'],
+                    width: 48,
+                    height: 48,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) =>
                         SvgPicture.asset(
                       "assets/images/personal_icon.svg",
-                      width: 64,
-                      height: 64,
+                      width: 48,
+                      height: 48,
                     ),
                   ),
                 ),
@@ -70,7 +70,9 @@ class ReviewRow extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           TextPoppins(
-                            text: "${data['reviewer']['name']}".capitalize,
+                            text:
+                                "${data['reviewer']['bio']['firstname']} ${data['reviewer']['bio']['lastname']}"
+                                    .capitalize,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -134,7 +136,7 @@ class ReviewRow extends StatelessWidget {
                     ],
                   ),
                 ),
-                (manager.getUser()['id'] == data['userId'] &&
+                (manager.getUser()['id'] == data['user']['id'] &&
                         (data['reply'] == null ||
                             data['reply'].toString().isEmpty ||
                             data['reply'].toString() == "{}"))
@@ -260,8 +262,9 @@ class ReviewRow extends StatelessWidget {
                                 child: ListView(
                                   children: [
                                     TextPoppins(
-                                      text: "Reply ${data['reviewer']['name']}"
-                                          .capitalize,
+                                      text:
+                                          "Reply ${data['reviewer']['bio']['firstname']} ${data['reviewer']['bio']['lastname']}"
+                                              .capitalize,
                                       fontSize: 21,
                                       align: TextAlign.center,
                                       fontWeight: FontWeight.w600,
@@ -275,7 +278,7 @@ class ReviewRow extends StatelessWidget {
                                         shrinkWrap: true,
                                         children: [
                                           Text(
-                                            "Note that your reply to ${data['reviewer']['name'].toString().capitalize} as well as your profile will be available to the public for their review and decision making",
+                                            "Note that your reply to ${data['reviewer']['bio']['firstname'].toString().capitalize} as well as your profile will be available to the public for their review and decision making",
                                             textAlign: TextAlign.justify,
                                           ),
                                           const SizedBox(
@@ -385,7 +388,8 @@ class ReviewRow extends StatelessWidget {
                                     value: 0,
                                   )
                                 ]
-                              : (manager.getUser()['id'] == data['userId'] &&
+                              : (manager.getUser()['id'] ==
+                                          data['user']['id'] &&
                                       (data['reply'] == null ||
                                           data['reply'].toString().isEmpty ||
                                           data['reply'].toString() == "{}"))
@@ -441,8 +445,8 @@ class ReviewRow extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                DateFormat('dd/MM/yy').format(
-                                    DateTime.parse(data['reply']['createdAt'])),
+                                DateFormat('dd/MM/yy')
+                                    .format(DateTime.parse(data['updatedAt'])),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -456,7 +460,7 @@ class ReviewRow extends StatelessWidget {
                           Wrap(
                             children: [
                               TextPoppins(
-                                text: "${data['reply']['message']}",
+                                text: "${data['reply']}",
                                 fontSize: 13,
                                 align: TextAlign.end,
                               ),

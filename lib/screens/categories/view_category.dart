@@ -28,9 +28,11 @@ class _ViewCategoryState extends State<ViewCategory> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
+            backgroundColor: Colors.grey,
             pinned: true,
             floating: true,
             expandedHeight: 210.0,
@@ -71,8 +73,8 @@ class _ViewCategoryState extends State<ViewCategory> {
           SliverFillViewport(
             delegate: SliverChildListDelegate(
               [
-                FutureBuilder<http.Response>(
-                  future: APIService().getProfessionalsByCategory(
+                StreamBuilder<http.Response>(
+                  stream: APIService().getProfessionalsByCategoryStreamed(
                     category: "${widget.data['name']}",
                   ),
                   builder: (context, snapshot) {

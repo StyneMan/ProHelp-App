@@ -17,6 +17,8 @@ class ExperienceSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("EXPERIENCE ::::  $data");
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
@@ -112,12 +114,6 @@ class ExperienceSection extends StatelessWidget {
                                       TextPoppins(
                                         text:
                                             "${e['startDate']} - ${e['stillHere'] ? "Present" : e['endate']}",
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                      TextPoppins(
-                                        text:
-                                            "${DateFormat('dd/MMM/yyyy').format(DateTime.parse(e['startDate']))} - ${e['stillHere'] ? "Present" : DateFormat('dd/MMM/yyyy').format(DateTime.parse(e['endate']))}",
                                         fontSize: 13,
                                         fontWeight: FontWeight.w400,
                                       ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -21,6 +22,10 @@ class APIService {
   APIService() {
     // init();
   }
+
+  // Define a StreamController
+  final StreamController<http.Response> _streamController =
+      StreamController<http.Response>();
 
   Future<http.Response> signup(Map body) async {
     return await http.post(
@@ -91,6 +96,26 @@ class APIService {
     );
   }
 
+  Stream<http.Response> getProfileStreamed({
+    required String email,
+    required String accessToken,
+  }) async* {
+    try {
+      // Fetch data and add it to the stream
+      http.Response response = await client.get(
+        Uri.parse('${Constants.baseURL}/api/user/$email'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+      );
+      yield response; // Yield the response to the stream
+    } catch (error) {
+      // Handle errors by adding an error to the stream
+      _streamController.addError(error);
+    }
+  }
+
   Future<http.Response> getFreelancers() async {
     return await client.get(
       Uri.parse('${Constants.baseURL}/api/freelancers/'),
@@ -100,13 +125,52 @@ class APIService {
     );
   }
 
-  Future<http.Response> getProfessionalsByCategory({var category}) async {
-    return await client.get(
-      Uri.parse('${Constants.baseURL}/api/freelancers/' + category),
-      headers: {
-        "Content-type": "application/json",
-      },
-    );
+  // Stream<http.Response> getProfessionalsByCategory({var category}) async {
+  //   return await client.get(
+  //     Uri.parse('${Constants.baseURL}/api/freelancers/' + category),
+  //     headers: {
+  //       "Content-type": "application/json",
+  //     },
+  //   );
+  // }
+
+  // Modify your function to return a stream
+  Stream<http.Response> getProfessionalsByCategoryStreamed(
+      {var category}) async* {
+    try {
+      // Fetch data and add it to the stream
+      http.Response response = await client.get(
+        Uri.parse('${Constants.baseURL}/api/freelancers/$category'),
+        headers: {
+          "Content-type": "application/json",
+        },
+      );
+      yield response; // Yield the response to the stream
+    } catch (error) {
+      // Handle errors by adding an error to the stream
+      _streamController.addError(error);
+    }
+  }
+
+  Stream<http.Response> getTransactionsStreamed({
+    required String email,
+    required String accessToken,
+  }) async* {
+    try {
+      // Fetch data and add it to the stream
+      http.Response response = await client.get(
+        Uri.parse(
+            '${Constants.baseURL}/api/account/transactions/byUser/$email'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+      );
+      yield response; // Yield the response to the stream
+    } catch (error) {
+      // Handle errors by adding an error to the stream
+      _streamController.addError(error);
+    }
   }
 
   Future<http.Response> getRecruiters(String accessToken, String email) async {
@@ -176,10 +240,10 @@ class APIService {
     );
   }
 
-  Future<http.Response> saveConnection(
+  Future<http.Response> requestConnection(
       Map body, String accessToken, String email) async {
-    return await client.put(
-      Uri.parse('${Constants.baseURL}/api/connection/$email'),
+    return await client.post(
+      Uri.parse('${Constants.baseURL}/api/connection/request/$email'),
       headers: {
         "Content-type": "application/json",
         "Authorization": "Bearer " + accessToken,
@@ -341,21 +405,43 @@ class APIService {
     );
   }
 
-  Future<List<dynamic>> getReviewsByUserIdStreamed(
-      {var accessToken, var email, var userId}) async {
-    final response = await client.get(
-      Uri.parse('${Constants.baseURL}/api/review/byUser/$email?userId=$userId'),
-      headers: {
-        "Content-type": "application/json",
-        "Authorization": "Bearer " + accessToken,
-      },
-    );
-    if (response.statusCode == 200) {
-      debugPrint("REVES DATA >> ${response.body}");
-      Map<String, dynamic> map = jsonDecode(response.body);
-      return map['data'] as List<dynamic>;
-    } else {
-      throw Exception('Failed to fetch data from the backend');
+  // Future<List<dynamic> getReviewsByUserIdStreamed(
+  //     {var accessToken, var email, var userId}) async {
+  //   final response = await client.get(
+  //     Uri.parse('${Constants.baseURL}/api/review/byUser/$email?userId=$userId'),
+  //     headers: {
+  //       "Content-type": "application/json",
+  //       "Authorization": "Bearer " + accessToken,
+  //     },
+  //   );
+  //   if (response.statusCode == 200) {
+  //     debugPrint("REVES DATA >> ${response.body}");
+  //     Map<String, dynamic> map = jsonDecode(response.body);
+  //     return map['data'] as List<dynamic>;
+  //   } else {
+  //     throw Exception('Failed to fetch data from the backend');
+  //   }
+  // }
+
+  Stream<http.Response> getReviewsByUserIdStreamed({
+    required String accessToken,
+    required String email,
+    required var userId,
+  }) async* {
+    try {
+      // Fetch data and add it to the stream
+      http.Response response = await client.get(
+        Uri.parse(
+            '${Constants.baseURL}/api/review/byUser/$email?userId=$userId'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+      );
+      yield response; // Yield the response to the stream
+    } catch (error) {
+      // Handle errors by adding an error to the stream
+      _streamController.addError(error);
     }
   }
 
@@ -471,6 +557,24 @@ class APIService {
     );
   }
 
+  Stream<http.Response> getSavedJobsStreamed(
+      {required String accessToken, required String email, var userId}) async* {
+    try {
+      // Fetch data and add it to the stream
+      http.Response response = await client.get(
+        Uri.parse('${Constants.baseURL}/api/job/savedJobs/$email'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+      );
+      yield response; // Yield the response to the stream
+    } catch (error) {
+      // Handle errors by adding an error to the stream
+      _streamController.addError(error);
+    }
+  }
+
   Future<http.Response> getJobApplicationsByUser(
       {var accessToken, var email}) async {
     return await client.get(
@@ -517,7 +621,7 @@ class APIService {
       {var email, var jobId}) async {
     return await client.get(
       Uri.parse(
-          '${Constants.baseURL}/api/job/applications/$email?jobId=$jobId'),
+          '${Constants.baseURL}/api/job/applications/byUser/$email?jobId=$jobId'),
       headers: {
         "Content-type": "application/json",
       },
@@ -584,5 +688,193 @@ class APIService {
         "Content-type": "application/json",
       },
     );
+  }
+
+  Future<http.Response> getUserConnections(
+      {required String accessToken, required String email}) async {
+    return await client.get(
+      Uri.parse('${Constants.baseURL}/api/connection/byUser/all/$email'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+    );
+  }
+
+  Stream<http.Response> getUserConnectionsStreamed({
+    required String accessToken,
+    required String email,
+  }) async* {
+    try {
+      // Fetch data and add it to the stream
+      http.Response response = await client.get(
+        Uri.parse('${Constants.baseURL}/api/connection/byUser/all/$email'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+      );
+      yield response; // Yield the response to the stream
+    } catch (error) {
+      // Handle errors by adding an error to the stream
+      _streamController.addError(error);
+    }
+  }
+
+  Stream<http.Response> getUserPastConnectionsStreamed({
+    required String accessToken,
+    required String email,
+  }) async* {
+    try {
+      // Fetch data and add it to the stream
+      http.Response response = await client.get(
+        Uri.parse('${Constants.baseURL}/api/connection/past/byUser/all/$email'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+      );
+      yield response; // Yield the response to the stream
+    } catch (error) {
+      // Handle errors by adding an error to the stream
+      _streamController.addError(error);
+    }
+  }
+
+  Future<http.Response> getUserPendingReceivedConnectionsRequest(
+      {required String accessToken, required String email}) async {
+    return await client.get(
+      Uri.parse(
+          '${Constants.baseURL}/api/connection/byUser/pending-request/received/$email'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+    );
+  }
+
+// Modify your function to return a stream
+  Stream<http.Response> getUserPendingReceivedConnectionsRequestStream({
+    required String accessToken,
+    required String email,
+  }) async* {
+    try {
+      // Fetch data and add it to the stream
+      http.Response response = await client.get(
+        Uri.parse(
+            '${Constants.baseURL}/api/connection/byUser/pending-request/received/$email'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+      );
+      yield response; // Yield the response to the stream
+    } catch (error) {
+      // Handle errors by adding an error to the stream
+      _streamController.addError(error);
+    }
+  }
+
+  Future<http.Response> acceptConnectionRequest({
+    required String accessToken,
+    required String email,
+    required var payload,
+    required var connectionId,
+  }) async {
+    return await client.put(
+        Uri.parse(
+            '${Constants.baseURL}/api/connection/request/accept/$email/$connectionId'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+        body: jsonEncode(payload));
+  }
+
+  Future<http.Response> declineConnectionRequest({
+    required String accessToken,
+    required String email,
+    required var payload,
+    required var connectionId,
+  }) async {
+    return await client.put(
+        Uri.parse(
+            '${Constants.baseURL}/api/connection/request/decline/$email/$connectionId'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+        body: jsonEncode(payload));
+  }
+
+  Future<http.Response> cancelConnectionRequest(
+      {required String accessToken,
+      required String email,
+      required var payload}) async {
+    return await client.post(
+        Uri.parse('${Constants.baseURL}/api/connection/request/decline/$email'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+        body: jsonEncode(payload));
+  }
+
+  Future<http.Response> disconnectConnection({
+    required String accessToken,
+    required String email,
+    required var payload,
+    required var connectionId,
+  }) async {
+    return await client.post(
+        Uri.parse(
+            '${Constants.baseURL}/api/connection/request/disconnect/$email/$connectionId'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+        body: jsonEncode(payload));
+  }
+
+  Future<http.Response> reportUser({
+    required String accessToken,
+    required String email,
+    required var payload,
+  }) async {
+    return await client.post(
+        Uri.parse('${Constants.baseURL}/api/account/report/$email'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+        body: jsonEncode(payload));
+  }
+
+  Future<http.Response> blockUser({
+    required String accessToken,
+    required String email,
+    required var payload,
+  }) async {
+    return await client.post(
+        Uri.parse('${Constants.baseURL}/api/account/block/$email'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+        body: jsonEncode(payload));
+  }
+
+  Future<http.Response> unblockUser({
+    required String accessToken,
+    required String email,
+    required var payload,
+  }) async {
+    return await client.post(
+        Uri.parse('${Constants.baseURL}/api/account/unblock/$email'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+        body: jsonEncode(payload));
   }
 }

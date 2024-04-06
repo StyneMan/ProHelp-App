@@ -178,21 +178,12 @@ class _WriteReviewState extends State<WriteReview> {
 
   _createReview() async {
     _controller.setLoading(true);
+    Get.back();
     Map _payload = {
       "rating": "$_rating".contains(".") ? _rating : _rating.toDouble(),
       "comment": _reviewController.text,
-      "userId": widget.data['id'],
-      "fullname": widget.data['bio']['firstname'] +
-          " " +
-          widget.data['bio']['lastname'],
-      "reviewer": {
-        "id": widget.manager.getUser()['id'],
-        "name": widget.manager.getUser()['bio']['firstname'] +
-            " " +
-            widget.manager.getUser()['bio']['lastname'],
-        "photo": widget.manager.getUser()['bio']['image'],
-        "email": widget.manager.getUser()['email'],
-      }
+      "userId": widget.data['id'] ?? widget.data['_id'],
+      "reviewer": widget.manager.getUser()['id'],
     };
 
     try {

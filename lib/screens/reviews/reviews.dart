@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +10,10 @@ import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
+import 'package:prohelp_app/helper/socket/socket_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
+
+import 'package:http/http.dart' as http;
 
 import 'components/reviews_row.dart';
 import 'components/write_review.dart';
@@ -34,17 +37,17 @@ class _ViewReviewsState extends State<ViewReviews> {
   bool _isReviewed = false;
   bool _isConnected = false;
 
-  Stream<List<dynamic>> fetchDataStream() {
-    final controller = StreamController<List<dynamic>>();
-    APIService()
-        .getReviewsByUserIdStreamed(
-            accessToken: widget.manager.getAccessToken(),
-            email: widget.manager.getUser()['email'],
-            userId: widget.data['id'])
-        .then((resp) => controller.add(resp))
-        .catchError((error) => controller.addError(error));
-    return controller.stream;
-  }
+  // Stream<List<dynamic>> fetchDataStream() {
+  //   final controller = StreamController<List<dynamic>>();
+  //   APIService()
+  //       .getReviewsByUserIdStreamed(
+  //           accessToken: widget.manager.getAccessToken(),
+  //           email: widget.manager.getUser()['email'],
+  //           userId: widget.data['id'])
+  //       .then((resp) => controller.add(resp))
+  //       .catchError((error) => controller.addError(error));
+  //   return controller.stream;
+  // }
 
   _checkReviewed() {
     for (var i = 0; i < widget.data['reviews']?.length; i++) {
@@ -61,21 +64,74 @@ class _ViewReviewsState extends State<ViewReviews> {
     }
   }
 
-  _checkConnection() {
-    for (var element in widget.manager.getUser()['connections']) {
-      if (element == widget.data['id']) {
-        setState(() {
-          _isConnected = true;
-        });
-      }
-    }
+  _connectionState() {
+    final socket = SocketManager().socket;
+
+    socket.on(
+      "new-review",
+      (data) {
+        debugPrint("DATA FROM  REVIEW ---!!! >> ${jsonEncode(data)}");
+        // debugPrint("USER ID >> ${data['userId']}");
+        if (data['reviewedBy']['email'] == widget.manager.getUser()['email']) {
+          //For me
+          debugPrint("FOR ME !! ");
+          if (mounted) {
+            setState(() {
+              _isReviewed = true;
+            });
+          }
+          Constants.toast("NA ME WRITE THIS REVIEW!!!");
+        } else {
+          // Not for me
+          debugPrint("NOT FOR ME !! ");
+          Constants.toast("NO BE ME WRITE THIS REVIEW!!!");
+        }
+      },
+    );
+
+    socket.on(
+      "review-reply",
+      (data) {
+        debugPrint("DATA FROM  REVIEW REPLY !!! >> ${jsonEncode(data)}");
+        // debugPrint("USER ID >> ${data['userId']}");
+        // if (data['data']['email'] == _userMap['email']) {
+        //   //For me
+        //   debugPrint("FOR ME !! ");
+        //   _prefs.setString('user', data['data']);
+        //   _controller.userData.value = data['data'];
+        // } else {
+        //   // Not for me
+        //   debugPrint("NOT FOR ME !! ");
+        // }
+      },
+    );
   }
 
   @override
   void initState() {
     super.initState();
-    _checkReviewed();
-    _checkConnection();
+    // _checkReviewed();
+    _connectionState();
+
+    APIService()
+        .getUserConnectionsStreamed(
+      accessToken: widget.manager.getAccessToken(),
+      email: widget.data['email'],
+    )
+        .listen((event) {
+      Map<String, dynamic> map = jsonDecode(event.body);
+
+      for (var element in map['docs']) {
+        if ((element['user']['_id'] == widget.data['_id'] &&
+                element['guest']['_id'] == widget.manager.getUser()['id']) ||
+            (element['user']['_id'] == widget.manager.getUser()['id'] &&
+                element['guest']['_id'] == widget.data['_id'])) {
+          setState(() {
+            _isConnected = true;
+          });
+        }
+      }
+    });
   }
 
   // bool _isClicked = false;
@@ -156,20 +212,25 @@ class _ViewReviewsState extends State<ViewReviews> {
                         )
             ],
           ),
-          body: StreamBuilder<List<dynamic>>(
-            stream: fetchDataStream(),
+          body: StreamBuilder<http.Response>(
+            stream: APIService().getReviewsByUserIdStreamed(
+                accessToken: widget.manager.getAccessToken(),
+                email: widget.manager.getUser()['email'],
+                userId: widget.data['id']),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 // Data is available, use it to build the UI
                 final mdata = snapshot.data!;
-                debugPrint("REVIEWS DATA  ${mdata.length}");
-                if (mdata.length > 0) {
+                Map<String, dynamic> map = jsonDecode(mdata.body);
+                debugPrint("REVIEWS DATA  ${mdata.body}");
+
+                if (map['docs'].length > 0) {
                   return ListView.separated(
-                    itemCount: mdata.length,
+                    itemCount: map['docs']?.length,
                     padding: const EdgeInsets.all(10.0),
                     separatorBuilder: (context, index) => const Divider(),
                     itemBuilder: (context, index) {
-                      final item = mdata[index];
+                      final item = map['docs'][index];
                       return ReviewRow(
                         manager: widget.manager,
                         data: item,
@@ -189,7 +250,8 @@ class _ViewReviewsState extends State<ViewReviews> {
                       children: [
                         Image.asset('assets/images/empty.png'),
                         const TextInter(text: "No reviews found", fontSize: 16),
-                        widget.manager.getUser()['id'] == widget.data['id'] ||
+                        widget.manager.getUser()['id'] ==
+                                    (widget.data['id'] ?? widget.data['_id']) ||
                                 !_isConnected
                             ? const SizedBox()
                             : TextButton.icon(

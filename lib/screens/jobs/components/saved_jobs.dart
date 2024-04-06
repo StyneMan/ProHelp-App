@@ -36,8 +36,8 @@ class SavedJobs extends StatelessWidget {
               ),
             ),
           )
-        : FutureBuilder<http.Response>(
-            future: APIService().getSavedJobs(
+        : StreamBuilder<http.Response>(
+            stream: APIService().getSavedJobsStreamed(
               accessToken: manager.getAccessToken(),
               email: manager.getUser()['email'],
             ),
@@ -86,6 +86,26 @@ class SavedJobs extends StatelessWidget {
               final data = snapshot.data;
               Map<String, dynamic> map = jsonDecode(data!.body);
               debugPrint("SAVED JOBS RESPONSE >>> ${data.body}");
+
+              if (map['data']['docs']?.length < 1) {
+                return SizedBox(
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset('assets/images/empty.png'),
+                        const Text(
+                          "No saved jobs found",
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
 
               return ListView.separated(
                 shrinkWrap: true,

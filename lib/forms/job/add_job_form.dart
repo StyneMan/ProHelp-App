@@ -362,11 +362,6 @@ class _AddJobFormState extends State<AddJobForm> {
         },
         "recruiter": {
           "id": widget.manager.getUser()['id'],
-          "name": widget.manager.getUser()['bio']['firstname'] +
-              " " +
-              widget.manager.getUser()['bio']['lastname'],
-          "photo": widget.manager.getUser()['bio']['image'],
-          "email": widget.manager.getUser()['email'],
         },
         "description": _step2Payload['description'].toString().toLowerCase(),
         "profession": _step2Payload['profession'].toString().toLowerCase(),

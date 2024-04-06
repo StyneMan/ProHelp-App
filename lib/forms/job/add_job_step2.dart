@@ -46,8 +46,13 @@ class _AddJobFormStep2State extends State<AddJobFormStep2> {
   }
 
   void _onSelected(String val) {
+    final _curr = _controller.allProfessions.value
+        .firstWhere((elem) => elem['name'] == val);
+
+    print("PROFESSION ::: ${_curr['id']}");
+
     setState(() {
-      _selectedProfession = val;
+      _selectedProfession = _curr['id'];
     });
 
     widget.onStep2Completed(

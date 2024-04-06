@@ -13,7 +13,6 @@ import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/jobs/applications.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 import 'apply_job.dart';
 
@@ -37,31 +36,34 @@ class _ViewJobState extends State<ViewJob> {
   bool _isCountLoaded = false;
   int _applicationCount = 0;
 
-  _checkApplied() {
-    for (var element in _controller.myJobsApplied.value) {
-      if (element['jobId'] == widget.data['id']) {
+  // _checkApplied() {
+  //   for (var element in _controller.myJobApplications.value) {
+  //     if (element['jobId'] == widget.data['id']) {
+  //       setState(() {
+  //         _isApplied = true;
+  //       });
+  //     }
+  //   }
+  // }
+
+  _checkSaved() {
+    for (var element in widget.manager.getUser()['savedJobs']) {
+      if (element == (widget.data['id'] ?? widget.data['_id'])) {
         setState(() {
-          _isApplied = true;
+          _isSaved = true;
         });
       }
     }
   }
 
-  _getApplications() async {
-    try {
-      final resp = await APIService().getCurrentJobApplications(
-        email: widget.manager.getUser()['email'],
-        jobId: widget.data['id'],
-      );
-
-      debugPrint("RJNK ${resp.body}");
-      Map<String, dynamic> map = jsonDecode(resp.body);
-      setState(() {
-        _isCountLoaded = true;
-        _applicationCount = map['docs']?.length;
-      });
-    } catch (e) {
-      debugPrint(e.toString());
+  _checkApplied() {
+    for (var element in _controller.myJobApplications.value) {
+      if ((element['job']['id'] ?? element['job']['_id']) ==
+          (widget.data['id'] ?? widget.data['_id'])) {
+        setState(() {
+          _isApplied = true;
+        });
+      }
     }
   }
 
@@ -70,16 +72,11 @@ class _ViewJobState extends State<ViewJob> {
     super.initState();
     _checkApplied();
     _checkSaved();
-    _getApplications();
   }
 
   @override
   void dispose() {
     super.dispose();
-  }
-
-  String timeUntil(DateTime date) {
-    return timeago.format(date, locale: "en", allowFromNow: true);
   }
 
   @override
@@ -201,14 +198,17 @@ class _ViewJobState extends State<ViewJob> {
                 children: [
                   TextPoppins(
                     text:
-                        "Posted ${timeUntil(DateTime.parse("${widget.data['createdAt']}"))}",
+                        "Posted ${Constants.timeUntil(DateTime.parse("${widget.data['createdAt']}"))}",
                     fontSize: 14,
                   ),
                   const SizedBox(
                     width: 10.0,
                   ),
-                  const Icon(CupertinoIcons.circle_fill,
-                      color: Colors.black, size: 8),
+                  const Icon(
+                    CupertinoIcons.circle_fill,
+                    color: Colors.black,
+                    size: 8,
+                  ),
                   const SizedBox(
                     width: 10.0,
                   ),
@@ -218,7 +218,7 @@ class _ViewJobState extends State<ViewJob> {
                     children: [
                       TextPoppins(
                         text:
-                            "${_isCountLoaded ? _applicationCount : 'Loading...'} ${_isCountLoaded ? _pluralize(widget.data['applicants']?.length) : ""}",
+                            "${widget.data['applicants']?.length} ${_pluralize(widget.data['applicants']?.length)}",
                         fontSize: 14,
                       ),
                       const SizedBox(
@@ -488,20 +488,6 @@ class _ViewJobState extends State<ViewJob> {
     } catch (e) {
       _controller.setLoading(false);
       debugPrint("ERROR LIKING >>> $e");
-    }
-  }
-
-  _checkSaved() {
-    for (var element in widget.manager.getUser()['savedJobs']) {
-      if (element == widget.data['id']) {
-        setState(() {
-          _isSaved = true;
-        });
-      } else {
-        setState(() {
-          _isSaved = false;
-        });
-      }
     }
   }
 }

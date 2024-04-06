@@ -21,7 +21,7 @@ class RoundedButton extends StatelessWidget {
     required this.onPressed,
     required this.variant,
     this.paddingX = 12.0,
-    this.paddingY = 12.0,
+    this.paddingY = 11.0,
     this.isLoading = false,
   }) : super(key: key);
 

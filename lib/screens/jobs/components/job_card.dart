@@ -10,11 +10,11 @@ import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
+import 'package:prohelp_app/helper/socket/socket_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/account/components/wallet.dart';
 import 'package:prohelp_app/screens/jobs/apply_job.dart';
 import 'package:prohelp_app/screens/jobs/viewjob.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class JobCard extends StatefulWidget {
   var data;
@@ -22,14 +22,14 @@ class JobCard extends StatefulWidget {
   final String type;
   final String? usecase;
   final PreferenceManager manager;
-  JobCard(
-      {Key? key,
-      required this.data,
-      required this.index,
-      required this.manager,
-      this.usecase,
-      this.type = ""})
-      : super(key: key);
+  JobCard({
+    Key? key,
+    required this.data,
+    required this.index,
+    required this.manager,
+    this.usecase,
+    this.type = "",
+  }) : super(key: key);
 
   @override
   State<JobCard> createState() => _JobCardState();
@@ -80,10 +80,6 @@ class _JobCardState extends State<JobCard> {
         setState(() {
           _isSaved = true;
         });
-      } else {
-        setState(() {
-          _isSaved = false;
-        });
       }
     }
   }
@@ -96,8 +92,10 @@ class _JobCardState extends State<JobCard> {
         });
       }
     }
-    for (var element in _controller.myJobsApplied.value) {
-      if (element['jobId'] == widget.data['id']) {
+    for (var element in _controller.myJobApplications.value) {
+      if (element['job']['id'] ??
+          element['job']['_id'] == widget.data['id'] ??
+          widget.data['_id']) {
         setState(() {
           _isApplied = true;
         });
@@ -105,15 +103,128 @@ class _JobCardState extends State<JobCard> {
     }
   }
 
+  _connectionState() {
+    // Connection Declined
+    final socket = SocketManager().socket;
+
+    socket.on("job-saved", (data) async {
+      Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+      Constants.toast("JOB BOOKMARKED!!!");
+      print("BOOKMARKED JOB DATA ::: ${data}");
+
+      // print("CONNECTION DECLINED USER :::  $map['user']['email']");
+      // print("CONNECTION DECLINED DECLINEDBY :::  $map['declinedBy']['email']");
+      // final userId = map['user']['id'].toString();
+      // final otherUserId = map['declinedBy']['id'].toString();
+      // if (userId == widget.manager.getUser()['id']) {
+      //   print('THEY DECLINED MY REQUEST OH USER');
+      //   setState(() {
+      //     _isConnectionRequestSent = false;
+      //   });
+      // } else {
+      //   print('ME THE USER');
+      // }
+    });
+
+    socket.on(
+      "job-unsaved",
+      (data) {
+        Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+        Constants.toast("JOB UNSAVED OH!!!");
+        print("UNBOOKMARKED JOB DATA ::: ${data}");
+
+        // print("CONNECTION ACCEPTED :::  $map['user']['email']");
+        // print("CONNECTION ACCEPTEDBY :::  $map['acceptedBy']['email']");
+        // final userId = map['user']['id'].toString();
+        // final acceptingUserId = map['acceptedBy']['id'].toString();
+        // if (userId == widget.manager.getUser()['id']) {
+        //   print('THEY ACCEPTED MY REQUEST!!');
+        //   setState(() {
+        //     _isConnected = true;
+        //     _isConnectionRequestSent = false;
+        //   });
+        // } else {
+        //   print('ME THE USER');
+        // }
+        _controller.onInit();
+      },
+    );
+
+    socket.on(
+      "connection-cancelled",
+      (data) {
+        _controller.onInit();
+      },
+    );
+
+    socket.on(
+      "connection-requested",
+      (data) async {
+        print("CONNECTION REQUESTED $data");
+        Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+        final requestedBy = map['requestBy']['id'].toString();
+        // if (requestedBy != widget.manager.getUser()['id']) {
+        //   Constants.toast('REQUEST SENT BBY ME');
+        //   setState(() {
+        //     _isConnectionRequestSent = true;
+        //   });
+        // } else {
+        //   Constants.toast("BY ANOTHER REQUESTED!!!");
+        // }
+
+        _controller.onInit();
+      },
+    );
+
+    // socket.on("user-unblocked", (data) {
+    //   print("UNBLOCKED USER DATA :: ${jsonEncode(data)}");
+
+    //   Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+    //   final unblockedBy = map['unblockedBy']['id'].toString();
+    //   if (unblockedBy != widget.manager.getUser()['id']) {
+    //     Constants.toast('USER JUST UNBLOCKED ME');
+    //     if (mounted) {
+    //       setState(() {
+    //         _userBlockedMe = false;
+    //       });
+    //     }
+    //   } else {
+    //     Constants.toast("I JUST UNBLOCKED THIS GUY!");
+    //     if (mounted) {
+    //       setState(() {
+    //         _iBlockedUser = false;
+    //       });
+    //     }
+    //   }
+    // });
+  }
+
   @override
   void initState() {
     super.initState();
     _checkApplied();
     _checkSaved();
-  }
+    _connectionState();
+    print("USJKS :::: ${jsonEncode(widget.data)}");
 
-  String timeUntil(DateTime date) {
-    return timeago.format(date, locale: "en", allowFromNow: true);
+    APIService()
+        .getSavedJobsStreamed(
+            accessToken: widget.manager.getAccessToken(),
+            email: widget.manager.getUser()['email'],
+            userId: widget.manager.getUser()['id'] ??
+                widget.manager.getUser()['_id'])
+        .listen((event) {
+      Map<String, dynamic> map = jsonDecode(event.body);
+      print("SAVED JOBBS STREAM LISTENER ::: ${jsonEncode(map)}");
+
+      for (var element in map['data']['docs']) {
+        if ((element['id'] == widget.data['id'])) {
+          setState(() {
+            _isSaved = true;
+          });
+        }
+      }
+    });
   }
 
   @override
@@ -324,12 +435,12 @@ class _JobCardState extends State<JobCard> {
                       const Icon(
                         Icons.track_changes_rounded,
                         color: Constants.primaryColor,
-                        size: 32,
+                        size: 24,
                       ),
                       const SizedBox(
                         width: 4.0,
                       ),
-                      TextPoppins(text: "Actively recruiting", fontSize: 13),
+                      TextPoppins(text: "Actively recruiting", fontSize: 12),
                       const SizedBox(
                         width: 4.0,
                       ),
@@ -345,10 +456,11 @@ class _JobCardState extends State<JobCard> {
                         width: MediaQuery.of(context).size.width * 0.36,
                         child: TextPoppins(
                           text:
-                              "Posted ${timeUntil(DateTime.parse("${widget.data['createdAt']}"))}"
+                              "Posted ${Constants.timeUntil(DateTime.parse("${widget.data['createdAt']}"))}"
                                   .replaceAll("about", "")
+                                  .replaceAll("a moment ago", "just now")
                                   .replaceAll("minute", "min"),
-                          fontSize: 13,
+                          fontSize: 12,
                         ),
                       ),
                     ],
@@ -445,7 +557,7 @@ class _JobCardState extends State<JobCard> {
                                                 children: [
                                                   TextSpan(
                                                     text:
-                                                        "${widget.manager.getUser()['bio']['fullname']}"
+                                                        "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['lastname']}"
                                                             .capitalize,
                                                     style: const TextStyle(
                                                       fontSize: 16,

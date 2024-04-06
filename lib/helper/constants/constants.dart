@@ -2,10 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import "package:intl/intl.dart";
 import 'package:money_formatter/money_formatter.dart';
+import 'package:prohelp_app/components/dialog/info_dialog.dart';
+import 'package:prohelp_app/components/text_components.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
+
+import 'package:timeago/timeago.dart' as timeago;
 // import 'package:logger/logger.dart';
 
 class Constants {
@@ -20,8 +25,8 @@ class Constants {
   static const Color shimmerBaseColor = Color.fromARGB(255, 203, 203, 203);
   static const Color shimmerHighlightColor = Colors.white;
 
-  static const baseURL =
-      "https://my-prohelp-server.vercel.app"; // "http://192.168.1.24:8082"; //
+  static const baseURL = "http://192.168.100.247:8082";
+  // "https://my-prohelp-server.vercel.app"; //
 
   static String pstk = "pk_test_40f544aec0415695c9fae0ba0819ee5bebcb6a5e";
   // "pk_test_40f544aec0415695c9fae0ba0819ee5bebcb6a5e"; //"pk_test_043683268da92cd71e0d30f9d72396396f2dfb1f";
@@ -72,6 +77,79 @@ class Constants {
       backgroundColor: Colors.grey[800],
       textColor: Colors.white,
       fontSize: 16.0,
+    );
+  }
+
+  static String timeUntil(DateTime date) {
+    return timeago.format(date, locale: "en", allowFromNow: true);
+  }
+
+  static void showConfirmDialog({
+    required var context,
+    required var message,
+    required var onPressed,
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.4,
+          width: MediaQuery.of(context).size.width * 0.98,
+          child: InfoDialog(
+            body: Wrap(
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 16.0),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: TextPoppins(
+                        text: "$message",
+                        fontSize: 13,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () {
+                                Get.back();
+                              },
+                              child: TextPoppins(
+                                text: "Close",
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10.0,
+                          ),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: onPressed,
+                              child: TextPoppins(
+                                text: "Yes, Proceed",
+                                fontSize: 13,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -13,9 +13,11 @@ import 'components/item_row.dart';
 
 class Alerts extends StatelessWidget {
   final PreferenceManager manager;
+  var stateController;
   Alerts({
     Key? key,
     required this.manager,
+    required this.stateController,
   }) : super(key: key);
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();

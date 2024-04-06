@@ -146,6 +146,8 @@ class _MyAppState extends State<MyApp> {
   PreferenceManager? _manager;
   bool _authenticated = false;
 
+  final player = AudioPlayer();
+
   _init() async {
     // print("FROM MAIN DART ::::");
     try {
@@ -196,126 +198,255 @@ class _MyAppState extends State<MyApp> {
 
       if (_token.isNotEmpty) {
         socket.emit('identity', _userMap['id']);
+
+        socket.on(
+          "new-chat",
+          (data) => debugPrint("DATA FROM CHAT >> $data"),
+        );
+
+        // socket.on(
+        //   "new-review",
+        //   (data) {
+        //     debugPrint("DATA FROM  REVIEW NOW !!! >> ${jsonEncode(data)}");
+        //     // debugPrint("USER ID >> ${data['userId']}");
+        //     if (data['data']['email'] == _userMap['email']) {
+        //       //For me
+        //       debugPrint("FOR ME !! ");
+        //       _prefs.setString('user', data['data']);
+        //       _controller.userData.value = data['data'];
+        //     } else {
+        //       // Not for me
+        //       debugPrint("NOT FOR ME !! ");
+        //     }
+        //   },
+        // );
+
+        socket.on(
+          "review-updated",
+          (data) {
+            debugPrint("DATA FROM  REVIEW NOW !!! >> ${jsonEncode(data)}");
+            // debugPrint("USER ID >> ${data['userId']}");
+            if (data['data']['email'] == _userMap['email']) {
+              //For me
+              debugPrint("FOR ME !! ");
+              _prefs.setString('user', data['data']);
+              _controller.userData.value = data['data'];
+            } else {
+              // Not for me
+              debugPrint("NOT FOR ME !! ");
+            }
+          },
+        );
+
+        socket.on(
+          "review-reply",
+          (data) {
+            debugPrint("DATA FROM REVIEW REPLY !!! >> ${jsonEncode(data)}");
+            // debugPrint("USER ID >> ${data['userId']}");
+            if (data['data']['email'] == _userMap['email']) {
+              //For me
+              debugPrint("FOR ME !! ");
+              _prefs.setString('user', data['data']);
+              _controller.userData.value = data['data'];
+            } else {
+              // Not for me
+              debugPrint("NOT FOR ME !! ");
+            }
+          },
+        );
+
+        socket.on(
+          "isOnline",
+          (data) => debugPrint("DATA FROM  >> $data"),
+        );
+
+        socket.on(
+          "job-posted",
+          (data) {
+            debugPrint("JOB POSTED NOW!! >> $data");
+            _controller.onInit();
+          },
+        );
+
+        socket.on(
+          "job-application-accepted",
+          (data) {
+            debugPrint("DATA FROM APPLICATION ACCEPTANCE !!! >> ${data}");
+            // debugPrint("USER ID >> ${data['userId']}");
+            if (data['applicant']['email'] == _userMap['email']) {
+              //For me
+              debugPrint("FOR ME !! ");
+              // fetchDataStream();
+              // _prefs.setString('user', data['data']);
+              // _controller.userData.value = data['data'];
+            } else {
+              // Not for me
+              debugPrint("NOT FOR ME !! ");
+            }
+          },
+        );
+
+        socket.on(
+          "job-application",
+          (data) {
+            // debugPrint("DATA FROM JOB APPLICATION >> $data");
+            if (data['job']['recruiter']['id'] == _userMap['id']) {
+              //UPDate here
+              // debugPrint("TIRGGER HERE -->>");
+              _controller.onInit();
+            }
+          },
+        );
+
+        socket.on(
+          "connection-requested",
+          (data) async {
+            print("CONNECTION REQUESTED $data");
+
+            try {
+              // AudioCache audioCache = AudioCache();
+              // audioCache.load(
+              //   'sound1.mp3',
+              // ); // Ensure the path matches the one in pubspec.yaml
+
+              // await player.play(
+              //   AssetSource('assets/audio/sound1.mp3'),
+              //   volume: 1.0,
+              // );
+
+              final _profileResp = await APIService().getProfile(
+                _token,
+                _userMap['email'],
+              );
+
+              // print("PROFILE ::: ${_profileResp.body}");
+              if (_profileResp.statusCode == 200) {
+                Map<String, dynamic> map = jsonDecode(_profileResp.body);
+                String userData = jsonEncode(map['data']);
+                _prefs.setString('user', userData);
+                _controller.setUserData(map['data']);
+              }
+            } catch (e) {
+              print("ERROR ::: -- :: $e");
+            }
+
+            _controller.onInit();
+          },
+        );
+
+        socket.on(
+          "connection-accepted",
+          (data) async {
+            print("CONNECTION ACCEPTED $data");
+
+            try {
+              Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+              print("CONNECTION DECLINED $map['declinedBy']");
+              final declinedBy = map['declinedBy']['id'];
+              if (declinedBy != _userMap['id']) {
+                print('OTHER USER');
+                _controller.currentConversation.add(map['message']);
+              } else {
+                print('ME THE USER');
+              }
+
+              final _profileResp = await APIService().getProfile(
+                _token,
+                _userMap['email'],
+              );
+
+              // print("PROFILE ::: ${_profileResp.body}");
+              if (_profileResp.statusCode == 200) {
+                Map<String, dynamic> map = jsonDecode(_profileResp.body);
+                String userData = jsonEncode(map['data']);
+                _prefs.setString('user', userData);
+                _controller.setUserData(map['data']);
+              }
+            } catch (e) {
+              print("ERROR ::: -- :: $e");
+            }
+
+            _controller.onInit();
+          },
+        );
+
+        socket.on("connection-declined", (data) async {
+          try {
+            // AudioCache audioCache = AudioCache();
+            // audioCache.load(
+            //   'sound1.mp3',
+            // ); // Ensure the path matches the one in pubspec.yaml
+
+            // print("LOADED AUDIOS ::: ${audioCache.loadedFiles.length}");
+
+            // await player.setSource();
+            // await player.play(
+            //   AssetSource('assets/audio/sound1.mp3'),
+            //   volume: 1.0,
+            // );
+
+            Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+            print("CONNECTION DECLINED $map['declinedBy']");
+            final declinedBy = map['declinedBy']['id'];
+            if (declinedBy != _userMap['id']) {
+              print('OTHER USER');
+              _controller.currentConversation.add(map['message']);
+            } else {
+              print('ME THE USER');
+            }
+
+            final _profileResp = await APIService().getProfile(
+              _token,
+              _userMap['email'],
+            );
+
+            // print("PROFILE ::: ${_profileResp.body}");
+            if (_profileResp.statusCode == 200) {
+              Map<String, dynamic> map = jsonDecode(_profileResp.body);
+              String userData = jsonEncode(map['data']);
+              _prefs.setString('user', userData);
+              _controller.setUserData(map['data']);
+            }
+          } catch (e) {
+            print("ERROR ::: -- :: $e");
+          }
+        });
+
+        socket.on(
+          "connection-cancelled",
+          (data) {
+            _controller.onInit();
+          },
+        );
+
+        socket.on("user-blocked", (data) {
+          print("BLOCKED USER DATA :: ${data}");
+        });
+
+        socket.on("user-unblocked", (data) {
+          print("UNBLOCKED USER DATA :: ${data}");
+        });
+
+        socket.on(
+          "new-message",
+          (data) {
+            debugPrint("DATA FROM MESSAGE >> ${(data)}");
+            Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+            final senderId = map['senderId'];
+            if (senderId != _userMap['id']) {
+              _controller.currentConversation.add(map['message']);
+            }
+
+            _refreshChatList();
+            //Now play sound here
+            AudioPlayer().play(AssetSource('assets/audio/sound2.mp3'));
+          },
+        );
       }
 
       socket.on(
         "FromAPI",
         (data) => debugPrint("DATA FROM SERVER >> $data"),
-      );
-
-      socket.on(
-        "new-chat",
-        (data) => debugPrint("DATA FROM CHAT >> $data"),
-      );
-
-      socket.on(
-        "new-review",
-        (data) {
-          debugPrint("DATA FROM  REVIEW NOW !!! >> ${jsonEncode(data)}");
-          // debugPrint("USER ID >> ${data['userId']}");
-          if (data['data']['email'] == _userMap['email']) {
-            //For me
-            debugPrint("FOR ME !! ");
-            _prefs.setString('user', data['data']);
-            _controller.userData.value = data['data'];
-          } else {
-            // Not for me
-            debugPrint("NOT FOR ME !! ");
-          }
-        },
-      );
-
-      socket.on(
-        "review-updated",
-        (data) {
-          debugPrint("DATA FROM  REVIEW NOW !!! >> ${jsonEncode(data)}");
-          // debugPrint("USER ID >> ${data['userId']}");
-          if (data['data']['email'] == _userMap['email']) {
-            //For me
-            debugPrint("FOR ME !! ");
-            _prefs.setString('user', data['data']);
-            _controller.userData.value = data['data'];
-          } else {
-            // Not for me
-            debugPrint("NOT FOR ME !! ");
-          }
-        },
-      );
-
-      socket.on(
-        "review-reply",
-        (data) {
-          debugPrint("DATA FROM REVIEW REPLY !!! >> ${jsonEncode(data)}");
-          // debugPrint("USER ID >> ${data['userId']}");
-          if (data['data']['email'] == _userMap['email']) {
-            //For me
-            debugPrint("FOR ME !! ");
-            _prefs.setString('user', data['data']);
-            _controller.userData.value = data['data'];
-          } else {
-            // Not for me
-            debugPrint("NOT FOR ME !! ");
-          }
-        },
-      );
-
-      socket.on(
-        "isOnline",
-        (data) => debugPrint("DATA FROM  >> $data"),
-      );
-
-      socket.on(
-        "job-posted",
-        (data) {
-          debugPrint("JOB POSTED NOW!! >> $data");
-          _controller.onInit();
-        },
-      );
-
-      socket.on(
-        "job-application-accepted",
-        (data) {
-          debugPrint("DATA FROM APPLICATION ACCEPTANCE !!! >> ${data}");
-          // debugPrint("USER ID >> ${data['userId']}");
-          if (data['applicant']['email'] == _userMap['email']) {
-            //For me
-            debugPrint("FOR ME !! ");
-            // fetchDataStream();
-            // _prefs.setString('user', data['data']);
-            // _controller.userData.value = data['data'];
-          } else {
-            // Not for me
-            debugPrint("NOT FOR ME !! ");
-          }
-        },
-      );
-
-      socket.on(
-        "job-application",
-        (data) {
-          // debugPrint("DATA FROM JOB APPLICATION >> $data");
-          if (data['job']['recruiter']['id'] == _userMap['id']) {
-            //UPDate here
-            // debugPrint("TIRGGER HERE -->>");
-            _controller.onInit();
-          }
-        },
-      );
-
-      socket.on(
-        "new-message",
-        (data) {
-          debugPrint("DATA FROM MESSAGE >> ${(data)}");
-          Map<String, dynamic> map = jsonDecode(jsonEncode(data));
-          final senderId = map['senderId'];
-          if (senderId != _userMap['id']) {
-            _controller.currentConversation.add(map['message']);
-          }
-
-          _refreshChatList();
-          //Now play sound here
-          AudioPlayer().play(AssetSource('assets/audio/sound2.mp3'));
-        },
       );
     } catch (e) {}
   }
@@ -326,6 +457,12 @@ class _MyAppState extends State<MyApp> {
     _manager = PreferenceManager(context);
     _init();
     _connectSocket();
+  }
+
+  @override
+  void dispose() async {
+    await player.dispose();
+    super.dispose();
   }
 
   // This widget is the root of your application.

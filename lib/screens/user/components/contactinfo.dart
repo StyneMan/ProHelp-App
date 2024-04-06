@@ -14,7 +14,7 @@ import 'package:prohelp_app/screens/account/components/wallet.dart';
 
 typedef void InitCallback(bool value);
 
-class ContactInfoContent extends StatelessWidget {
+class ContactInfoContent extends StatefulWidget {
   var guestData;
   final PreferenceManager manager;
   InitCallback onConnected;
@@ -25,6 +25,12 @@ class ContactInfoContent extends StatelessWidget {
     required this.onConnected,
   }) : super(key: key);
 
+  @override
+  State<ContactInfoContent> createState() => _ContactInfoContentState();
+}
+
+class _ContactInfoContentState extends State<ContactInfoContent> {
+  bool _trigger = false;
   _obscurePhone(String phone) {
     var part1 =
         phone.length > 11 ? phone.substring(0, 6) : phone.substring(0, 4);
@@ -43,17 +49,20 @@ class ContactInfoContent extends StatelessWidget {
     return "xxxxxx@" + secon1 + ".xxx";
   }
 
-  _addConnection() async {
+  _sendConnectionRequest() async {
+    _controller.setLoading(true);
+    Get.back();
+
     Map _payload = {
-      "guestId": "${guestData['id']}",
+      "guestId": "${widget.guestData['id']}",
       "guestName":
-          "${guestData['bio']['firstname']} ${guestData['bio']['lastname']}",
-      "userId": "${manager.getUser()['id']}",
+          "${widget.guestData['bio']['firstname']} ${widget.guestData['bio']['lastname']}",
+      "userId": "${widget.manager.getUser()['id']}",
     };
 
     try {
-      final _resp = await APIService().saveConnection(
-          _payload, manager.getAccessToken(), manager.getUser()['email']);
+      final _resp = await APIService().requestConnection(_payload,
+          widget.manager.getAccessToken(), widget.manager.getUser()['email']);
 
       debugPrint("CONNECTION RESPONSE >> ${_resp.body}");
       _controller.setLoading(false);
@@ -62,12 +71,12 @@ class ContactInfoContent extends StatelessWidget {
         Constants.toast(map['message']);
 
         String userStr = jsonEncode(map['data']);
-        manager.setUserData(userStr);
+        widget.manager.setUserData(userStr);
         _controller.userData.value = map['data'];
-        onConnected(true);
+        // onConnected(true);
         _controller.onInit();
 
-        Get.back();
+        // Get.back();
       }
     } catch (e) {
       _controller.setLoading(false);
@@ -125,7 +134,7 @@ class ContactInfoContent extends StatelessWidget {
                     height: 21.0,
                   ),
                   TextInter(
-                    text: "${_obscurePhone(guestData['bio']['phone'])}",
+                    text: "${_obscurePhone(widget.guestData['bio']['phone'])}",
                     fontSize: 16,
                   ),
                   const SizedBox(
@@ -136,7 +145,7 @@ class ContactInfoContent extends StatelessWidget {
                     height: 10.0,
                   ),
                   TextInter(
-                    text: "${_obscureEmail(guestData['email'])}",
+                    text: "${_obscureEmail(widget.guestData['email'])}",
                     fontSize: 16,
                   ),
                   const SizedBox(
@@ -224,7 +233,7 @@ class ContactInfoContent extends StatelessWidget {
                                           children: [
                                             TextPoppins(
                                               text:
-                                                  "You will be charged 200 coins from your wallet for this connection. \nDo you wish to proceed?",
+                                                  "You will be charged 200 coins from your wallet for this connection request. \nDo you wish to proceed?",
                                               fontSize: 16,
                                             ),
                                             const SizedBox(
@@ -259,7 +268,7 @@ class ContactInfoContent extends StatelessWidget {
                                                     bgColor:
                                                         Constants.primaryColor,
                                                     child: const TextInter(
-                                                      text: "Proceed",
+                                                      text: "Send Request",
                                                       fontSize: 16,
                                                     ),
                                                     borderColor:
@@ -267,8 +276,7 @@ class ContactInfoContent extends StatelessWidget {
                                                     foreColor: Colors.white,
                                                     onPressed: () {
                                                       // Navigator.pop(context);
-                                                      //Now connect user here
-                                                      _addConnection();
+                                                      _sendConnectionRequest();
                                                     },
                                                     variant: "Filled",
                                                   ),
@@ -325,7 +333,8 @@ class ContactInfoContent extends StatelessWidget {
                                                       Navigator.pop(context);
                                                       Get.to(
                                                         MyWallet(
-                                                          manager: manager,
+                                                          manager:
+                                                              widget.manager,
                                                         ),
                                                         transition: Transition
                                                             .cupertino,

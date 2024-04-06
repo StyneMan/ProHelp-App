@@ -4,13 +4,18 @@ import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/jobs/components/job_card.dart';
 
-class AllJobs extends StatelessWidget {
+class AllJobs extends StatefulWidget {
   final PreferenceManager manager;
   AllJobs({
     Key? key,
     required this.manager,
   }) : super(key: key);
 
+  @override
+  State<AllJobs> createState() => _AllJobsState();
+}
+
+class _AllJobsState extends State<AllJobs> {
   final _controller = Get.find<StateController>();
 
   @override
@@ -36,11 +41,15 @@ class AllJobs extends StatelessWidget {
             )
           : ListView.separated(
               shrinkWrap: true,
-              itemBuilder: (context, i) => JobCard(
-                data: _controller.allJobs.value[i],
-                manager: manager,
-                index: i,
-              ),
+              itemBuilder: (context, i) {
+                return _controller.allJobs.value[i]['recruiter'] == null
+                    ? const SizedBox()
+                    : JobCard(
+                        data: _controller.allJobs.value[i],
+                        manager: widget.manager,
+                        index: i,
+                      );
+              },
               separatorBuilder: (context, i) => const SizedBox(
                 height: 16.0,
               ),

@@ -18,7 +18,12 @@ import 'verify_docs.dart';
 
 class Account extends StatelessWidget {
   final PreferenceManager manager;
-  Account({Key? key, required this.manager}) : super(key: key);
+  var stateController;
+  Account({
+    Key? key,
+    required this.manager,
+    required this.stateController,
+  }) : super(key: key);
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _controller = Get.find<StateController>();
@@ -91,7 +96,7 @@ class Account extends StatelessWidget {
           manager: manager,
         ),
       ),
-      body: manager.getUser().isEmpty || _controller.userData.value.isEmpty
+      body: manager.getUser().isEmpty
           ? const SizedBox()
           : ListView(
               padding: const EdgeInsets.all(16.0),
@@ -155,7 +160,7 @@ class Account extends StatelessWidget {
                             width: 32,
                           ),
                           Text(
-                            " ${Constants.formatMoney(_controller.userData.value['wallet']['balance'])} coin${_pluralize(manager.getUser()['wallet']['balance'])}",
+                            " ${Constants.formatMoney(manager.getUser()['wallet']['balance'])} coin${_pluralize(manager.getUser()['wallet']['balance'])}",
                           ),
                         ],
                       ),
@@ -247,7 +252,8 @@ class Account extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 SvgPicture.asset(
-                                    "assets/images/security_icon.svg"),
+                                  "assets/images/security_icon.svg",
+                                ),
                                 const SizedBox(
                                   width: 16.0,
                                 ),
@@ -302,7 +308,8 @@ class Account extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 SvgPicture.asset(
-                                    "assets/images/support_icon.svg"),
+                                  "assets/images/support_icon.svg",
+                                ),
                                 const SizedBox(
                                   width: 16.0,
                                 ),

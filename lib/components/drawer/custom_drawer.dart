@@ -35,6 +35,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   final _controller = Get.find<StateController>();
   bool _isLoggedIn = true;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   _initAuth() {
     // final prefs = await SharedPreferences.getInstance();
@@ -48,6 +49,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           isAction: false,
           widget: Pros(
             manager: widget.manager,
+            stateController: _controller,
           ),
         ),
         DrawerModel(
@@ -56,6 +58,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           isAction: false,
           widget: Jobs(
             manager: widget.manager,
+            stateController: _controller,
           ),
         ),
         DrawerModel(
@@ -64,6 +67,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           isAction: false,
           widget: Messages(
             manager: widget.manager,
+            stateController: _controller,
           ),
         ),
         DrawerModel(
@@ -110,15 +114,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
       _controller.setLoading(false);
 
       if (res.statusCode == 200) {
-        Map<String, dynamic> map = jsonDecode(res.body);
-        Constants.toast(map['message']);
+        // Map<String, dynamic> map = jsonDecode(res.body);
+        Constants.toast("Successfully logged out");
+
         widget.manager.setIsLoggedIn(false);
         widget.manager.clearProfile();
 
-        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+        // final GoogleSignInAccount? googleUser;
 
-        if (googleUser != null) {
-          await GoogleSignIn().signOut();
+        if (_googleSignIn.currentUser != null) {
+          await _googleSignIn.signOut();
         }
 
         Get.offAll(const Welcome());

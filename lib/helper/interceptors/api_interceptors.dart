@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 // import 'package:zema/helper/state/state_controller.dart';
@@ -45,6 +46,28 @@ class MyApiInterceptor implements InterceptorContract {
 
   @override
   Future<ResponseData> interceptResponse({required ResponseData data}) async {
+    print("RESPONSE DATA :: ${data.statusCode}");
+    Map<String, dynamic> _map = jsonDecode('${data.body}');
+    // print("INTERCEPT RE :: ${_map['message']}");
+    try {
+      if (_map['message'] != null) {
+        if (_map['message']!['message'] != null) {
+          if (_map['message']['message'] == "jwt expired") {
+            debugPrint("LOG THIS USER OUT. SESSION EXPIRED!!!");
+            //Clear prefeence
+            final _pref = await SharedPreferences.getInstance();
+            _pref.clear();
+
+            Get.offAll(const Login());
+          }
+        }
+
+        print("NOT EMPTERY OOHH");
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+
     if (data.statusCode == 401 || data.statusCode == 403) {
       debugPrint("LOG THIS USER OUT. SESSION EXPIRED!!!");
       //Clear prefeence

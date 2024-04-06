@@ -44,7 +44,7 @@ class _NewExperienceFormState extends State<NewExperienceForm> {
 
   String _selectedState = "Abia";
   String _selectedWorkType = "Full-time";
-  String _selectedCountry = "Afghanistan";
+  String _selectedCountry = "Nigeria";
 
   final double _kItemExtent = 32.0;
   bool _stillHere = false;
@@ -401,14 +401,14 @@ class _NewExperienceFormState extends State<NewExperienceForm> {
                           });
                         },
                       ),
-                      const SizedBox(
-                        height: 16.0,
-                      ),
-                      CustomAutoComplete(
-                        data: countries,
-                        onItemSelected: _onCountrySelected,
-                        hintText: "Country",
-                      ),
+                      // const SizedBox(
+                      //   height: 16.0,
+                      // ),
+                      // CustomAutoComplete(
+                      //   data: countries,
+                      //   onItemSelected: _onCountrySelected,
+                      //   hintText: "Country",
+                      // ),
                       const SizedBox(
                         height: 24.0,
                       ),
@@ -443,9 +443,8 @@ class _NewExperienceFormState extends State<NewExperienceForm> {
       if (_controller.croppedPic.value.isNotEmpty) {
         //Now upload to Firebase Storage first
         final storageRef = FirebaseStorage.instance.ref();
-        final fileRef = storageRef
-            .child("experience")
-            .child("${widget.manager.getUser()['email']}_${_companyController.text.toLowerCase()}");
+        final fileRef = storageRef.child("experience").child(
+            "${widget.manager.getUser()['email']}_${_companyController.text.toLowerCase()}");
         final _resp = await fileRef.putFile(File(_controller.croppedPic.value));
         final url = await _resp.ref.getDownloadURL();
 
@@ -458,7 +457,7 @@ class _NewExperienceFormState extends State<NewExperienceForm> {
               "role": _roleController.text.toLowerCase(),
               "region": _selectedState.toLowerCase(),
               "startDate": _startDateController.text,
-              "country": _selectedCountry.toLowerCase(),
+              "country": "nigeria",
               "companyLogo": url,
               "endate": _stillHere ? " " : _endDateController.text,
               "stillHere": _stillHere,

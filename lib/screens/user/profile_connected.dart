@@ -1,15 +1,16 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:loading_overlay_pro/loading_overlay_pro.dart';
 import 'package:prohelp_app/components/button/custombutton.dart';
 import 'package:prohelp_app/components/dialog/info_dialog.dart';
 import 'package:prohelp_app/components/drawer/custom_drawer.dart';
-import 'package:prohelp_app/components/shimmer/banner_shimmer.dart';
-import 'package:prohelp_app/components/shimmer/pros_shimmer.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
@@ -19,7 +20,6 @@ import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/connections/connection.dart';
 import 'package:prohelp_app/screens/reviews/reviews.dart';
 import 'package:prohelp_app/screens/connections/manage_connections.dart';
-import 'package:http/http.dart' as http;
 
 import 'components/block_report.dart';
 import 'components/conectedinfo.dart';
@@ -28,34 +28,38 @@ import 'components/guest_education_section.dart';
 import 'components/guest_experience_section.dart';
 import 'components/verifications.dart';
 
-class UserProfile2 extends StatefulWidget {
+class UserProfileConnected extends StatefulWidget {
   final PreferenceManager manager;
-  final String userId, name, image, email;
-
-  UserProfile2({
+  final bool triggerHire;
+  var data;
+  UserProfileConnected({
     Key? key,
     required this.manager,
-    required this.name,
-    required this.image,
-    required this.email,
-    required this.userId,
+    required this.data,
+    required this.triggerHire,
   }) : super(key: key);
 
   @override
-  State<UserProfile2> createState() => _UserProfile2State();
+  State<UserProfileConnected> createState() => _UserProfileConnectedState();
 }
 
-class _UserProfile2State extends State<UserProfile2> {
+class _UserProfileConnectedState extends State<UserProfileConnected> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _controller = Get.find<StateController>();
 
   bool _isLiked = false;
   bool _isConnected = false;
+  bool _isConnectionRequestSent = false;
+  bool _iBlockedUser = false;
+  bool _userBlockedMe = false;
+
+  String _professionBanner = "";
+  var _connectionCount = 0;
 
   _likeUser() async {
     _controller.setLoading(true);
     Map _payload = {
-      "userId": widget.userId,
+      "userId": "${widget.data['_id']}",
     };
     try {
       final resp = await APIService().likeUser(_payload,
@@ -86,26 +90,30 @@ class _UserProfile2State extends State<UserProfile2> {
 
   _checkLiked() {
     for (var element in widget.manager.getUser()['savedPros']) {
-      if (element == widget.userId) {
+      if (element.toString() == (widget.data['_id'] ?? widget.data['id'])) {
         setState(() {
           _isLiked = true;
-        });
-      } else {
-        setState(() {
-          _isLiked = false;
         });
       }
     }
   }
 
   _checkConnection() {
-    for (var element in widget.manager.getUser()['connections']) {
-      if (element == widget.userId) {
+    for (var element in widget.manager.getUser()['pendingSentConnect']) {
+      if (element == widget.data['_id']) {
         setState(() {
-          _isConnected = true;
+          _isConnectionRequestSent = true;
         });
       }
     }
+
+    // for (var element in widget.manager.getUser()['pendingSentConnect']) {
+    //   if (element == widget.data['id']) {
+    //     setState(() {
+    //       _isConnectionRequestSent = true;
+    //     });
+    //   }
+    // }
   }
 
   _checkOnlineStatus() {
@@ -119,95 +127,297 @@ class _UserProfile2State extends State<UserProfile2> {
     });
   }
 
+  _setBanner() {
+    if (_controller.allProfessions.value.isNotEmpty) {
+      var pro = _controller.allProfessions.value.where((item) =>
+          item['name'].toLowerCase() ==
+          widget.data['profession']?.toLowerCase());
+      try {
+        if (mounted) {
+          setState(() {
+            _professionBanner = "${pro.first['image']}";
+          });
+        }
+      } catch (e) {
+        print("$e");
+      }
+    }
+  }
+
+  _connectionState() {
+    // Connection Declined
+    final socket = SocketManager().socket;
+
+    socket.on("connection-declined", (data) async {
+      Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+      // Constants.toast("CONNECTION DECLINED!!!");
+
+      print("CONNECTION DECLINED USER :::  $map['user']['email']");
+      print("CONNECTION DECLINED DECLINEDBY :::  $map['declinedBy']['email']");
+      final userId = map['user']['id'].toString();
+      final otherUserId = map['declinedBy']['id'].toString();
+      if (userId == widget.manager.getUser()['id']) {
+        print('THEY DECLINED MY REQUEST OH USER');
+        setState(() {
+          _isConnectionRequestSent = false;
+        });
+      } else {
+        print('ME THE USER');
+      }
+    });
+
+    socket.on(
+      "connection-accepted",
+      (data) {
+        Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+        // Constants.toast("CONNECTION DECLINED!!!");
+
+        print("CONNECTION ACCEPTED :::  $map['user']['email']");
+        print("CONNECTION ACCEPTEDBY :::  $map['acceptedBy']['email']");
+        final userId = map['user']['id'].toString();
+        final acceptingUserId = map['acceptedBy']['id'].toString();
+        if (userId == widget.manager.getUser()['id']) {
+          print('THEY ACCEPTED MY REQUEST!!');
+          setState(() {
+            _isConnected = true;
+            _isConnectionRequestSent = false;
+          });
+        } else {
+          print('ME THE USER');
+        }
+        _controller.onInit();
+      },
+    );
+
+    socket.on(
+      "connection-cancelled",
+      (data) {
+        _controller.onInit();
+      },
+    );
+
+    socket.on(
+      "connection-requested",
+      (data) async {
+        print("CONNECTION REQUESTED $data");
+        Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+        final requestedBy = map['requestBy']['id'].toString();
+        if (requestedBy != widget.manager.getUser()['id']) {
+          Constants.toast('REQUEST SENT BBY ME');
+          setState(() {
+            _isConnectionRequestSent = true;
+          });
+        } else {
+          Constants.toast("BY ANOTHER REQUESTED!!!");
+        }
+
+        _controller.onInit();
+      },
+    );
+
+    socket.on("user-blocked", (data) {
+      print("BLOCKED USER DATA :: ${data}");
+
+      Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+      final blockedBy = map['blockedBy']['id'].toString();
+      if (blockedBy != widget.manager.getUser()['id']) {
+        Constants.toast('USER JUST BLOCKED ME');
+        if (mounted) {
+          setState(() {
+            _userBlockedMe = true;
+          });
+        }
+      } else {
+        Constants.toast("I JUST BLOCKED THIS GUY!");
+        if (mounted) {
+          setState(() {
+            _iBlockedUser = true;
+          });
+        }
+      }
+    });
+
+    socket.on("user-unblocked", (data) {
+      print("UNBLOCKED USER DATA :: ${data}");
+
+      Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+      final unblockedBy = map['unblockedBy']['id'].toString();
+      if (unblockedBy != widget.manager.getUser()['id']) {
+        Constants.toast('USER JUST UNBLOCKED ME');
+        if (mounted) {
+          setState(() {
+            _userBlockedMe = false;
+          });
+        }
+      } else {
+        Constants.toast("I JUST UNBLOCKED THIS GUY!");
+        if (mounted) {
+          setState(() {
+            _iBlockedUser = false;
+          });
+        }
+      }
+    });
+  }
+
   @override
   void initState() {
-    super.initState();
-    _checkLiked();
-    _checkConnection();
     _checkOnlineStatus();
+    super.initState();
+    _setBanner();
+    _checkConnection();
+    _checkLiked();
+
+    print("CURENT USE  :: ${jsonEncode(widget.data)} ");
+
+    _connectionState();
+
+    APIService()
+        .getUserConnectionsStreamed(
+      accessToken: widget.manager.getAccessToken(),
+      email: widget.data['email'],
+    )
+        .listen((event) {
+      Map<String, dynamic> map = jsonDecode(event.body);
+      print("CONNECTIONS STREAM LISTENER ::: ${jsonEncode(map)}");
+      setState(() {
+        _connectionCount = 0;
+      });
+      if (mounted) {
+        setState(() {
+          _connectionCount = map['totalDocs'] ?? 0;
+        });
+      }
+
+      for (var element in map['docs']) {
+        if ((element['user']['_id'] == widget.data['_id'] &&
+                element['guest']['_id'] == widget.manager.getUser()['id']) ||
+            (element['user']['_id'] == widget.manager.getUser()['id'] &&
+                element['guest']['_id'] == widget.data['_id'])) {
+          setState(() {
+            _isConnected = true;
+          });
+        }
+      }
+    });
+
+    APIService()
+        .getProfileStreamed(
+      accessToken: widget.manager.getAccessToken(),
+      email: widget.data['email'],
+    )
+        .listen((event) {
+      Map<String, dynamic> map = jsonDecode(event.body);
+      print("PROFILE STREAM LISTENER ::: ${jsonEncode(map)}");
+      final _userData = map['data'];
+
+      for (var element in _userData['blockedUsers']) {
+        if ((element == widget.manager.getUser()['id'])) {
+          Constants.toast("THIS USER BLCOKED ME OH!!");
+          setState(() {
+            _userBlockedMe = true;
+          });
+        }
+      }
+    });
+
+    // For CURRENT LOGGED IN USER ::
+    APIService()
+        .getProfileStreamed(
+      accessToken: widget.manager.getAccessToken(),
+      email: widget.manager.getUser()['email'],
+    )
+        .listen((event) {
+      Map<String, dynamic> map = jsonDecode(event.body);
+      print("PROFILE STREAM LISTENER ::: ${jsonEncode(map)}");
+      final _userData = map['data'];
+
+      for (var element in _userData['blockedUsers']) {
+        if ((element == (widget.data['id'] ?? widget.data['_id']))) {
+          Constants.toast("I BLOCKED THIS USER OH!!");
+          setState(() {
+            _iBlockedUser = true;
+          });
+        }
+      }
+    });
+
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (widget.triggerHire) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            return SizedBox(
+              height: 200,
+              width: MediaQuery.of(context).size.width * 0.98,
+              child: InfoDialog(
+                body: _isConnected
+                    ? ConnectedInfoContent(
+                        manager: widget.manager,
+                        guestData: widget.data,
+                      )
+                    : ContactInfoContent(
+                        manager: widget.manager,
+                        guestData: widget.data,
+                        onConnected: _onConnected,
+                      ),
+              ),
+            );
+          },
+        );
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  _unblockUser() async {
+    _controller.setLoading(true);
+    Get.back();
+    try {
+      Map _payload = {
+        "userId": widget.data['_id'],
+      };
+
+      final _resp = await APIService().unblockUser(
+        accessToken: widget.manager.getAccessToken(),
+        email: widget.manager.getUser()['email'],
+        payload: _payload,
+      );
+
+      print("UNBLOCKED RESPONSE ::: :: ${_resp.body}");
+
+      _controller.setLoading(false);
+
+      if (_resp.statusCode == 200) {
+        Map<String, dynamic> map = jsonDecode(_resp.body);
+        Constants.toast(map['message']);
+      }
+    } catch (e) {
+      _controller.setLoading(false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      endDrawer: CustomDrawer(
-        manager: widget.manager,
-      ),
-      body: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          FutureBuilder<http.Response>(
-            future: APIService().getProfile(
-              widget.manager.getAccessToken(),
-              widget.email,
-            ),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return ListView(
-                  children: const [
-                    SizedBox(
-                      width: double.infinity,
-                      height: 200,
-                      child: BannerShimmer(),
-                    ),
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    ProsShimmer(),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 156,
-                      child: BannerShimmer(),
-                    ),
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 150,
-                      child: BannerShimmer(),
-                    ),
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 144,
-                      child: BannerShimmer(),
-                    ),
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                  ],
-                );
-              }
-
-              if (!snapshot.hasData) {
-                return const Center(
-                  child: TextInter(
-                    text: "No user record found",
-                    fontSize: 16,
-                  ),
-                );
-              }
-
-              if (snapshot.hasError) {
-                return const Center(
-                  child: TextInter(
-                    text:
-                        "An error occured. Check your internet connection and try again!",
-                    fontSize: 16,
-                  ),
-                );
-              }
-
-              final data = snapshot.data;
-              Map<String, dynamic> map = jsonDecode(data!.body);
-
-              debugPrint("PROFILES >> ${data.body}");
-
-              return ListView(
+    return GetBuilder<StateController>(builder: (controller) {
+      return LoadingOverlayPro(
+        isLoading: controller.isLoading.value,
+        backgroundColor: Colors.black54,
+        progressIndicator: const CircularProgressIndicator.adaptive(),
+        child: Scaffold(
+          key: _scaffoldKey,
+          endDrawer: CustomDrawer(
+            manager: widget.manager,
+          ),
+          body: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              ListView(
                 children: [
                   Stack(
                     clipBehavior: Clip.none,
@@ -216,7 +426,7 @@ class _UserProfile2State extends State<UserProfile2> {
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height * 0.25,
                         child: Image.asset(
-                          "assets/images/profile_bg.png",
+                          'assets/images/recruiter_prohelp.webp',
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -264,17 +474,19 @@ class _UserProfile2State extends State<UserProfile2> {
                                   width: 1.0,
                                 ),
                               ),
-                              child: Image.network(
-                                widget.image,
-                                fit: BoxFit.cover,
-                                width: Constants.avatarRadius + 48,
-                                height: Constants.avatarRadius + 48,
-                                errorBuilder: (context, error, stackTrace) =>
+                              child: CachedNetworkImage(
+                                imageUrl: widget.data['bio']['image'],
+                                placeholder: (context, url) =>
+                                    const CircularProgressIndicator(),
+                                errorWidget: (context, url, error) =>
                                     SvgPicture.asset(
                                   "assets/images/personal_icon.svg",
                                   width: Constants.avatarRadius + 40,
                                   height: Constants.avatarRadius + 40,
                                 ),
+                                fit: BoxFit.cover,
+                                width: Constants.avatarRadius + 48,
+                                height: Constants.avatarRadius + 48,
                               ),
                             ),
                           ),
@@ -297,7 +509,7 @@ class _UserProfile2State extends State<UserProfile2> {
                                 height: 18,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(9),
-                                  color: !map['isVerified']
+                                  color: !widget.data['isVerified']
                                       ? Constants.golden
                                       : Colors.green,
                                 ),
@@ -310,9 +522,7 @@ class _UserProfile2State extends State<UserProfile2> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0,
-                      vertical: 2.0,
-                    ),
+                        horizontal: 8.0, vertical: 2.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -332,15 +542,15 @@ class _UserProfile2State extends State<UserProfile2> {
                                     MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  !map['isVerified']
+                                  !widget.data['isVerified']
                                       ? TextPoppins(
-                                          text: "Not verified",
+                                          text: " Not verified",
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
                                           color: Constants.golden,
                                         )
                                       : TextPoppins(
-                                          text: "Verified",
+                                          text: " Verified",
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
                                           color: Colors.green,
@@ -363,78 +573,36 @@ class _UserProfile2State extends State<UserProfile2> {
                                   ),
                                 ],
                               ),
-
-                              // SizedBox(
-                              //   width: MediaQuery.of(context).size.width * 0.6,
-                              //   child: TextPoppins(
-                              //     text: "${map['bio']['about']}".length > 50
-                              //         ? "${map['bio']['about']}"
-                              //                 .substring(0, 50) +
-                              //             "..."
-                              //         : "${map['bio']['about']}",
-                              //     fontSize: 11,
-                              //   ),
-                              // ),
-                              // Row(
-                              //   mainAxisAlignment: MainAxisAlignment.start,
-                              //   crossAxisAlignment: CrossAxisAlignment.center,
-                              //   children: [
-                              //     RatingBar.builder(
-                              //       initialRating: 4, //map.rating,
-                              //       minRating: 1,
-                              //       direction: Axis.horizontal,
-                              //       allowHalfRating: true,
-                              //       ignoreGestures: true,
-                              //       itemCount: 5,
-                              //       itemSize: 21,
-                              //       itemPadding: const EdgeInsets.symmetric(
-                              //           horizontal: 0.0),
-                              //       itemBuilder: (context, _) => const Icon(
-                              //         Icons.star,
-                              //         size: 18,
-                              //         color: Colors.amber,
-                              //       ),
-                              //       onRatingUpdate: (rating) {
-                              //         debugPrint("$rating");
-                              //       },
-                              //     ),
-                              //     const SizedBox(
-                              //       width: 4.0,
-                              //     ),
-                              //     TextPoppins(
-                              //       text: "(${map['reviews']?.length} reviews)",
-                              //       fontSize: 12,
-                              //     ),
-                              //   ],
-                              // ),
                             ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 21.0),
+                  const SizedBox(
+                    height: 21.0,
+                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 1.0,
-                    ),
+                        horizontal: 16.0, vertical: 1.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         TextPoppins(
                           text:
-                              "${map['data']['bio']['firstname']} ${map['data']['bio']['middlename']} ${map['data']['bio']['lastname']}"
+                              "${widget.data['bio']['firstname']} ${widget.data['bio']['middlename']} ${widget.data['bio']['lastname']}"
                                   .capitalize,
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                         ),
-                        TextPoppins(
-                          text: "${map['data']['profession']}".capitalize,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                        ),
+                        widget.data['accountType'] != "recruiter"
+                            ? TextPoppins(
+                                text: "${widget.data['profession']}".capitalize,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                              )
+                            : const SizedBox(),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -445,11 +613,11 @@ class _UserProfile2State extends State<UserProfile2> {
                               children: [
                                 RatingBar.builder(
                                   initialRating:
-                                      "${map['data']['rating']}".contains(".")
-                                          ? map['data']['rating']
-                                          : (map['data']['rating'] ?? 0)
+                                      "${widget.data['rating']}".contains(".")
+                                          ? widget.data['rating']
+                                          : (widget.data['rating'] ?? 1)
                                                   .toDouble() ??
-                                              0.0, //map['data'].rating,
+                                              0.0, //widget.data.rating,
                                   minRating: 1,
                                   direction: Axis.horizontal,
                                   allowHalfRating: true,
@@ -472,7 +640,7 @@ class _UserProfile2State extends State<UserProfile2> {
                                 ),
                                 TextPoppins(
                                   text:
-                                      "(${map['data']['reviews']?.length} reviews)",
+                                      "(${widget.data['reviews']?.length ?? 0} reviews)",
                                   fontSize: 12,
                                 ),
                               ],
@@ -485,7 +653,7 @@ class _UserProfile2State extends State<UserProfile2> {
                                 Get.to(
                                   ViewReviews(
                                     manager: widget.manager,
-                                    data: map['data'],
+                                    data: widget.data,
                                   ),
                                   transition: Transition.cupertino,
                                 );
@@ -499,14 +667,15 @@ class _UserProfile2State extends State<UserProfile2> {
                             )
                           ],
                         ),
-                        map['data']['accountType'] == "recruiter"
+                        widget.data['accountType'] == "recruiter" &&
+                                !_isConnected
                             ? const SizedBox()
                             : Wrap(
                                 crossAxisAlignment: WrapCrossAlignment.center,
                                 children: [
                                   TextPoppins(
                                     text:
-                                        "${map['data']['address']['state']}, ${map['data']['address']['country']}"
+                                        "${widget.data['address']['state']}, ${widget.data['address']['country']}"
                                             .capitalize,
                                     fontSize: 13,
                                     color: Colors.black54,
@@ -519,7 +688,7 @@ class _UserProfile2State extends State<UserProfile2> {
                                   ),
                                   TextPoppins(
                                     text:
-                                        " ${map['data']['connections']?.length} Connections",
+                                        "$_connectionCount ${_connectionCount > 1 ? "Connections " : "Connection"}",
                                     fontSize: 13,
                                     fontWeight: FontWeight.w500,
                                     color: Constants.primaryColor,
@@ -527,28 +696,31 @@ class _UserProfile2State extends State<UserProfile2> {
                                   const SizedBox(
                                     width: 6.0,
                                   ),
-                                  InkWell(
-                                    onTap: () {
-                                      Get.to(
-                                        Connection(
-                                          caller: "guest",
-                                          data: map['data'],
-                                          manager: widget.manager,
-                                        ),
-                                        transition: Transition.cupertino,
-                                      );
-                                    },
-                                    child: const Text(
-                                      "See more",
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        decoration: TextDecoration.underline,
-                                        fontStyle: FontStyle.italic,
-                                        fontWeight: FontWeight.w500,
-                                        color: Constants.primaryColor,
-                                      ),
-                                    ),
-                                  )
+                                  2 > 1
+                                      ? const SizedBox()
+                                      : InkWell(
+                                          onTap: () {
+                                            Get.to(
+                                              Connection(
+                                                caller: "guest",
+                                                data: widget.data,
+                                                manager: widget.manager,
+                                              ),
+                                              transition: Transition.cupertino,
+                                            );
+                                          },
+                                          child: const Text(
+                                            "See more",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              decoration:
+                                                  TextDecoration.underline,
+                                              fontStyle: FontStyle.italic,
+                                              fontWeight: FontWeight.w500,
+                                              color: Constants.primaryColor,
+                                            ),
+                                          ),
+                                        )
                                 ],
                               ),
                         const SizedBox(
@@ -561,11 +733,11 @@ class _UserProfile2State extends State<UserProfile2> {
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             for (var e = 0;
-                                e < map['data']['skills']?.length;
+                                e < widget.data['skills']?.length;
                                 e++)
                               Chip(
                                 label: TextPoppins(
-                                  text: map['data']['skills'][e]['name'],
+                                  text: widget.data['skills'][e]['name'],
                                   fontSize: 12,
                                 ),
                               ),
@@ -584,22 +756,20 @@ class _UserProfile2State extends State<UserProfile2> {
                                 child: CustomButton(
                                   borderRadius: 36.0,
                                   paddingY: 1.0,
-                                  bgColor: Constants.primaryColor,
+                                  bgColor: _userBlockedMe || _iBlockedUser
+                                      ? Constants.accentColor
+                                      : Constants.primaryColor,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
-                                      const Icon(
-                                        Icons.visibility,
-                                        size: 13,
-                                        color: Colors.white,
-                                      ),
-                                      const SizedBox(
-                                        width: 2.0,
-                                      ),
                                       TextPoppins(
-                                        text: "Contact Info",
+                                        text: _isConnectionRequestSent
+                                            ? "Request Sent"
+                                            : _isConnected
+                                                ? "Contact Info"
+                                                : "Connect",
                                         fontSize: 11,
                                         color: Colors.white,
                                       )
@@ -607,39 +777,72 @@ class _UserProfile2State extends State<UserProfile2> {
                                   ),
                                   borderColor: Colors.transparent,
                                   foreColor: Colors.white,
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      barrierDismissible: false,
-                                      builder: (context) {
-                                        return SizedBox(
-                                          height: 200,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.98,
-                                          child: InfoDialog(
-                                            body: _isConnected
-                                                ? ConnectedInfoContent(
-                                                    manager: widget.manager,
-                                                    guestData: map['data'],
-                                                  )
-                                                : ContactInfoContent(
-                                                    manager: widget.manager,
-                                                    guestData: map['data'],
-                                                    onConnected: _onConnected,
-                                                  ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
+                                  onPressed: _isConnectionRequestSent ||
+                                          _userBlockedMe ||
+                                          _iBlockedUser
+                                      ? null
+                                      : () {
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (context) {
+                                              return SizedBox(
+                                                height: 200,
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.98,
+                                                child: InfoDialog(
+                                                  body: _isConnected
+                                                      ? ConnectedInfoContent(
+                                                          manager:
+                                                              widget.manager,
+                                                          guestData:
+                                                              widget.data,
+                                                        )
+                                                      : ContactInfoContent(
+                                                          manager:
+                                                              widget.manager,
+                                                          guestData:
+                                                              widget.data,
+                                                          onConnected:
+                                                              _onConnected,
+                                                        ),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
                                   variant: "Filled",
                                 ),
                               ),
                               const SizedBox(
-                                width: 3.0,
+                                width: 2.0,
                               ),
+                              _isConnectionRequestSent
+                                  ? Expanded(
+                                      child: CustomButton(
+                                        borderRadius: 36.0,
+                                        paddingY: 1.0,
+                                        bgColor: Constants.primaryColor,
+                                        child: TextPoppins(
+                                          text: "Cancel Request",
+                                          fontSize: 11,
+                                          align: TextAlign.center,
+                                          color: Colors.white,
+                                        ),
+                                        borderColor: Colors.transparent,
+                                        foreColor: Colors.white,
+                                        onPressed: () {},
+                                        variant: "Filled",
+                                      ),
+                                    )
+                                  : const SizedBox(),
+                              _isConnectionRequestSent
+                                  ? const SizedBox(
+                                      width: 3.0,
+                                    )
+                                  : const SizedBox(),
                               !_isConnected
                                   ? const SizedBox()
                                   : Expanded(
@@ -653,42 +856,64 @@ class _UserProfile2State extends State<UserProfile2> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            const Icon(
-                                              Icons.flag,
+                                            Icon(
+                                              _userBlockedMe
+                                                  ? Icons.block
+                                                  : Icons.flag,
                                               size: 14,
                                             ),
                                             const SizedBox(
                                               width: 5.0,
                                             ),
                                             TextPoppins(
-                                              text: "Report/Block",
+                                              text: _iBlockedUser
+                                                  ? "unBlock"
+                                                  : _userBlockedMe
+                                                      ? "Blocked"
+                                                      : "Block",
                                               fontSize: 11,
                                             )
                                           ],
                                         ),
                                         borderColor: Colors.transparent,
                                         foreColor: Colors.black,
-                                        onPressed: () {
-                                          showDialog(
-                                            context: context,
-                                            barrierDismissible: false,
-                                            builder: (context) {
-                                              return SizedBox(
-                                                height: 200,
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.98,
-                                                child: InfoDialog(
-                                                  body: BlockReport(
-                                                    data: map['data'],
-                                                    manager: widget.manager,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        },
+                                        onPressed: _userBlockedMe
+                                            ? null
+                                            : _iBlockedUser
+                                                ? () {
+                                                    // Unblock user here
+                                                    Constants.showConfirmDialog(
+                                                      context: context,
+                                                      message:
+                                                          "Are you sure you want to unblock ${widget.data['bio']['firstname'].toString().capitalize} ${widget.data['bio']['lastname'].toString().capitalize}? ",
+                                                      onPressed: () {
+                                                        _unblockUser();
+                                                      },
+                                                    );
+                                                  }
+                                                : () {
+                                                    showDialog(
+                                                      context: context,
+                                                      barrierDismissible: false,
+                                                      builder: (context) {
+                                                        return SizedBox(
+                                                          height: 200,
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              0.98,
+                                                          child: InfoDialog(
+                                                            body: BlockReport(
+                                                              data: widget.data,
+                                                              manager: widget
+                                                                  .manager,
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    );
+                                                  },
                                         variant: "Filled",
                                       ),
                                     ),
@@ -706,7 +931,7 @@ class _UserProfile2State extends State<UserProfile2> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       Icon(
-                                        map['data']['accountType'] ==
+                                        widget.data['accountType'] ==
                                                 "recruiter"
                                             ? CupertinoIcons.person_3_fill
                                             : Icons.edit_document,
@@ -717,7 +942,7 @@ class _UserProfile2State extends State<UserProfile2> {
                                         width: 5.0,
                                       ),
                                       TextPoppins(
-                                        text: map['data']['accountType'] ==
+                                        text: widget.data['accountType'] ==
                                                 "recruiter"
                                             ? "Connects"
                                             : "Docs",
@@ -727,14 +952,14 @@ class _UserProfile2State extends State<UserProfile2> {
                                   ),
                                   borderColor: Colors.transparent,
                                   foreColor: Colors.white,
-                                  onPressed: map['data']['accountType'] ==
+                                  onPressed: widget.data['accountType'] ==
                                           "recruiter"
                                       ? () {
                                           Get.to(
                                             Connection(
                                               caller: "guest",
                                               manager: widget.manager,
-                                              data: map['data'],
+                                              data: widget.data,
                                             ),
                                             transition: Transition.cupertino,
                                           );
@@ -752,8 +977,8 @@ class _UserProfile2State extends State<UserProfile2> {
                                                     0.98,
                                                 child: InfoDialog(
                                                   body: VerificationsContent(
-                                                    documents: map['data']
-                                                        ['documents'],
+                                                    documents: widget
+                                                        .data['documents'],
                                                   ),
                                                 ),
                                               );
@@ -769,7 +994,7 @@ class _UserProfile2State extends State<UserProfile2> {
                         const SizedBox(
                           height: 16.0,
                         ),
-                        map['data']['accountType'] == "recruiter"
+                        widget.data['accountType'] == "recruiter"
                             ? const SizedBox()
                             : Container(
                                 width: double.infinity,
@@ -795,32 +1020,31 @@ class _UserProfile2State extends State<UserProfile2> {
                                       height: 4.0,
                                     ),
                                     TextPoppins(
-                                      text: map['data']['bio']['about'],
+                                      text: widget.data['bio']['about'],
                                       fontSize: 12,
                                     ),
                                   ],
                                 ),
                               ),
-                        map['data']['accountType'].toString().toLowerCase() ==
+                        widget.data['accountType'].toString().toLowerCase() ==
                                 "recruiter"
                             ? const SizedBox()
                             : const SizedBox(
                                 height: 16.0,
                               ),
-                        map['data']['accountType'].toString().toLowerCase() ==
+                        widget.data['accountType'].toString().toLowerCase() ==
                                 "recruiter"
                             ? const SizedBox()
                             : GuestExperienceSection(
-                                data: map['data']['experience'],
+                                data: widget.data['experience'],
                               ),
                         const SizedBox(
                           height: 16.0,
                         ),
-                        map['data']['accountType'] == "recruiter"
+                        widget.data['accountType'] == "recruiter"
                             ? const SizedBox()
                             : GuestEducationSection(
-                                data: map['data']['education'],
-                              ),
+                                data: widget.data['education']),
                         const SizedBox(
                           height: 36.0,
                         ),
@@ -828,46 +1052,43 @@ class _UserProfile2State extends State<UserProfile2> {
                     ),
                   ),
                 ],
-              );
-            },
+              ),
+              Positioned(
+                top: 36,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      icon: const Icon(
+                        CupertinoIcons.arrow_left_circle,
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        if (!_scaffoldKey.currentState!.isEndDrawerOpen) {
+                          _scaffoldKey.currentState?.openEndDrawer();
+                          // Scaffold.of(context).openEndDrawer();
+                        }
+                      },
+                      icon: SvgPicture.asset(
+                        'assets/images/menu_icon.svg',
+                        color: Constants.secondaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
           ),
-          Positioned(
-            top: 48,
-            left: 0,
-            right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: const Icon(
-                    CupertinoIcons.arrow_left_circle,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(
-                  width: 16.0,
-                ),
-                IconButton(
-                  onPressed: () {
-                    if (!_scaffoldKey.currentState!.isEndDrawerOpen) {
-                      _scaffoldKey.currentState?.openEndDrawer();
-                      // Scaffold.of(context).openEndDrawer();
-                    }
-                  },
-                  icon: SvgPicture.asset(
-                    'assets/images/menu_icon.svg',
-                    color: Constants.secondaryColor,
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
+        ),
+      );
+    });
   }
 }

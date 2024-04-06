@@ -12,14 +12,16 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
 import 'package:prohelp_app/components/drawer/custom_drawer.dart';
 import 'package:prohelp_app/components/inputfield/customdropdown.dart';
+import 'package:prohelp_app/components/inputfield/lineddropdown2.dart';
+import 'package:prohelp_app/components/inputfield/llinedtextfield.dart';
+import 'package:prohelp_app/components/inputfield/state_lineddropdown.dart';
 import 'package:prohelp_app/components/picker/img_picker.dart';
 import 'package:prohelp_app/components/text_components.dart';
-import 'package:prohelp_app/forms/account/change_password.dart';
+import 'package:prohelp_app/data/state/statesAndCities.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class VerifyDocs extends StatefulWidget {
   final PreferenceManager manager;
@@ -38,6 +40,19 @@ class _VerifyDocsState extends State<VerifyDocs> {
   bool _isFrontSelected = false, _isFrontErr = false;
   bool _isBackSelected = false, _isBackErr = false;
   String _idType = "";
+  bool _shouldEdit = false;
+
+  final _companyController = TextEditingController();
+  final _roleController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _countryController = TextEditingController();
+  final _phoneController = TextEditingController();
+
+  String _selectedCity = "";
+  String _selectedState = "";
+  String _selectedCountry = "Nigeria";
+
+  List<String> _cities = [];
 
   var _croppedFile1;
   var _croppedFile2;
@@ -65,6 +80,36 @@ class _VerifyDocsState extends State<VerifyDocs> {
   _onTypeSelected(var value) {
     setState(() {
       _idType = value;
+    });
+  }
+
+  _onCitySelected(val) {
+    setState(() {
+      _selectedCity = val;
+      _shouldEdit = true;
+    });
+  }
+
+  _onStateSelected(val) {
+    setState(() {
+      _shouldEdit = true;
+    });
+
+    setState(() {
+      _cities = [];
+    });
+    _onCitySelected("Select city");
+    _selectedState = val;
+    var selector = stateCities.where((element) => element['state'] == val);
+    setState(() {
+      _cities = selector.first['cities'] as List<String>;
+    });
+  }
+
+  _onCountrySelected(val) {
+    setState(() {
+      _selectedCountry = val;
+      _shouldEdit = true;
     });
   }
 
@@ -257,161 +302,187 @@ class _VerifyDocsState extends State<VerifyDocs> {
               const SizedBox(
                 height: 8.0,
               ),
-              TextPoppins(
-                text: "Front view",
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-              SizedBox(
-                height: 210,
-                child: TextButton(
-                  onPressed: () {
-                    showBarModalBottomSheet(
-                      expand: false,
-                      context: context,
-                      topControl: ClipOval(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(
-                                16,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextPoppins(
+                          text: "Front view",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        SizedBox(
+                          height: 175,
+                          child: TextButton(
+                            onPressed: () {
+                              showBarModalBottomSheet(
+                                expand: false,
+                                context: context,
+                                topControl: ClipOval(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Container(
+                                      width: 32,
+                                      height: 32,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(
+                                          16,
+                                        ),
+                                      ),
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.close,
+                                          size: 24,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                backgroundColor: Colors.white,
+                                builder: (context) => SizedBox(
+                                  height: 175,
+                                  child: ImgPicker(
+                                    onCropped: _onFrontSelected,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: _isFrontSelected
+                                ? Image.file(
+                                    File(_croppedFile1),
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            Image.asset(
+                                      "assets/images/placeholder.png",
+                                      fit: BoxFit.cover,
+                                    ),
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.network(
+                                    widget.manager.getUser()['bio']['idcard'] ==
+                                            null
+                                        ? ""
+                                        : "${widget.manager.getUser()['bio']['idcard']['frontview']}",
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            Image.asset(
+                                      "assets/images/placeholder.png",
+                                      fit: BoxFit.cover,
+                                    ),
+                                    fit: BoxFit.cover,
+                                  ),
+                            style: TextButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                side: BorderSide(
+                                  color: _isFrontErr ? Colors.red : Colors.grey,
+                                  width: 1.0,
+                                ),
                               ),
                             ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.close,
-                                size: 24,
-                              ),
-                            ),
                           ),
                         ),
-                      ),
-                      backgroundColor: Colors.white,
-                      builder: (context) => SizedBox(
-                        height: 175,
-                        child: ImgPicker(
-                          onCropped: _onFrontSelected,
-                        ),
-                      ),
-                    );
-                  },
-                  child: _isFrontSelected
-                      ? Image.file(
-                          File(_croppedFile1),
-                          errorBuilder: (context, error, stackTrace) =>
-                              Image.asset(
-                            "assets/images/placeholder.png",
-                            fit: BoxFit.cover,
-                          ),
-                          fit: BoxFit.cover,
-                        )
-                      : Image.network(
-                          widget.manager.getUser()['bio']['idcard'] == null
-                              ? ""
-                              : "${widget.manager.getUser()['bio']['idcard']['frontview']}",
-                          errorBuilder: (context, error, stackTrace) =>
-                              Image.asset(
-                            "assets/images/placeholder.png",
-                            fit: BoxFit.cover,
-                          ),
-                          fit: BoxFit.cover,
-                        ),
-                  style: TextButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      side: BorderSide(
-                        color: _isFrontErr ? Colors.red : Colors.grey,
-                        width: 1.0,
-                      ),
+                      ],
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(
-                height: 16.0,
-              ),
-              TextPoppins(
-                text: "Back view",
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-              SizedBox(
-                height: 210,
-                child: TextButton(
-                  onPressed: () {
-                    showBarModalBottomSheet(
-                      expand: false,
-                      context: context,
-                      topControl: ClipOval(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(
-                                16,
+                  const SizedBox(width: 8.0),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        TextPoppins(
+                          text: "Back view",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        SizedBox(
+                          height: 175,
+                          child: TextButton(
+                            onPressed: () {
+                              showBarModalBottomSheet(
+                                expand: false,
+                                context: context,
+                                topControl: ClipOval(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Container(
+                                      width: 32,
+                                      height: 32,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(
+                                          16,
+                                        ),
+                                      ),
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.close,
+                                          size: 24,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                backgroundColor: Colors.white,
+                                builder: (context) => SizedBox(
+                                  height: 175,
+                                  child: ImgPicker(
+                                    onCropped: _onBackSelected,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: _isBackSelected
+                                ? Image.file(
+                                    File(_croppedFile2),
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            Image.asset(
+                                      "assets/images/placeholder.png",
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.network(
+                                    widget.manager.getUser()['bio']['idcard'] ==
+                                            null
+                                        ? ""
+                                        : "${widget.manager.getUser()['bio']['idcard']['backview']}",
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            Image.asset(
+                                      "assets/images/placeholder.png",
+                                      fit: BoxFit.cover,
+                                    ),
+                                    fit: BoxFit.cover,
+                                  ),
+                            style: TextButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                side: BorderSide(
+                                  color: _isBackErr ? Colors.red : Colors.grey,
+                                  width: 1.0,
+                                ),
                               ),
                             ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.close,
-                                size: 24,
-                              ),
-                            ),
                           ),
                         ),
-                      ),
-                      backgroundColor: Colors.white,
-                      builder: (context) => SizedBox(
-                        height: 175,
-                        child: ImgPicker(
-                          onCropped: _onBackSelected,
-                        ),
-                      ),
-                    );
-                  },
-                  child: _isBackSelected
-                      ? Image.file(
-                          File(_croppedFile2),
-                          errorBuilder: (context, error, stackTrace) =>
-                              Image.asset(
-                            "assets/images/placeholder.png",
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                          fit: BoxFit.cover,
-                        )
-                      : Image.network(
-                          widget.manager.getUser()['bio']['idcard'] == null
-                              ? ""
-                              : "${widget.manager.getUser()['bio']['idcard']['backview']}",
-                          errorBuilder: (context, error, stackTrace) =>
-                              Image.asset(
-                            "assets/images/placeholder.png",
-                            fit: BoxFit.cover,
-                          ),
-                          fit: BoxFit.cover,
-                        ),
-                  style: TextButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      side: BorderSide(
-                        color: _isBackErr ? Colors.red : Colors.grey,
-                        width: 1.0,
-                      ),
+                      ],
                     ),
-                  ),
-                ),
+                  )
+                ],
               ),
               const SizedBox(
                 height: 21.0,
@@ -451,6 +522,123 @@ class _VerifyDocsState extends State<VerifyDocs> {
                 },
                 variant: "Filled",
               ),
+              const SizedBox(height: 12.0),
+              const Divider(),
+              const SizedBox(
+                height: 6.0,
+              ),
+              TextPoppins(
+                text: "Previous Work Information",
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+              const SizedBox(
+                height: 4.0,
+              ),
+              LinedTextField(
+                label: "Company Name",
+                onChanged: (val) {
+                  setState(() {
+                    _shouldEdit = true;
+                  });
+                },
+                controller: _companyController,
+                validator: (value) {
+                  if (value.toString().isEmpty || value == null) {
+                    return "Company name is required";
+                  }
+                  return null;
+                },
+                inputType: TextInputType.name,
+                capitalization: TextCapitalization.words,
+              ),
+              const Divider(
+                color: Constants.accentColor,
+              ),
+              const SizedBox(
+                height: 6.0,
+              ),
+              LinedTextField(
+                label: "Role",
+                onChanged: (val) {
+                  setState(() {
+                    _shouldEdit = true;
+                  });
+                },
+                controller: _roleController,
+                validator: (value) {
+                  if (value.toString().isEmpty || value == null) {
+                    return "Role is required";
+                  }
+                  return null;
+                },
+                inputType: TextInputType.name,
+                capitalization: TextCapitalization.words,
+              ),
+              LinedDropdownState(
+                  label: _selectedState,
+                  title: "State",
+                  onSelected: _onStateSelected,
+                  items: stateCities),
+              const Divider(
+                color: Constants.accentColor,
+              ),
+              const SizedBox(
+                height: 6.0,
+              ),
+              LinedDropdown2(
+                label: _selectedCity,
+                title: "City",
+                onSelected: _onCitySelected,
+                items: _cities,
+              ),
+              const Divider(
+                color: Constants.accentColor,
+              ),
+              const SizedBox(
+                height: 6.0,
+              ),
+              LinedDropdown2(
+                label: _selectedCountry,
+                title: "Country",
+                onSelected: _onCountrySelected,
+                items: const ["Nigeria"],
+              ),
+              const Divider(
+                color: Constants.accentColor,
+              ),
+              const SizedBox(
+                height: 6.0,
+              ),
+              LinedTextField(
+                label: "Street Address",
+                onChanged: (val) {
+                  setState(() {
+                    _shouldEdit = true;
+                  });
+                },
+                controller: _addressController,
+                validator: (value) {
+                  // if (value.toString().isEmpty || value == null) {
+                  //   return "ID number is required";
+                  // }
+                  return null;
+                },
+                inputType: TextInputType.number,
+                capitalization: TextCapitalization.none,
+              ),
+              const SizedBox(height: 10.0),
+              RoundedButton(
+                bgColor: Constants.primaryColor,
+                child: const TextInter(
+                  text: "Submit for Review",
+                  fontSize: 16,
+                ),
+                borderColor: Colors.transparent,
+                foreColor: Colors.white,
+                onPressed: () {},
+                variant: 'outlined',
+              )
             ],
           ),
         ),
