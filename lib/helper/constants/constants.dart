@@ -1,10 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import "package:intl/intl.dart";
 import 'package:money_formatter/money_formatter.dart';
+import 'package:prohelp_app/components/button/roundedbutton.dart';
+import 'package:prohelp_app/components/dialog/custom_dialog.dart';
 import 'package:prohelp_app/components/dialog/info_dialog.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -25,8 +28,8 @@ class Constants {
   static const Color shimmerBaseColor = Color.fromARGB(255, 203, 203, 203);
   static const Color shimmerHighlightColor = Colors.white;
 
-  static const baseURL = "http://192.168.100.247:8082";
-  // "https://my-prohelp-server.vercel.app"; //
+  static const baseURL = "http://13.60.21.159:8082";
+  // "https://my-prohelp-server.vercel.app"; // "http://192.168.1.25:8082";
 
   static String pstk = "pk_test_40f544aec0415695c9fae0ba0819ee5bebcb6a5e";
   // "pk_test_40f544aec0415695c9fae0ba0819ee5bebcb6a5e"; //"pk_test_043683268da92cd71e0d30f9d72396396f2dfb1f";
@@ -81,7 +84,13 @@ class Constants {
   }
 
   static String timeUntil(DateTime date) {
-    return timeago.format(date, locale: "en", allowFromNow: true);
+    return timeago
+        .format(date, locale: "en", allowFromNow: true)
+        .replaceAll("minute", "min")
+        .replaceAll("second", "sec")
+        .replaceAll("hour", "hr")
+        .replaceAll("a moment ago", "just now")
+        .replaceAll("about", "");
   }
 
   static void showConfirmDialog({
@@ -152,6 +161,71 @@ class Constants {
       },
     );
   }
+
+  static void showStatusDialog({required var context}) => showDialog(
+        context: context,
+        builder: (BuildContext context) => SizedBox(
+          height: MediaQuery.of(context).size.height * 0.4,
+          width: MediaQuery.of(context).size.width * 0.98,
+          child: CustomDialog(
+            ripple: SvgPicture.asset(
+              "assets/images/check_effect.svg",
+              width: (Constants.avatarRadius + 20),
+              height: (Constants.avatarRadius + 20),
+            ),
+            avtrBg: Colors.transparent,
+            avtrChild: Image.asset(
+              "assets/images/checked.png",
+            ), //const Icon(CupertinoIcons.check_mark, size: 50,),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 16.0,
+                horizontal: 36.0,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  TextPoppins(
+                    text: "Profile Update",
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  const SizedBox(
+                    height: 5.0,
+                  ),
+                  TextPoppins(
+                    text: "Updated successfully",
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  const SizedBox(
+                    height: 21,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.36,
+                    child: RoundedButton(
+                      bgColor: Constants.primaryColor,
+                      child: TextPoppins(
+                        text: "CLOSE",
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300,
+                      ),
+                      borderColor: Colors.transparent,
+                      foreColor: Colors.white,
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      variant: "Filled",
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
 
 // AnimationController localAnimationController;
   static toastify({

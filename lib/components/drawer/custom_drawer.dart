@@ -82,7 +82,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             icon: Icons.info_outline,
             title: 'About us',
             isAction: true,
-            url: "https://google.com"
+            url: "https://prohelp.ng"
             // widget: Categories(
             //   manager: widget.manager,
             // ),

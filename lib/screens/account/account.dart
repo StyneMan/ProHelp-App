@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -28,8 +27,6 @@ class Account extends StatelessWidget {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _controller = Get.find<StateController>();
 
-  final _user = FirebaseAuth.instance.currentUser;
-
   _pluralize(int num) {
     return num > 1 ? "s" : "";
   }
@@ -50,15 +47,16 @@ class Account extends StatelessWidget {
             const SizedBox(
               width: 16.0,
             ),
-            manager.getUser().isEmpty
+            _controller.userData.isEmpty
                 ? const SizedBox()
                 : ClipOval(
                     child: Image.network(
-                      "${manager.getUser()['bio']['image'] ?? ""}",
+                      "${_controller.userData.value['bio']['image'] ?? ""}",
                       errorBuilder: (context, error, stackTrace) => const Icon(
-                          CupertinoIcons.person_alt,
-                          size: 21,
-                          color: Colors.white),
+                        CupertinoIcons.person_alt,
+                        size: 21,
+                        color: Colors.white,
+                      ),
                       width: 36,
                       height: 36,
                       fit: BoxFit.cover,
@@ -77,7 +75,8 @@ class Account extends StatelessWidget {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
+          _controller.userData.isEmpty
+                ? const SizedBox() : IconButton(
             onPressed: () {
               if (!_scaffoldKey.currentState!.isEndDrawerOpen) {
                 _scaffoldKey.currentState!.openEndDrawer();
@@ -96,7 +95,7 @@ class Account extends StatelessWidget {
           manager: manager,
         ),
       ),
-      body: manager.getUser().isEmpty
+      body: _controller.userData.isEmpty
           ? const SizedBox()
           : ListView(
               padding: const EdgeInsets.all(16.0),
@@ -104,7 +103,7 @@ class Account extends StatelessWidget {
                 Center(
                   child: ClipOval(
                     child: Image.network(
-                      manager.getUser()['bio']['image'],
+                      _controller.userData.value['bio']['image'],
                       errorBuilder: (context, error, stackTrace) =>
                           SvgPicture.asset(
                         "assets/images/personal.svg",
@@ -126,7 +125,7 @@ class Account extends StatelessWidget {
                     children: [
                       TextPoppins(
                         text:
-                            "${manager.getUser()['bio']['firstname']} ${manager.getUser()['bio']['middlename']} ${manager.getUser()['bio']['lastname']}"
+                            "${_controller.userData.value['bio']['firstname']} ${_controller.userData.value['bio']['middlename']} ${_controller.userData.value['bio']['lastname']}"
                                 .capitalize,
                         fontSize: 21,
                         fontWeight: FontWeight.w600,
@@ -157,10 +156,10 @@ class Account extends StatelessWidget {
                           // ),
                           Image.asset(
                             "assets/images/coin_gold.png",
-                            width: 32,
+                            width: 28,
                           ),
                           Text(
-                            " ${Constants.formatMoney(manager.getUser()['wallet']['balance'])} coin${_pluralize(manager.getUser()['wallet']['balance'])}",
+                            " ${Constants.formatMoney(_controller.userData.value['wallet']['balance'])} coin${_pluralize(_controller.userData.value['wallet']['balance'])}",
                           ),
                         ],
                       ),
@@ -197,7 +196,8 @@ class Account extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 SvgPicture.asset(
-                                    "assets/images/personal_icon.svg"),
+                                  "assets/images/personal_icon.svg",
+                                ),
                                 const SizedBox(
                                   width: 16.0,
                                 ),

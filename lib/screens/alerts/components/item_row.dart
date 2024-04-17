@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class AlertItemRow extends StatelessWidget {
@@ -14,15 +15,18 @@ class AlertItemRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(
+          vertical: 12.0,
+          horizontal: 10.0,
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ClipOval(
               child: Container(
-                width: 48,
-                height: 48,
+                width: 42,
+                height: 42,
                 color: alert['type'] == "auth" || alert['type'] == "profile"
                     ? Colors.red.shade50
                     : alert['type'] == "wallet"
@@ -50,13 +54,13 @@ class AlertItemRow extends StatelessWidget {
                             : alert['type'] == "job"
                                 ? Colors.purple
                                 : Colors.green,
-                    size: 28,
+                    size: 24,
                   ),
                 ),
               ),
             ),
             const SizedBox(
-              width: 16.0,
+              width: 10.0,
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -77,7 +81,7 @@ class AlertItemRow extends StatelessWidget {
                   height: 2.0,
                 ),
                 Text(
-                  "${DateFormat('E d MMM, yyyy hh:mm a').format(DateTime.parse(alert['createdAt']))} (${timeUntil(DateTime.parse(alert['createdAt']))})",
+                  "${DateFormat('E d MMM, yyyy hh:mm a').format(DateTime.parse(alert['createdAt']))} (${Constants.timeUntil(DateTime.parse(alert['createdAt']))})",
                   style: const TextStyle(
                     fontSize: 11,
                     fontFamily: 'Poppins',
@@ -90,14 +94,5 @@ class AlertItemRow extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String timeUntil(DateTime date) {
-    return timeago
-        .format(date, locale: "en", allowFromNow: true)
-        .replaceAll("minute", "min")
-        .replaceAll("second", "sec")
-        .replaceAll("hour", "hr")
-        .replaceAll("about", "");
   }
 }

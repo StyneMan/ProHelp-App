@@ -214,7 +214,10 @@ class StateController extends GetxController {
 
       //Get User Alerts
       APIService()
-          .getAlerts(accessToken: _token, email: "${map['email']}")
+          .getAlerts(
+              accessToken: _token,
+              email: "${map['email']}",
+              userId: "${map['id'] ?? map['_id']}")
           .then((value) {
         debugPrint("STATE GET ALERTS >>> ${value.body}");
         Map<String, dynamic> data = jsonDecode(value.body);

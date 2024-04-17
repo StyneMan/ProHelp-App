@@ -44,68 +44,74 @@ class GuestEducationSection extends StatelessWidget {
                     for (var e = 0; e < data.length; e++)
                       Column(
                         children: [
-                          data[e]['school'].toString() == 'undefined' ||
-                                  data[e]['school'].toString() == 'null'
+                          data[e]['degree'].toString() == 'none'
                               ? const SizedBox()
-                              : SizedBox(
-                                  height: 90,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      data[e]['schoolLogo'].isEmpty
-                                          ? const SizedBox()
-                                          : SizedBox(
-                                              width: 100,
-                                              height: 200,
-                                              child: Image.network(
-                                                "${data[e]['schoolLogo']}",
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (context, error,
-                                                        stackTrace) =>
-                                                    Image.asset(
-                                                  "assets/images/logo_dark.png",
-                                                  color: Constants.accentColor,
+                              : data[e]['school'].toString() == 'undefined' ||
+                                      data[e]['school'].toString() == 'null'
+                                  ? const SizedBox()
+                                  : SizedBox(
+                                      height: 90,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          data[e]['schoolLogo'].isEmpty
+                                              ? const SizedBox()
+                                              : SizedBox(
+                                                  width: 100,
+                                                  height: 200,
+                                                  child: Image.network(
+                                                    "${data[e]['schoolLogo']}",
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (context,
+                                                            error,
+                                                            stackTrace) =>
+                                                        Image.asset(
+                                                      "assets/images/logo_dark.png",
+                                                      color:
+                                                          Constants.accentColor,
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
+                                          const SizedBox(
+                                            width: 10.0,
+                                          ),
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                TextPoppins(
+                                                  text: "${data[e]['school']}"
+                                                      .toUpperCase(),
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                                TextPoppins(
+                                                  text:
+                                                      "${data[e]['degree']}, ${data[e]['course']}"
+                                                          .capitalize,
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                                TextPoppins(
+                                                  text: data[e]
+                                                          ['stillSchooling']
+                                                      ? "Still a student"
+                                                      : "Graduated  ${data[e]['endate'].toString().contains("/") ? data[e]['endate'] : DateFormat('dd/MMM/yyyy').format(DateTime.tryParse(data[e]['endate'])!)}",
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ],
                                             ),
-                                      const SizedBox(
-                                        width: 10.0,
+                                          )
+                                        ],
                                       ),
-                                      Expanded(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            TextPoppins(
-                                              text: "${data[e]['school']}"
-                                                  .toUpperCase(),
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                            TextPoppins(
-                                              text:
-                                                  "${data[e]['degree']}, ${data[e]['course']}"
-                                                      .capitalize,
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w400,
-                                            ),
-                                            TextPoppins(
-                                              text: data[e]['stillSchooling']
-                                                  ? "Still a student"
-                                                  : "Graduated  ${data[e]['endate'].toString().contains("/") ? data[e]['endate'] : DateFormat('dd/MMM/yyyy').format(DateTime.tryParse(data[e]['endate'])!)}",
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w400,
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
+                                    ),
                           data[e]['school'].toString() == 'undefined' ||
                                   data[e]['school'].toString() == 'null'
                               ? const SizedBox()

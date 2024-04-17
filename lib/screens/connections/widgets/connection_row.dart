@@ -192,14 +192,14 @@ class _ConnectionRowState extends State<ConnectionRow> {
                     ClipOval(
                       child: Image.network(
                         "${widget.data['user']['bio']['image']}",
-                        width: 64,
-                        height: 64,
+                        width: 40,
+                        height: 40,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) =>
                             SvgPicture.asset(
                           "assets/images/personal_icon.svg",
-                          width: 64,
-                          height: 64,
+                          width: 40,
+                          height: 40,
                         ),
                       ),
                     ),
@@ -221,7 +221,7 @@ class _ConnectionRowState extends State<ConnectionRow> {
                             child: TextPoppins(
                               text:
                                   "${widget.data['user']['bio']['firstname'].toString().capitalize!} ${widget.data['user']['bio']['lastname'].toString().capitalize!} sent you a connection request",
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
                           ),

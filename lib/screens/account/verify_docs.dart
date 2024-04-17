@@ -22,6 +22,7 @@ import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class VerifyDocs extends StatefulWidget {
   final PreferenceManager manager;
@@ -45,7 +46,6 @@ class _VerifyDocsState extends State<VerifyDocs> {
   final _companyController = TextEditingController();
   final _roleController = TextEditingController();
   final _addressController = TextEditingController();
-  final _countryController = TextEditingController();
   final _phoneController = TextEditingController();
 
   String _selectedCity = "";
@@ -58,6 +58,36 @@ class _VerifyDocsState extends State<VerifyDocs> {
   var _croppedFile2;
 
   String _frontUrl = "", _backUrl = "";
+
+  @override
+  void initState() {
+    super.initState();
+    if (_controller.userData.value.isNotEmpty ||
+        widget.manager.getUser().isNotEmpty) {
+      setState(() {
+        _companyController.text =
+            '${_controller.userData.value['previousWorkInfo']['company'] ?? widget.manager.getUser()['previousWorkInfo']['company']}'
+                .capitalize!;
+
+        _roleController.text =
+            '${_controller.userData.value['previousWorkInfo']['role'] ?? widget.manager.getUser()['previousWorkInfo']['role']}'
+                .capitalize!;
+
+        _addressController.text = _controller.userData.value['previousWorkInfo']
+                ['street'] ??
+            widget.manager.getUser()['previousWorkInfo']['street'];
+        _phoneController.text = _controller.userData.value['previousWorkInfo']
+                ['phoneNumber'] ??
+            widget.manager.getUser()['previousWorkInfo']['phoneNumber'];
+        _selectedState =
+            '${_controller.userData.value['previousWorkInfo']['state'] ?? widget.manager.getUser()['previousWorkInfo']['state']}'
+                .capitalize!;
+        _selectedCity =
+            '${_controller.userData.value['previousWorkInfo']['city'] ?? widget.manager.getUser()['previousWorkInfo']['city']}'
+                .capitalize!;
+      });
+    }
+  }
 
   _onFrontSelected(var file) {
     setState(() {
@@ -559,6 +589,29 @@ class _VerifyDocsState extends State<VerifyDocs> {
                 height: 6.0,
               ),
               LinedTextField(
+                label: "Company Phone",
+                onChanged: (val) {
+                  setState(() {
+                    _shouldEdit = true;
+                  });
+                },
+                inputType: TextInputType.phone,
+                controller: _phoneController,
+                validator: (value) {
+                  if (value.toString().isEmpty || value == null) {
+                    return "Company phone number is required";
+                  }
+                  return null;
+                },
+                capitalization: TextCapitalization.none,
+              ),
+              const Divider(
+                color: Constants.accentColor,
+              ),
+              const SizedBox(
+                height: 6.0,
+              ),
+              LinedTextField(
                 label: "Role",
                 onChanged: (val) {
                   setState(() {
@@ -574,6 +627,12 @@ class _VerifyDocsState extends State<VerifyDocs> {
                 },
                 inputType: TextInputType.name,
                 capitalization: TextCapitalization.words,
+              ),
+              const Divider(
+                color: Constants.accentColor,
+              ),
+              const SizedBox(
+                height: 6.0,
               ),
               LinedDropdownState(
                   label: _selectedState,
@@ -636,7 +695,9 @@ class _VerifyDocsState extends State<VerifyDocs> {
                 ),
                 borderColor: Colors.transparent,
                 foreColor: Colors.white,
-                onPressed: () {},
+                onPressed: () {
+                  _updateProfile();
+                },
                 variant: 'outlined',
               )
             ],
@@ -644,5 +705,69 @@ class _VerifyDocsState extends State<VerifyDocs> {
         ),
       ),
     );
+  }
+
+  _updateProfile() async {
+    _controller.setLoading(true);
+
+    Map _payload = {
+      ...widget.manager.getUser(),
+      "previousWorkInfo": {
+        "company": _companyController.text.toLowerCase(),
+        "role": _roleController.text.toLowerCase(),
+        "phoneNumber": _phoneController.text,
+        "street": _addressController.text,
+        "city": _selectedCity,
+        "state": _selectedState,
+        "country": _selectedCountry,
+      }
+    };
+    try {
+      final _prefs = await SharedPreferences.getInstance();
+      var _token = _prefs.getString("accessToken") ?? "";
+      final resp = await APIService().updateProfile(
+        accessToken: _token,
+        body: _payload,
+        email: widget.manager.getUser()['email'],
+      );
+
+      debugPrint("PREV WORK UPDATE:  >> ${resp.body}");
+      _controller.setLoading(false);
+
+      if (resp.statusCode == 200) {
+        Map<String, dynamic> map = jsonDecode(resp.body);
+        Constants.toast(map['message']);
+
+        //Refresh user profile
+        String userData = jsonEncode(map['data']);
+        widget.manager.setUserData(userData);
+        _controller.setUserData(map['data']);
+
+        setState(() {
+          _companyController.text =
+              '${map['data']['previousWorkInfo']['company']}'.capitalize!;
+
+          _roleController.text =
+              '${map['data']['previousWorkInfo']['role']}'.capitalize!;
+
+          _addressController.text = map['data']['previousWorkInfo']['street'];
+          _phoneController.text =
+              map['data']['previousWorkInfo']['phoneNumber'];
+          _selectedState =
+              '${map['data']['previousWorkInfo']['state']}'.capitalize!;
+          _selectedCity =
+              '${map['data']['previousWorkInfo']['city']}'.capitalize!;
+          _shouldEdit = false;
+        });
+
+        Constants.showStatusDialog(context: context);
+      } else {
+        Map<String, dynamic> map = jsonDecode(resp.body);
+        Constants.toast(map['message']);
+      }
+    } catch (e) {
+      _controller.setLoading(false);
+      debugPrint(e.toString());
+    }
   }
 }

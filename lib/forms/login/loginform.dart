@@ -2,16 +2,19 @@ import 'dart:convert';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/instance_manager.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
 import 'package:prohelp_app/components/inputfield/passwordfield.dart';
 import 'package:prohelp_app/components/inputfield/textfield.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
+import 'package:prohelp_app/helper/socket/pusher_manager.dart';
 import 'package:prohelp_app/helper/socket/socket_manager.dart';
 import 'package:prohelp_app/screens/account/setup_profile.dart';
 import 'package:prohelp_app/screens/account/setup_profile_employer.dart';
 import 'package:prohelp_app/screens/auth/otp/verifyotp.dart';
+import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 
 import '../../components/dashboard/dashboard.dart';
 import '../../components/text_components.dart';
@@ -54,7 +57,7 @@ class _LoginFormState extends State<LoginForm> {
         widget.manager.saveAccessToken(map['token']);
         Constants.toast(map['message']);
 
-        socket.emit('identity', map['data']["_id"]);
+        socket.emit('identity', map['data']["_id"] ?? map['data']["id"]);
 
         if (!map['data']["isEmailVerified"]) {
           Navigator.of(context).pushReplacement(
@@ -94,6 +97,20 @@ class _LoginFormState extends State<LoginForm> {
 
             _controller.onInit();
 
+            // Initialize Pusher Auth Here
+            // PusherChannelsFlutter pusher = PusherChannelsFlutter.getInstance();
+            // final sockId = await pusher.getSocketId();
+            // print("USER ID ::: ${map['data']['id']}");
+            // final Map<String, String> _paramsMap = {
+            //   "socket_id": sockId,
+            //   "id": map['data']['id'],
+            //   "firstname": map['data']['bio']['firstname'],
+            //   "lastname": map['data']['bio']['lastname'],
+            //   "email": map['data']['email'],
+            // };
+
+            // // pusher.printError()
+
             Navigator.of(context).pushReplacement(
               PageTransition(
                 type: PageTransitionType.size,
@@ -111,7 +128,7 @@ class _LoginFormState extends State<LoginForm> {
       }
     } catch (e) {
       _controller.setLoading(false);
-      // print(e.message);
+      print("ON LOGIN ERROR ::: $e");
       Constants.toast(e.toString());
     }
   }

@@ -9,12 +9,10 @@ import 'package:get/get.dart';
 import 'package:get/instance_manager.dart';
 import 'package:loading_overlay_pro/loading_overlay_pro.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
-import 'package:prohelp_app/components/inputfield/customautocomplete.dart';
 import 'package:prohelp_app/components/inputfield/datefield.dart';
 import 'package:prohelp_app/components/inputfield/textfield.dart';
 import 'package:prohelp_app/components/picker/img_picker.dart';
 import 'package:prohelp_app/components/text_components.dart';
-import 'package:prohelp_app/data/countries/countries.dart';
 import 'package:prohelp_app/data/state/nigerian_states.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
@@ -534,8 +532,10 @@ class _NewExperienceFormState extends State<NewExperienceForm> {
 
           _controller.onInit();
 
-          Navigator.of(context).pop();
-          Navigator.of(context).pop();
+          Future.delayed(const Duration(seconds: 2), () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          });
         } else {
           Map<String, dynamic> _map = jsonDecode(_resp.body);
           Constants.toast(_map['message']);

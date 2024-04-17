@@ -127,9 +127,14 @@ class _ViewApplicationState extends State<ViewApplication> {
           downloadsListMaps.add(_map);
           _isDownloading = false;
         });
+        Constants.toast("Resume saved to ${_task.savedDir}");
+
+        Future.delayed(const Duration(seconds: 2), () {
+          FlutterDownloader.open(taskId: _task.taskId);
+        });
       });
 
-      // FlutterDownloader.open(taskId: "$taskId");
+      //
     } catch (e) {
       debugPrint('DOWNLOAD ERROR >>: $e');
     }

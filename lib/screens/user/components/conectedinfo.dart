@@ -203,8 +203,11 @@ class _ConnectedInfoContentState extends State<ConnectedInfoContent> {
 
     _controller.setLoading(true);
     Map _data = {
-      "userId": widget.guestData['id'],
+      "userId": widget.guestData['id'] ?? widget.guestData['_id'],
     };
+
+    print("PAYLOAD :: $_data");
+
     try {
       final resp = await APIService().initChat(
         accessToken: widget.manager.getAccessToken(),
@@ -216,6 +219,7 @@ class _ConnectedInfoContentState extends State<ConnectedInfoContent> {
 
       if (resp.statusCode == 200) {
         Map<String, dynamic> map = jsonDecode(resp.body);
+        _controller.selectedConversation.value = map;
 
         final _allChatsResponse = await APIService().getUsersChats(
           accessToken: widget.manager.getAccessToken(),
@@ -230,16 +234,17 @@ class _ConnectedInfoContentState extends State<ConnectedInfoContent> {
         }
 
         // socket.emit(
-        //     "subscribe",
-        //     ({
-        //       "room": map['data']['chatId'],
-        //       "otherUser": widget.guestData['id']
-        //     }));
+        //   "subscribe",
+        //   ({
+        //     "room": map['data']['chatId'],
+        //     "otherUser": widget.guestData['id']
+        //   }),
+        // );
 
         Get.to(
           ChatPage(
             manager: widget.manager,
-            data: map['data'],
+            data: map,
             caller: "profile",
           ),
         );

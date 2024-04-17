@@ -151,7 +151,7 @@ class _UserProfileState extends State<UserProfile> {
       Map<String, dynamic> map = jsonDecode(jsonEncode(data));
       // Constants.toast("CONNECTION DECLINED!!!");
 
-      print("CONNECTION DECLINED USER :::  $map['user']['email']");
+      // print("CONNECTION DECLINED USER :::  $map['user']['email']");
       print("CONNECTION DECLINED DECLINEDBY :::  $map['declinedBy']['email']");
       final userId = map['user']['id'].toString();
       final otherUserId = map['declinedBy']['id'].toString();
@@ -220,14 +220,14 @@ class _UserProfileState extends State<UserProfile> {
       Map<String, dynamic> map = jsonDecode(jsonEncode(data));
       final blockedBy = map['blockedBy']['_id'].toString();
       if (blockedBy != widget.manager.getUser()['id']) {
-        Constants.toast('USER JUST BLOCKED ME');
+        // Constants.toast('USER JUST BLOCKED ME');
         if (mounted) {
           setState(() {
             _userBlockedMe = true;
           });
         }
       } else {
-        Constants.toast("I JUST BLOCKED THIS GUY!");
+        // Constants.toast("I JUST BLOCKED THIS GUY!");
         if (mounted) {
           setState(() {
             _iBlockedUser = true;
@@ -242,14 +242,14 @@ class _UserProfileState extends State<UserProfile> {
       Map<String, dynamic> map = jsonDecode(jsonEncode(data));
       final unblockedBy = map['unblockedBy']['id'].toString();
       if (unblockedBy != widget.manager.getUser()['id']) {
-        Constants.toast('USER JUST UNBLOCKED ME');
+        // Constants.toast('USER JUST UNBLOCKED ME');
         if (mounted) {
           setState(() {
             _userBlockedMe = false;
           });
         }
       } else {
-        Constants.toast("I JUST UNBLOCKED THIS GUY!");
+        // Constants.toast("I JUST UNBLOCKED THIS GUY!");
         if (mounted) {
           setState(() {
             _iBlockedUser = false;
@@ -278,64 +278,68 @@ class _UserProfileState extends State<UserProfile> {
       });
     });
 
-    print("CURENT USE  :: ${jsonEncode(widget.data)} ");
+    // print("CURENT USE  :: ${} ");
 
     _connectionState();
 
-    APIService()
-        .getUserConnectionsStreamed(
-      accessToken: widget.manager.getAccessToken(),
-      email: widget.data['email'],
-    )
-        .listen((event) {
-      Map<String, dynamic> map = jsonDecode(event.body);
-      print("CONNECTIONS STREAM LISTENER ::: ${jsonEncode(map)}");
-      setState(() {
-        _connectionCount = 0;
+    if (widget.data['authType'] != "google") {
+      APIService()
+          .getUserConnectionsStreamed(
+        accessToken: widget.manager.getAccessToken(),
+        email: widget.data['email'],
+      )
+          .listen((event) {
+        Map<String, dynamic> map = jsonDecode(event.body);
+        print("CONNECTIONS STREAM LISTENER ::: ${jsonEncode(map)}");
+        setState(() {
+          _connectionCount = 0;
+        });
+        if (mounted) {
+          setState(() {
+            _connectionCount = map['totalDocs'] ?? 0;
+          });
+        }
+
+        for (var element in map['docs']) {
+          if ((element['user']['_id'] == widget.data['id'] &&
+                  element['guest']['_id'] == widget.manager.getUser()['id']) ||
+              (element['user']['_id'] == widget.manager.getUser()['id'] &&
+                  element['guest']['_id'] == widget.data['id'])) {
+            setState(() {
+              _isConnected = true;
+            });
+          }
+        }
       });
-      if (mounted) {
-        setState(() {
-          _connectionCount = map['totalDocs'] ?? 0;
-        });
-      }
+    }
 
-      for (var element in map['docs']) {
-        if ((element['user']['_id'] == widget.data['id'] &&
-                element['guest']['_id'] == widget.manager.getUser()['id']) ||
-            (element['user']['_id'] == widget.manager.getUser()['id'] &&
-                element['guest']['_id'] == widget.data['id'])) {
+    if (widget.data['authType'] != "google") {
+      APIService()
+          .getProfileStreamed(
+        accessToken: widget.manager.getAccessToken(),
+        email: widget.data['email'],
+      )
+          .listen((event) {
+        Map<String, dynamic> map = jsonDecode(event.body);
+        print("PROFILE STREAM LISTENER ::: ${jsonEncode(map)}");
+        final _userData = map['data'];
+
+        if (mounted) {
           setState(() {
-            _isConnected = true;
+            userData = map['data'];
           });
         }
-      }
-    });
 
-    APIService()
-        .getProfileStreamed(
-      accessToken: widget.manager.getAccessToken(),
-      email: widget.data['email'],
-    )
-        .listen((event) {
-      Map<String, dynamic> map = jsonDecode(event.body);
-      print("PROFILE STREAM LISTENER ::: ${jsonEncode(map)}");
-      final _userData = map['data'];
-
-      if (mounted) {
-        setState(() {
-          userData = map['data'];
-        });
-      }
-
-      for (var element in _userData['blockedUsers']) {
-        if ((element == widget.manager.getUser()['id'])) {
-          Constants.toast("THIS USER BLCOKED ME OH!!");
-          setState(() {
-            _userBlockedMe = true;
-          });
+        for (var element in _userData['blockedUsers']) {
+          if ((element == widget.manager.getUser()['id'])) {
+            // Constants.toast("THIS USER BLCOKED ME OH!!");
+            setState(() {
+              _userBlockedMe = true;
+            });
+          }
         }
-      }
-    });
+      });
+    }
 
     // For CURRENT LOGGED IN USER::
     APIService()
@@ -350,7 +354,7 @@ class _UserProfileState extends State<UserProfile> {
 
       for (var element in _userData['blockedUsers']) {
         if ((element == (widget.data['id'] ?? widget.data['_id']))) {
-          Constants.toast("I BLOCKED THIS USER OH!!");
+          // Constants.toast("I BLOCKED THIS USER OH!!");
           setState(() {
             _iBlockedUser = true;
           });
@@ -405,7 +409,7 @@ class _UserProfileState extends State<UserProfile> {
         payload: _payload,
       );
 
-      print("UNBLOCKED RESPONSE ::: :: ${_resp.body}");
+      // print("UNBLOCKED RESPONSE ::: :: ${_resp.body}");
 
       _controller.setLoading(false);
 
@@ -1007,30 +1011,33 @@ class _UserProfileState extends State<UserProfile> {
                                                       Transition.cupertino,
                                                 );
                                               }
-                                            : () {
-                                                showDialog(
-                                                  context: context,
-                                                  barrierDismissible: false,
-                                                  builder: (context) {
-                                                    return SizedBox(
-                                                      height: 200,
-                                                      width:
-                                                          MediaQuery.of(context)
+                                            : 3 > 2
+                                                ? () {
+                                                    Constants.toast(
+                                                        "Coming soon!");
+                                                  }
+                                                : () {
+                                                    showDialog(
+                                                      context: context,
+                                                      barrierDismissible: false,
+                                                      builder: (context) {
+                                                        return SizedBox(
+                                                          height: 200,
+                                                          width: MediaQuery.of(
+                                                                      context)
                                                                   .size
                                                                   .width *
                                                               0.98,
-                                                      child: InfoDialog(
-                                                        body:
-                                                            VerificationsContent(
-                                                          documents:
-                                                              widget.data[
-                                                                  'documents'],
-                                                        ),
-                                                      ),
+                                                          child: InfoDialog(
+                                                            body:
+                                                                VerificationsContent(
+                                                              documents: [],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
                                                     );
                                                   },
-                                                );
-                                              },
                                         variant: "Filled",
                                       ),
                                     ),
@@ -1097,7 +1104,8 @@ class _UserProfileState extends State<UserProfile> {
                               widget.data['accountType'] == "recruiter"
                                   ? const SizedBox()
                                   : GuestEducationSection(
-                                      data: widget.data['education']),
+                                      data: widget.data['education'],
+                                    ),
                               const SizedBox(
                                 height: 36.0,
                               ),

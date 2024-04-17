@@ -46,7 +46,7 @@ class MyApiInterceptor implements InterceptorContract {
 
   @override
   Future<ResponseData> interceptResponse({required ResponseData data}) async {
-    print("RESPONSE DATA :: ${data.statusCode}");
+    // print(" ${data.statusCode}");
     Map<String, dynamic> _map = jsonDecode('${data.body}');
     // print("INTERCEPT RE :: ${_map['message']}");
     try {

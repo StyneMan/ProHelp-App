@@ -48,6 +48,20 @@ class _DashboardState extends State<Dashboard> {
       final _isShown = _prefs.getBool("dialogShown") ?? false;
       Map<String, dynamic> userMap = jsonDecode(_user);
 
+      final response = await APIService().getProfessions();
+      debugPrint("RESPONSI UOT ==>> ${response.body}");
+      Map<String, dynamic> map = jsonDecode(response.body);
+      debugPrint("RESPONS  ==>> ${map['docs']}");
+      _controller.allProfessions.value = map['docs'];
+
+      final bannerResponse = await APIService().getBanners();
+      debugPrint("RESPONSI BANNERS ==>> ${bannerResponse.body}");
+      Map<String, dynamic> _bannerMap = jsonDecode(bannerResponse.body);
+      final lis = _bannerMap['docs'];
+      final filterd = lis.where((item) => item['page'] == "home").toList();
+      // where((item) => item['page'] == "home") as List
+      _controller.homeBanners.value = filterd;
+
       APIService().getFreelancers().then((value) {
         debugPrint("STATE GET FREELANCERS >>> ${value.body}");
         Map<String, dynamic> data = jsonDecode("${value.body}");
@@ -72,6 +86,12 @@ class _DashboardState extends State<Dashboard> {
         widget.manager.setUserData(userData);
         _controller.setUserData(map['data']);
       }
+
+      final jobResponse = await APIService().getAllJobs();
+      debugPrint("RESPONSI JOBS ==>> ${jobResponse.body}");
+      Map<String, dynamic> _jobMap = jsonDecode(jobResponse.body);
+      // final jobs = _jobMap['docs'];
+      _controller.allJobs.value = _jobMap['docs'];
 
       // JOB APPLICATIONS
       final _applicationsResp = await APIService().getJobApplicationsByUser(
@@ -103,10 +123,10 @@ class _DashboardState extends State<Dashboard> {
         email: userMap['email'],
         // userId: userMap['id'],
       );
-      // debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
+      debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
       if (chatResp.statusCode == 200) {
         Map<String, dynamic> chatMap = jsonDecode(chatResp.body);
-        _controller.myChats.value = chatResp.body as List;
+        _controller.myChats.value = chatMap['docs'];
       }
     } catch (e) {
       debugPrint(e.toString());

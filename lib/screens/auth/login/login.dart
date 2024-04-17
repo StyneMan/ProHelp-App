@@ -15,6 +15,7 @@ import 'package:prohelp_app/forms/login/loginform.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
+import 'package:prohelp_app/helper/socket/socket_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/account/setup_profile.dart';
 import 'package:prohelp_app/screens/account/setup_profile_employer.dart';
@@ -34,6 +35,7 @@ class _LoginState extends State<Login> {
   PreferenceManager? _manager;
 
   final _controller = Get.find<StateController>();
+  final socket = SocketManager().socket;
 
   @override
   void initState() {
@@ -72,43 +74,39 @@ class _LoginState extends State<Login> {
       _controller.firstname.value = "${map['data']['bio']['firstname']}";
       _controller.lastname.value = "${map['data']['bio']['lastname']}";
 
+      socket.emit('identity', map['data']["_id"] ?? map['data']["id"]);
+
       if (map['message'].contains("Account created")) {
         //New account so now select user type recruiter or freelancer
-        Navigator.of(context).pushReplacement(
-          PageTransition(
-            type: PageTransitionType.size,
-            alignment: Alignment.bottomCenter,
-            child: AccountType(
-              isSocial: true,
-              email: map['data']['email'],
-              name:
-                  "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
-            ),
+        Get.off(
+          AccountType(
+            isSocial: true,
+            email: map['data']['email'],
+            name:
+                "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
           ),
+          transition: Transition.cupertino,
         );
       } else {
         if (!map['data']["hasProfile"]) {
-          Navigator.of(context).pushReplacement(
-            PageTransition(
-              type: PageTransitionType.size,
-              alignment: Alignment.bottomCenter,
-              child: map['data']["accountType"].toString().toLowerCase() ==
-                      "professional"
-                  ? SetupProfile(
-                      manager: _manager!,
-                      isSocial: true,
-                      email: map['data']['email'],
-                      name:
-                          "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
-                    )
-                  : SetupProfileEmployer(
-                      manager: _manager!,
-                      isSocial: true,
-                      email: map['data']['email'],
-                      name:
-                          "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
-                    ),
-            ),
+          Get.off(
+            map['data']["accountType"].toString().toLowerCase() ==
+                    "professional"
+                ? SetupProfile(
+                    manager: _manager!,
+                    isSocial: true,
+                    email: map['data']['email'],
+                    name:
+                        "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
+                  )
+                : SetupProfileEmployer(
+                    manager: _manager!,
+                    isSocial: true,
+                    email: map['data']['email'],
+                    name:
+                        "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
+                  ),
+            transition: Transition.cupertino,
           );
         } else {
           String userData = jsonEncode(map['data']);
@@ -118,14 +116,11 @@ class _LoginState extends State<Login> {
 
           _controller.onInit();
 
-          Navigator.of(context).pushReplacement(
-            PageTransition(
-              type: PageTransitionType.size,
-              alignment: Alignment.bottomCenter,
-              child: Dashboard(
-                manager: _manager!,
-              ),
+          Get.off(
+            Dashboard(
+              manager: _manager!,
             ),
+            transition: Transition.cupertino,
           );
         }
       }

@@ -37,7 +37,7 @@ class _GuestMessageBoxState extends State<GuestMessageBox> {
     return ConstrainedBox(
       constraints: BoxConstraints(
         minWidth: 75.0,
-        maxWidth: MediaQuery.of(context).size.width * 0.6,
+        maxWidth: MediaQuery.of(context).size.width * 0.54,
       ),
       child: Wrap(
         clipBehavior: Clip.none,

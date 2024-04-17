@@ -81,6 +81,8 @@ class _ViewJobState extends State<ViewJob> {
 
   @override
   Widget build(BuildContext context) {
+    print("JOD DATA ::: ${widget.data['recruiter']}");
+
     return Obx(
       () => LoadingOverlayPro(
         isLoading: _controller.isLoading.value,
@@ -224,7 +226,7 @@ class _ViewJobState extends State<ViewJob> {
                       const SizedBox(
                         width: 16.0,
                       ),
-                      _applicationCount > 0 &&
+                      widget.data['applicants']?.length > 0 &&
                               widget.manager.getUser()['id'] ==
                                   widget.data['recruiter']['_id']
                           ? InkWell(

@@ -67,17 +67,19 @@ class Messages extends StatelessWidget {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            onPressed: () {
-              if (!_scaffoldKey.currentState!.isEndDrawerOpen) {
-                _scaffoldKey.currentState!.openEndDrawer();
-              }
-            },
-            icon: SvgPicture.asset(
-              'assets/images/menu_icon.svg',
-              color: Constants.secondaryColor,
-            ),
-          ),
+          _controller.userData.isEmpty
+              ? const SizedBox()
+              : IconButton(
+                  onPressed: () {
+                    if (!_scaffoldKey.currentState!.isEndDrawerOpen) {
+                      _scaffoldKey.currentState!.openEndDrawer();
+                    }
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/images/menu_icon.svg',
+                    color: Constants.secondaryColor,
+                  ),
+                ),
         ],
       ),
       endDrawer: SizedBox(
@@ -88,7 +90,7 @@ class Messages extends StatelessWidget {
       ),
       body: Container(
         padding: const EdgeInsets.all(16.0),
-        child: _controller.myChats.isEmpty
+        child: _controller.myChats.value.isEmpty
             ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

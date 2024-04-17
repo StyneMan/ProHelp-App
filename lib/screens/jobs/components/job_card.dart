@@ -205,7 +205,7 @@ class _JobCardState extends State<JobCard> {
     _checkApplied();
     _checkSaved();
     _connectionState();
-    print("USJKS :::: ${jsonEncode(widget.data)}");
+    // print("USJKS :::: ${jsonEncode(widget.data)}");
 
     APIService()
         .getSavedJobsStreamed(

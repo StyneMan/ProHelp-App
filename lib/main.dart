@@ -11,6 +11,7 @@ import 'package:prohelp_app/components/dashboard/dashboard.dart';
 import 'package:prohelp_app/firebase_options.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
+import 'package:prohelp_app/helper/socket/pusher_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/helper/theme/app_theme.dart';
 import 'package:prohelp_app/screens/jobs/applications.dart';
@@ -21,6 +22,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:prohelp_app/screens/welcome/welcome.dart';
+import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
@@ -171,8 +173,7 @@ class _MyAppState extends State<MyApp> {
       debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
       if (chatResp.statusCode == 200) {
         Map<String, dynamic> chatMap = jsonDecode(chatResp.body);
-        _controller.myChats.value = chatMap['data'];
-        ;
+        _controller.myChats.value = chatMap['docs'];
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -372,19 +373,6 @@ class _MyAppState extends State<MyApp> {
 
         socket.on("connection-declined", (data) async {
           try {
-            // AudioCache audioCache = AudioCache();
-            // audioCache.load(
-            //   'sound1.mp3',
-            // ); // Ensure the path matches the one in pubspec.yaml
-
-            // print("LOADED AUDIOS ::: ${audioCache.loadedFiles.length}");
-
-            // await player.setSource();
-            // await player.play(
-            //   AssetSource('assets/audio/sound1.mp3'),
-            //   volume: 1.0,
-            // );
-
             Map<String, dynamic> map = jsonDecode(jsonEncode(data));
             print("CONNECTION DECLINED $map['declinedBy']");
             final declinedBy = map['declinedBy']['id'];
@@ -436,6 +424,19 @@ class _MyAppState extends State<MyApp> {
             if (senderId != _userMap['id']) {
               _controller.currentConversation.add(map['message']);
             }
+
+            _refreshChatList();
+            //Now play sound here
+            AudioPlayer().play(AssetSource('assets/audio/sound2.mp3'));
+          },
+        );
+
+        socket.on(
+          "message recieved",
+          (data) {
+            debugPrint("DATA FROM MESSAGE >> ${(data)}");
+            // Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+            // final senderId = map['senderId'];
 
             _refreshChatList();
             //Now play sound here

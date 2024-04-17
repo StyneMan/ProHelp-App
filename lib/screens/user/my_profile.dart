@@ -383,43 +383,47 @@ class _UserProfileState extends State<MyProfile> {
                           ),
                     widget.manager.getUser()['accountType'] == "recruiter"
                         ? const SizedBox()
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Wrap(
                                 spacing: 0,
-                                runSpacing: -8,
+                                runSpacing: -6,
                                 alignment: WrapAlignment.start,
                                 crossAxisAlignment: WrapCrossAlignment.center,
-                                children:
-                                    widget.manager.getUser()['skills']?.isEmpty
-                                        ? const [
-                                            Center(
-                                              child: TextInter(
+                                children: (_controller
+                                                .userData.value['skills'] ??
+                                            widget.manager.getUser()['skills'])
+                                        ?.isEmpty
+                                    ? const [
+                                        Center(
+                                          child: TextInter(
+                                            text:
+                                                "You have not added any skill",
+                                            fontSize: 12,
+                                          ),
+                                        )
+                                      ]
+                                    : [
+                                        for (var m = 0;
+                                            m <
+                                                _controller.userData
+                                                    .value['skills']?.length;
+                                            m++)
+                                          Container(
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 1.5),
+                                            child: Chip(
+                                              label: TextPoppins(
                                                 text:
-                                                    "You have not added any skill",
+                                                    "${_controller.userData.value['skills'][m]['name']}"
+                                                        .capitalize,
                                                 fontSize: 12,
                                               ),
-                                            )
-                                          ]
-                                        : [
-                                            for (var m = 0;
-                                                m <
-                                                    _controller
-                                                        .userData
-                                                        .value['skills']
-                                                        ?.length;
-                                                m++)
-                                              Chip(
-                                                label: TextPoppins(
-                                                  text:
-                                                      "${_controller.userData.value['skills'][m]['name']}"
-                                                          .capitalize,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                          ],
+                                            ),
+                                          ),
+                                      ],
                               ),
                               TextButton.icon(
                                 onPressed: () {
@@ -439,7 +443,7 @@ class _UserProfileState extends State<MyProfile> {
                                 icon: Icon(
                                   (_controller.userData.value['skills'] ??
                                                   widget.manager
-                                                      .getUser()['skill'])
+                                                      .getUser()['skills'])
                                               ?.length ==
                                           5
                                       ? CupertinoIcons.pen
@@ -448,7 +452,7 @@ class _UserProfileState extends State<MyProfile> {
                                 ),
                                 label: TextInter(
                                   text: widget.manager
-                                              .getUser()['skill']
+                                              .getUser()['skills']
                                               ?.length ==
                                           5
                                       ? ""
@@ -702,7 +706,8 @@ class _UserProfileState extends State<MyProfile> {
                     widget.manager.getUser()['accountType'] == "recruiter"
                         ? const SizedBox()
                         : ExperienceSection(
-                            data: widget.manager.getUser()['experience'],
+                            data: _controller.userData.value['experience'] ??
+                                widget.manager.getUser()['experience'],
                             manager: widget.manager,
                           ),
                     const SizedBox(
@@ -711,7 +716,8 @@ class _UserProfileState extends State<MyProfile> {
                     widget.manager.getUser()['accountType'] == "recruiter"
                         ? const SizedBox()
                         : EducationSection(
-                            data: widget.manager.getUser()['education'],
+                            data: _controller.userData.value['education'] ??
+                                widget.manager.getUser()['education'],
                             manager: widget.manager,
                           ),
                     const SizedBox(

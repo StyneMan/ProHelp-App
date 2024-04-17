@@ -13,19 +13,20 @@ import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/jobs/view_application.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:url_launcher/url_launcher.dart';
 
 class ApplicantCard extends StatefulWidget {
   var data;
   final int index;
   final String type;
   final PreferenceManager manager;
-  ApplicantCard(
-      {Key? key,
-      required this.data,
-      required this.index,
-      required this.manager,
-      this.type = ""})
-      : super(key: key);
+  ApplicantCard({
+    Key? key,
+    required this.data,
+    required this.index,
+    required this.manager,
+    this.type = "",
+  }) : super(key: key);
 
   @override
   State<ApplicantCard> createState() => _ApplicantCardState();
@@ -41,9 +42,9 @@ class _ApplicantCardState extends State<ApplicantCard> {
     super.initState();
   }
 
-  String timeUntil(DateTime date) {
-    return timeago.format(date, locale: "en", allowFromNow: true);
-  }
+  // String timeUntil(DateTime date) {
+  //   return timeago.format(date, locale: "en", allowFromNow: true);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +104,7 @@ class _ApplicantCardState extends State<ApplicantCard> {
                       ),
                       TextPoppins(
                         text:
-                            "Applied on ${DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.data['createdAt']))} (${timeUntil(DateTime.parse("${widget.data['createdAt']}"))})"
+                            "Applied on ${DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.data['createdAt']))} (${Constants.timeUntil(DateTime.parse("${widget.data['createdAt']}"))})"
                                 .replaceAll("about", "")
                                 .replaceAll("minute", "min"),
                         fontSize: 13,
@@ -146,141 +147,6 @@ class _ApplicantCardState extends State<ApplicantCard> {
                 const SizedBox(
                   width: 8.0,
                 ),
-                widget.manager.getUser()['accountType'] == "recruiter" &&
-                        widget.data['job']['recruiter']['_id'] ==
-                            widget.manager.getUser()['id']
-                    ? Expanded(
-                        flex: 2,
-                        child: CustomButton(
-                          bgColor: widget.data['status'] != "submitted"
-                              ? Colors.grey
-                              : Constants.primaryColor,
-                          child: TextPoppins(
-                            text: widget.data['status'] == "submitted"
-                                ? "Accept"
-                                : "${widget.data['status']}".capitalize,
-                            fontSize: 13,
-                            color: Colors.white,
-                          ),
-                          borderColor: Colors.transparent,
-                          foreColor: Constants.secondaryColor,
-                          onPressed: widget.data['status'] != "submitted"
-                              ? null
-                              : () {
-                                  showCupertinoDialog(
-                                    context: context,
-                                    builder: (context) => CupertinoAlertDialog(
-                                      title: TextPoppins(
-                                        text: "Accept Application",
-                                        fontSize: 18,
-                                      ),
-                                      content: SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.96,
-                                        child: Column(
-                                          children: [
-                                            const SizedBox(
-                                              height: 24,
-                                            ),
-                                            RichText(
-                                              textAlign: TextAlign.center,
-                                              text: TextSpan(
-                                                text: "I ",
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                ),
-                                                children: [
-                                                  TextSpan(
-                                                    text:
-                                                        "${widget.manager.getUser()['bio']['firstname']} ${widget.manager.getUser()['bio']['lastname']}"
-                                                            .capitalize,
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                      color: Constants
-                                                          .primaryColor,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                  const TextSpan(
-                                                    text:
-                                                        " confirm that I want to ",
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                  const TextSpan(
-                                                    text: " ACCEPT ",
-                                                    style: TextStyle(
-                                                      color: Colors.green,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text:
-                                                        "${widget.data['applicant']['bio']['firstname']}'s"
-                                                            .capitalize,
-                                                    style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 17,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                  const TextSpan(
-                                                    text:
-                                                        " application.\nOnce accepted, others will be automatically declined.",
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      actions: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: TextRoboto(
-                                              text: "Cancel",
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                              _acceptApplication();
-                                            },
-                                            child: TextRoboto(
-                                              text: "Accept",
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                          variant: "Filled",
-                        ),
-                      )
-                    : const SizedBox(),
-                const SizedBox(
-                  width: 8.0,
-                ),
                 Expanded(
                   flex: 2,
                   child: CustomButton(
@@ -293,7 +159,8 @@ class _ApplicantCardState extends State<ApplicantCard> {
                     borderColor: Colors.transparent,
                     foreColor: Constants.secondaryColor,
                     onPressed: () {
-                      print("DATA RIOS :: ${widget.data['id']}");
+                      _makePhoneCall(
+                          "${widget.data['applicant']['bio']['phone']}");
                     },
                     variant: "Filled",
                   ),
@@ -304,6 +171,20 @@ class _ApplicantCardState extends State<ApplicantCard> {
         ),
       ),
     );
+  }
+
+  _makePhoneCall(String phoneNumber) {
+    // Use `Uri` to ensure that `phoneNumber` is properly URL-encoded.
+    // Just using 'tel:$phoneNumber' would create invalid URLs in some cases,
+    // such as spaces in the input, which would cause `launch` to fail on some
+    // platforms.
+    canLaunch('tel:123').then((bool result) async {
+      final Uri launchUri = Uri(
+        scheme: 'tel',
+        path: phoneNumber,
+      );
+      await launch(launchUri.toString());
+    });
   }
 
   _acceptApplication() async {

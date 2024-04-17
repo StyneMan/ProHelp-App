@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:prohelp_app/components/text_components.dart';
+import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
 import 'package:prohelp_app/screens/user/edits/edit_experience.dart';
 
@@ -45,15 +45,12 @@ class ExperienceSection extends StatelessWidget {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.of(context).push(
-                    PageTransition(
-                      type: PageTransitionType.size,
-                      alignment: Alignment.bottomCenter,
-                      child: ManageExperience(
-                        manager: manager,
-                        experience: [],
-                      ),
+                  Get.to(
+                    ManageExperience(
+                      manager: manager,
+                      experience: [],
                     ),
+                    transition: Transition.cupertino,
                   );
                 },
                 child: const Padding(
@@ -89,6 +86,12 @@ class ExperienceSection extends StatelessWidget {
                                   child: Image.network(
                                     "${e['companyLogo']}",
                                     fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            Image.asset(
+                                      "assets/images/logo_dark.png",
+                                      color: Constants.accentColor,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(

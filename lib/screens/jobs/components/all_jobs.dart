@@ -20,6 +20,7 @@ class _AllJobsState extends State<AllJobs> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("USER TEST :: ${_controller.allJobs.value}");
     return Obx(
       () => _controller.allJobs.isEmpty
           ? SizedBox(

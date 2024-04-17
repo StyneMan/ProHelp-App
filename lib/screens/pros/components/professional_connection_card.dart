@@ -112,21 +112,21 @@ class _ProfessionalsConnectionCardState
                       ClipOval(
                         child: Image.network(
                           '${widget.data['bio']['image']}',
-                          width: 64,
-                          height: 64,
+                          width: 52,
+                          height: 52,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
                               SvgPicture.asset(
                             "assets/images/personal_icon.svg",
-                            width: 64,
-                            height: 64,
+                            width: 52,
+                            height: 52,
                           ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(
-                    width: 8.0,
+                    width: 5.0,
                   ),
                   Expanded(
                     child: Column(
@@ -139,7 +139,7 @@ class _ProfessionalsConnectionCardState
                           children: [
                             const Icon(
                               Icons.person_2,
-                              size: 18,
+                              size: 14,
                             ),
                             const SizedBox(
                               width: 4.0,
@@ -150,7 +150,7 @@ class _ProfessionalsConnectionCardState
                                     .capitalize!,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -187,9 +187,8 @@ class _ProfessionalsConnectionCardState
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const Icon(
-                              Icons.location_on_outlined,
-                              size: 18,
-                              color: Colors.grey,
+                              Icons.location_on,
+                              size: 14,
                             ),
                             const SizedBox(
                               width: 4.0,
@@ -207,33 +206,7 @@ class _ProfessionalsConnectionCardState
                             ),
                           ],
                         ),
-                        widget.data['accountType'] != "recruiter"
-                            ? const SizedBox()
-                            : Wrap(
-                                children: [
-                                  SizedBox(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        const Icon(Icons.location_on_outlined),
-                                        const SizedBox(
-                                          width: 4.0,
-                                        ),
-                                        TextPoppins(
-                                          text:
-                                              "${widget.data['address']['city']} ${widget.data['address']['state']}, ${widget.data['address']['country']}"
-                                                  .capitalize,
-                                          fontSize: 13,
-                                          color: Constants.primaryColor,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,

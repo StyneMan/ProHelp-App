@@ -47,7 +47,7 @@ class _OwnMessageBoxState extends State<OwnMessageBox> {
     final RenderObject? overlay =
         Overlay.of(context).context.findRenderObject();
 
-    return SizedBox(
+    return Flexible(
       child: InkWell(
         // onTapDown: (details) => _getTapPosition(details),
         // onLongPress: () {
@@ -75,7 +75,7 @@ class _OwnMessageBoxState extends State<OwnMessageBox> {
         // },
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.6,
+            maxWidth: MediaQuery.of(context).size.width * 0.56,
           ),
           child: Wrap(
             children: [

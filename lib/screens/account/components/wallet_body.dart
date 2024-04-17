@@ -1,13 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutterwave_standard/flutterwave.dart';
 import 'package:get/get.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
 import 'package:prohelp_app/components/inputfield/rounded_money_input.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
+import 'package:prohelp_app/helper/service/api_service.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
-import 'package:uuid/uuid.dart';
+import 'package:prohelp_app/screens/payment/payment_view.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class WalletBody extends StatefulWidget {
   final PreferenceManager manager;
@@ -26,6 +29,9 @@ class _WalletBodyState extends State<WalletBody> {
   final _amountController = TextEditingController();
   int _amount = 0, _value = 0;
   var _selectedVal = "";
+
+  final DateTime pageStartTime = DateTime.now();
+  late WebViewController webviewController;
 
   _pluralize(int num) {
     return num > 1 ? "s" : "";
@@ -247,7 +253,7 @@ class _WalletBodyState extends State<WalletBody> {
                       _amount = int.parse(filteredAmt);
                     });
 
-                    // Iitialize FlutterWave Payment Here
+                    // // Iitialize FlutterWave Payment Here
                     _handlePaymentInitialization();
                   },
                   variant: "Outlined",
@@ -259,32 +265,161 @@ class _WalletBodyState extends State<WalletBody> {
 
   _handlePaymentInitialization() async {
     try {
-      final Customer customer = Customer(
-          name:
-              "${_controller.userData.value['bio']['firstname']} ${_controller.userData.value['bio']['middlename']} ${_controller.userData.value['bio']['lastname']}",
-          phoneNumber: "${_controller.userData.value['bio']['phone']}",
-          email: "${_controller.userData.value['email']}");
-      final Flutterwave flutterwave = Flutterwave(
-        context: context,
-        publicKey: "FLWPUBK_TEST-3d9167e11cc023e3b2c6164520da7ac8-X",
-        currency: "NG",
-        redirectUrl: "https://prohelp.ng",
-        txRef: const Uuid().v1(),
-        amount: "$_amount",
-        customer: customer,
-        paymentOptions: "ussd, card",
-        customization: Customization(
-          title: "Wallet Topup",
-          description: "This is for wallet topup coins purchase for ProHelp NG",
-          logo: "${_controller.userData.value['bio']['image']}",
-        ),
-        isTestMode: true,
-      );
+      _controller.setLoading(true);
+      // final Customer customer = Customer(
+      //     name:
+      //         "${_controller.userData.value['bio']['firstname']} ${_controller.userData.value['bio']['middlename']} ${_controller.userData.value['bio']['lastname']}",
+      //     phoneNumber: "${_controller.userData.value['bio']['phone']}",
+      //     email: "${_controller.userData.value['email']}");
+      // final Flutterwave flutterwave = Flutterwave(
+      //   context: context,
+      //   publicKey: "FLWPUBK_TEST-3d9167e11cc023e3b2c6164520da7ac8-X",
+      //   currency: "NG",
+      //   redirectUrl: "https://prohelp.ng",
+      //   txRef: const Uuid().v1(),
+      //   amount: "$_amount",
+      //   customer: customer,
+      //   paymentOptions: "ussd, card",
+      //   customization: Customization(
+      //     title: "Wallet Topup",
+      //     description: "This is for wallet topup coins purchase for ProHelp NG",
+      //     logo: "${_controller.userData.value['bio']['image']}",
+      //   ),
+      //   isTestMode: true,
+      // );
 
-      final charge = await flutterwave.charge();
-      print("CHARGE RESPONSE :::: $charge");
+      // final charge = await flutterwave.charge();
+      // print("CHARGE RESPONSE :::: $charge");
+
+      var data = {
+        'amount': "$_amount",
+        'currency': "NGN",
+        "redirect_url": "https://prohelp.ng",
+        "customer": {
+          'email': "${_controller.userData.value['email']}",
+          'phone': "${_controller.userData.value['bio']['phone']}",
+          'name':
+              "${_controller.userData.value['bio']['firstname']} ${_controller.userData.value['bio']['middlename']} ${_controller.userData.value['bio']['lastname']}",
+        },
+        'tx_ref': "Prohelp-${DateTime.now().millisecondsSinceEpoch}",
+        "customizations": {
+          'title': 'Wallet Topup',
+          "logo": "https://www.prohelp.ng/favicon.png"
+        }
+      };
+
+      final _response = await APIService().initPayment(
+        accessToken: widget.manager.getAccessToken(),
+        email: widget.manager.getUser()['email'],
+        transactionType: "fund_wallet",
+        payload: data,
+      );
+      _controller.setLoading(false);
+      print("INIT PAYMENT RESPONSE :: ${_response.body}");
+      if (_response.statusCode == 200) {
+        Map<String, dynamic> map = jsonDecode(_response.body);
+        String _paymentLink = map['data']['link'];
+
+        print("PAY LINK ;;; $_paymentLink");
+
+        // Now launch webview and open returned payment link here
+        _initWebview(paymentLink: _paymentLink);
+      }
     } catch (e) {
+      _controller.setLoading(false);
       print(e.toString());
     }
+  }
+
+  _initWebview({required String paymentLink}) {
+    webviewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(NavigationDelegate(
+          onPageStarted: (String url) {
+            // Set loading here
+            _controller.setLoading(true);
+          },
+          onPageFinished: (String url) {
+            Get.back();
+            _controller.setLoading(false);
+          },
+          onWebResourceError: (WebResourceError error) {},
+          onNavigationRequest: (NavigationRequest request) async {
+            final DateTime pageStartTime = DateTime.now();
+
+            print("REQUEST URL NOW ::: ${request.url}");
+
+            if (request.url
+                .startsWith('https://www.prohelp.ng/?status=successful')) {
+              // Transaction was successful.
+              // Now update user wallet balance.
+              Map _payload = {
+                "value": _value,
+                "userId": widget.manager.getUser()['id'] ??
+                    widget.manager.getUser()['_id'],
+              };
+
+              final resp = await APIService().topupWallet(
+                _payload,
+                widget.manager.getAccessToken(),
+                widget.manager.getUser()['email'],
+              );
+
+              print("TOPUP WALLET RESP :: ${resp.body}");
+
+              // PROFILE
+              final _profileResp = await APIService().getProfile(
+                widget.manager.getAccessToken(),
+                widget.manager.getUser()['email'],
+              );
+              // print("PROFILE ::: ${_profileResp.body}");
+              if (_profileResp.statusCode == 200) {
+                Map<String, dynamic> map = jsonDecode(_profileResp.body);
+
+                String userData = jsonEncode(map['data']);
+                widget.manager.setUserData(userData);
+                _controller.setUserData(map['data']);
+              }
+            }
+
+            // if (request.url
+            //     .startsWith('https://afrikunet.com/mobile/success/buy')) {
+            //   // User has paid. Now render his/her service here
+            //   final payload = Get.arguments['payload'];
+            //   final customerData = Get.arguments['customerData'];
+
+            // https://www.prohelp.ng/?status=successful&tx_ref=Prohelp-1713270237163&transaction_id=5030928
+
+            //   // _initiatePurchase(
+            //   //   payload: payload,
+            //   //   customerData: customerData,
+            //   //   accessToken: Get.arguments['accessToken'],
+            //   //   manager: Get.arguments['manager'],
+            //   //   selectedDataPlanName: Get.arguments['selectedDataPlanName'],
+            //   // );
+            // }
+
+            if (request.url.contains('payment/verify')) {
+              Constants.toast("VERIFY TRIIGERED!!!");
+              // Get.back();
+              // Duration durationOnPage =
+              //     DateTime.now().difference(pageStartTime);
+            }
+
+            return NavigationDecision.navigate;
+          }))
+      ..loadRequest(
+        Uri.parse(paymentLink),
+      );
+
+    Future.delayed(const Duration(seconds: 3), () {
+      Get.to(
+        PaymentView(
+          webViewController: webviewController,
+        ),
+        transition: Transition.cupertino,
+      );
+    });
   }
 }

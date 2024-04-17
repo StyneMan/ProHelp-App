@@ -45,65 +45,167 @@ class _ChatPageState extends State<ChatPage> {
   final _focusNode = FocusNode();
   var _guestData, _selectedConversationCompare;
   bool _refresh = false;
+  bool _iBlockedUser = false;
+  bool _userBlockedMe = false;
 
   bool isTyping = false,
       typing = false,
       loading = true,
-      socketConnected = false;
+      socketConnected = false,
+      otherPersonTyping = false;
   var messages;
+  String typerId = "";
   late Socket socket;
 
   _init() async {
+    print("DATA ::: --- ::: ${widget.data}");
     socket = SocketManager().socket;
     socket.emit("setup", widget.manager.getUser());
     socket.on("userConnected", (va) {
+      debugPrint("USER-CONNECTED :: :: $va");
       setState(() => socketConnected = true);
     });
-    socket.on("typing", (val) {
-      setState(() => isTyping = true);
-      debugPrint("WEB TYPING NOW!!!}");
-    });
-    socket.on("stop typing", (val) => setState(() => isTyping = false));
 
     for (var element in widget.data['users']) {
       if (element['_id'] != widget.manager.getUser()['id']) {
         setState(() {
           _guestData = element;
         });
+
+        APIService()
+            .getProfileStreamed(
+          accessToken: widget.manager.getAccessToken(),
+          email: element['email'],
+        )
+            .listen((event) {
+          Map<String, dynamic> map = jsonDecode(event.body);
+          // print("PROFILE STREAM LISTENER ::: ${jsonEncode(map)}");
+          final _userData = map['data'];
+
+          for (var elem in _userData['blockedUsers']) {
+            if ((elem == widget.manager.getUser()['id'])) {
+              // Constants.toast("THIS USER BLCOKED ME OH!!");
+              setState(() {
+                _userBlockedMe = true;
+              });
+            }
+          }
+        });
+
+        APIService()
+            .getProfileStreamed(
+          accessToken: widget.manager.getAccessToken(),
+          email: widget.manager.getUser()['email'],
+        )
+            .listen((event) {
+          Map<String, dynamic> map = jsonDecode(event.body);
+          print("PROFILE STREAM LISTENER ::: ${jsonEncode(map)}");
+          final _userData = map['data'];
+
+          for (var elem in _userData['blockedUsers']) {
+            if ((elem == (element['id'] ?? element['_id']))) {
+              // Constants.toast("I BLOCKED THIS USER OH!!");
+              setState(() {
+                _iBlockedUser = true;
+              });
+            }
+          }
+        });
       }
     }
+
+    socket.on("user-blocked", (data) {
+      print("BLOCKED USER DATA :: ${jsonEncode(data)}");
+
+      Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+      final blockedBy = map['blockedBy']['_id'].toString();
+      if (blockedBy != widget.manager.getUser()['id']) {
+        // Constants.toast('USER JUST BLOCKED ME');
+        if (mounted) {
+          setState(() {
+            _userBlockedMe = true;
+          });
+        }
+      } else {
+        // Constants.toast("I JUST BLOCKED THIS GUY!");
+        if (mounted) {
+          setState(() {
+            _iBlockedUser = true;
+          });
+        }
+      }
+    });
+
+    socket.on("user-unblocked", (data) {
+      print("UNBLOCKED USER DATA :: ${jsonEncode(data)}");
+
+      Map<String, dynamic> map = jsonDecode(jsonEncode(data));
+      final unblockedBy = map['unblockedBy']['id'].toString();
+      if (unblockedBy != widget.manager.getUser()['id']) {
+        // Constants.toast('USER JUST UNBLOCKED ME');
+        if (mounted) {
+          setState(() {
+            _userBlockedMe = false;
+          });
+        }
+      } else {
+        // Constants.toast("I JUST UNBLOCKED THIS GUY!");
+        if (mounted) {
+          setState(() {
+            _iBlockedUser = false;
+          });
+        }
+      }
+    });
   }
 
   _fetchMessage() async {
-    if (_controller.selectedConversation.value.isNotEmpty) {
+    print("CURRENT CONVO ::: ${_controller.selectedConversation.value}");
+    if (_controller.selectedConversation.isNotEmpty) {
       try {
         setState(() {
           loading = true;
         });
 
         final response = await APIService().getConversationsByChatId(
-            accessToken: widget.manager.getAccessToken(),
-            chatId: _controller.selectedConversation.value['id'],
-            email: widget.manager.getUser()['email']);
+          accessToken: widget.manager.getAccessToken(),
+          chatId:
+              _controller.selectedConversation.value['id'] ?? widget.data['id'],
+          email: widget.manager.getUser()['email'],
+        );
 
         debugPrint("THE RESPONSE ::>>:: ${response.body}");
+
         if (response.statusCode == 200) {
-          debugPrint("REACHED HERE LIKE THIS >>> ");
+          // debugPrint("REACHED HERE LIKE THIS >>> ");
           //  jsonData = json.decode(response.body);
           // dataController.data.value = jsonData;
-          // final List<Map<String, dynamic>> map = json.decode(response.body);
-          debugPrint("THE RESPONSE MAPPED ::>>:: ");
+          final Map<String, dynamic> map = json.decode(response.body);
+          // debugPrint("THE RESPONSE MAPPED ::>>:: $map['docs']");
 
           setState(() {
             loading = false;
-            messages = response.body;
+            messages = jsonEncode(map['docs']);
           });
 
-          _controller.currentMessages.value = response.body as List;
+          // _controller.currentMessages.value = response.body as List;
         }
 
         socket.emit("join chat", _controller.selectedConversation.value['id']);
+
+        _focusNode.addListener(_scrollToBottom);
+
+        final chatResp = await APIService().getUsersChats(
+          accessToken: widget.manager.getAccessToken(),
+          email: widget.manager.getUser()['email'],
+        );
+        // debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
+        if (chatResp.statusCode == 200) {
+          Map<String, dynamic> chatMap = jsonDecode(chatResp.body);
+          _controller.myChats.value = chatMap['docs'];
+        }
       } catch (e) {
+        print("FETCH ERROR ::: $e");
         setState(() {
           loading = false;
         });
@@ -116,14 +218,12 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     _init();
     _fetchMessage();
-    _focusNode.addListener(_scrollToBottom);
 
     _selectedConversationCompare = _controller.selectedConversation.value;
 
     socket.on("message recieved", (newMessageRecieved) {
-      // debugPrint("LOGGING RECEIVED MSG :: $newMessageRecieved");
-      // debugPrint("LOGGING 2 :: ${messages}");
-      // debugPrint("LOGGING 3 :: ${jsonEncode(newMessageRecieved)}");
+      debugPrint("LOGGING RECEIVED MSG :: $newMessageRecieved");
+      debugPrint("LOGGING 3 :: ${jsonEncode(newMessageRecieved)}");
 
       // debugPrint(
       //     "LOGGING RECEIVED MSG ENC :: ${jsonDecode(newMessageRecieved)}");
@@ -143,21 +243,31 @@ class _ChatPageState extends State<ChatPage> {
         _refresh = true;
       });
 
-      // }
+      _scrollToBottom();
     });
+
+    socket.on("typing", (val) {
+      // if (mounted) {
+      print("VAL TYPINGSON  ::: $val");
+      setState(() => isTyping = true);
+      // }
+      debugPrint("WEB TYPING NOW!!!}");
+    });
+
+    socket.on("stop typing", (val) => setState(() => isTyping = false));
   }
 
-  @override
-  void didUpdateWidget(covariant ChatPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  // @override
+  // void didUpdateWidget(covariant ChatPage oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
 
-    if (_selectedConversationCompare !=
-        _controller.selectedConversation.value) {
-      // Fetch messages when the selectedConversation changes
-      _fetchMessage();
-      _selectedConversationCompare = _controller.selectedConversation.value;
-    }
-  }
+  //   if (_selectedConversationCompare !=
+  //       _controller.selectedConversation.value) {
+  //     // Fetch messages when the selectedConversation changes
+  //     _fetchMessage();
+  //     _selectedConversationCompare = _controller.selectedConversation.value;
+  //   }
+  // }
 
   void _scrollToBottom() {
     print("CUUR POSITION ::: ${_scrollController.position.maxScrollExtent}");
@@ -165,11 +275,12 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   _postMessage() async {
-    _scrollController.animateTo(
-      _scrollController.position.minScrollExtent,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+    print("CHAT SISNID ::: ${_controller.selectedConversation.value['id']}");
+    // _scrollController.animateTo(
+    //   _scrollController.position.minScrollExtent,
+    //   duration: const Duration(milliseconds: 300),
+    //   curve: Curves.easeInOut,
+    // );
     if (_inputController.text.isNotEmpty) {
       socket.emit("stop typing", _controller.selectedConversation.value['id']);
       final Map _payload = {
@@ -193,10 +304,7 @@ class _ChatPageState extends State<ChatPage> {
           messages = jsonEncode(rawfied);
         });
 
-        // _controller.currentMessages.value = jsonEncode(rawfied) as List;
-
         _scrollToBottom();
-        // setMessages([...messages, resp.data]);
       } catch (e) {
         debugPrint(e.toString());
       }
@@ -204,6 +312,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   _typingHandler(var val) {
+    print("CHAT ID :::: ${_controller.selectedConversation.value['id']}");
     if (!socketConnected) return;
 
     if (!typing) {
@@ -211,9 +320,16 @@ class _ChatPageState extends State<ChatPage> {
         typing = true;
       });
 
-      socket.emit("typing", _controller.selectedConversation.value['id']);
+      socket.emit(
+        "typing",
+        _controller.selectedConversation.value['id'],
+      );
 
       print("HELLO START EJKJD");
+      setState(() {
+        otherPersonTyping = true;
+        typerId = widget.manager.getUser()['id'];
+      });
 
       var lastTypingTime = DateTime.now().millisecondsSinceEpoch;
       var timerLength = 2000;
@@ -224,7 +340,9 @@ class _ChatPageState extends State<ChatPage> {
 
         if (timeDiff >= timerLength && typing) {
           socket.emit(
-              "stop typing", _controller.selectedConversation.value['id']);
+            "stop typing",
+            _controller.selectedConversation.value['id'],
+          );
           setState(() {
             typing = false;
           });
@@ -245,8 +363,6 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("REFRESH :: $_refresh");
-
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -388,7 +504,6 @@ class _ChatPageState extends State<ChatPage> {
                       children: [
                         Expanded(
                           child: SingleChildScrollView(
-                            reverse: true,
                             controller: _scrollController,
                             child: ListView.separated(
                               padding: const EdgeInsets.all(10.0),
@@ -435,7 +550,10 @@ class _ChatPageState extends State<ChatPage> {
                 child: ChatInputField(
                   hintText: 'Your message',
                   focusNode: _focusNode,
-                  placeholder: "Your message",
+                  isEnabled: _iBlockedUser || _userBlockedMe ? false : true,
+                  placeholder: _iBlockedUser || _userBlockedMe
+                      ? "Connection blocked"
+                      : "Your message",
                   onChanged: (val) {
                     _typingHandler(val);
                     _scrollController.animateTo(
@@ -444,6 +562,7 @@ class _ChatPageState extends State<ChatPage> {
                       curve: Curves.easeInOut,
                     );
                   },
+                  capitalization: TextCapitalization.sentences,
                   controller: _inputController,
                   validator: (value) {},
                   inputType: TextInputType.text,
@@ -466,27 +585,4 @@ class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
-
-  // _refreshChatList() async {
-  //   try {
-  //     final _prefs = await SharedPreferences.getInstance();
-  //     final _token = _prefs.getString("accessToken") ?? "";
-  //     final _user = _prefs.getString("user") ?? "";
-  //     Map<String, dynamic> userMap = jsonDecode(_user);
-
-  //     final chatResp = await APIService().getUsersChats(
-  //       accessToken: _token,
-  //       email: userMap['email'],
-  //     );
-  //     debugPrint("MY CHATS RESPONSE >> ${chatResp.body}");
-  //     if (chatResp.statusCode == 200) {
-  //       Map<String, dynamic> chatMap = jsonDecode(chatResp.body);
-  //       _controller.myChats.value = chatMap['data'];
-  //     }
-  //   } catch (e) {
-  //     debugPrint(e.toString());
-  //   }
-  // }
-
-  _clearChat() {}
 }

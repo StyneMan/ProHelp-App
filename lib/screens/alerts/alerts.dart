@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,8 +20,7 @@ class Alerts extends StatelessWidget {
   }) : super(key: key);
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  // final _controller = Get.find<StateController>();
-  final _user = FirebaseAuth.instance.currentUser;
+  final _controller = Get.find<StateController>();
 
   @override
   Widget build(BuildContext context) {
@@ -65,17 +63,19 @@ class Alerts extends StatelessWidget {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            onPressed: () {
-              if (!_scaffoldKey.currentState!.isEndDrawerOpen) {
-                _scaffoldKey.currentState!.openEndDrawer();
-              }
-            },
-            icon: SvgPicture.asset(
-              'assets/images/menu_icon.svg',
-              color: Constants.secondaryColor,
-            ),
-          ),
+          _controller.userData.isEmpty
+              ? const SizedBox()
+              : IconButton(
+                  onPressed: () {
+                    if (!_scaffoldKey.currentState!.isEndDrawerOpen) {
+                      _scaffoldKey.currentState!.openEndDrawer();
+                    }
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/images/menu_icon.svg',
+                    color: Constants.secondaryColor,
+                  ),
+                ),
         ],
       ),
       endDrawer: SizedBox(

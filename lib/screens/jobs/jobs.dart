@@ -43,7 +43,7 @@ class _JobsState extends State<Jobs> with SingleTickerProviderStateMixin {
     final _prefs = await SharedPreferences.getInstance();
     var user = _prefs.getString("user") ?? "";
     var _token = _prefs.getString("accessToken") ?? "";
-    print("USER ::: $user");
+    // print("USER ::: $user");
     if (user.isNotEmpty) {
       _userData = jsonDecode(user);
     }
@@ -55,7 +55,6 @@ class _JobsState extends State<Jobs> with SingleTickerProviderStateMixin {
     super.initState();
     _init();
     // _controller.setLoading(true);
-    // debugPrint("USER TEST :: ${_getUser()}");
   }
 
   @override
@@ -105,17 +104,19 @@ class _JobsState extends State<Jobs> with SingleTickerProviderStateMixin {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            onPressed: () {
-              if (!_scaffoldKey.currentState!.isEndDrawerOpen) {
-                _scaffoldKey.currentState!.openEndDrawer();
-              }
-            },
-            icon: SvgPicture.asset(
-              'assets/images/menu_icon.svg',
-              color: Constants.secondaryColor,
-            ),
-          ),
+          _controller.userData.isEmpty
+              ? const SizedBox()
+              : IconButton(
+                  onPressed: () {
+                    if (!_scaffoldKey.currentState!.isEndDrawerOpen) {
+                      _scaffoldKey.currentState!.openEndDrawer();
+                    }
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/images/menu_icon.svg',
+                    color: Constants.secondaryColor,
+                  ),
+                ),
         ],
       ),
       endDrawer: SizedBox(

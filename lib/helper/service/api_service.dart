@@ -369,6 +369,27 @@ class APIService {
     );
   }
 
+  Stream<http.Response> getConversationsByChatIdStreamed(
+      {required String email,
+      required String accessToken,
+      required String chatId}) async* {
+    try {
+      // Fetch data and add it to the stream
+      http.Response response = await client.get(
+        Uri.parse('${Constants.baseURL}/api/chat/messages/$email/$chatId'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+      );
+      print("My CHATES REPINSE ::: ${response.body}");
+      yield response; // Yield the response to the stream
+    } catch (error) {
+      // Handle errors by adding an error to the stream
+      _streamController.addError(error);
+    }
+  }
+
   Future<http.Response> postReview(
       {var accessToken, var email, var payload}) async {
     return await client.post(
@@ -598,22 +619,22 @@ class APIService {
     );
   }
 
-  Future<List<dynamic>> getJobApplicationsStreamed(
-      {var accessToken, var email, var jobId}) async {
-    final response = await client.get(
-      Uri.parse(
-          '${Constants.baseURL}/api/job/applications/$email?jobId=$jobId'),
-      headers: {
-        "Content-type": "application/json",
-        "Authorization": "Bearer " + accessToken,
-      },
-    );
-    if (response.statusCode == 200) {
-      debugPrint("MY JOB APPLICATIONS DATA >> ${response.body}");
-      Map<String, dynamic> map = jsonDecode(response.body);
-      return map['docs'] as List<dynamic>;
-    } else {
-      throw Exception('Failed to fetch data from the backend');
+  Stream<http.Response> getJobApplicationsStreamed(
+      {var accessToken, var email, var jobId}) async* {
+    try {
+      // Fetch data and add it to the stream
+      http.Response response = await client.get(
+        Uri.parse(
+            '${Constants.baseURL}/api/job/applications/$email?jobId=$jobId'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + accessToken,
+        },
+      );
+      yield response; // Yield the response to the stream
+    } catch (error) {
+      // Handle errors by adding an error to the stream
+      _streamController.addError(error);
     }
   }
 
@@ -671,9 +692,11 @@ class APIService {
   }
 
   Future<http.Response> getAlerts(
-      {required String accessToken, required String email}) async {
+      {required String accessToken,
+      required String email,
+      required String userId}) async {
     return await client.get(
-      Uri.parse('${Constants.baseURL}/api/alerts/all/$email'),
+      Uri.parse('${Constants.baseURL}/api/alerts/byUser/$email?userId=$userId'),
       headers: {
         "Content-type": "application/json",
         "Authorization": "Bearer " + accessToken,
@@ -714,6 +737,7 @@ class APIService {
           "Authorization": "Bearer " + accessToken,
         },
       );
+      print("USER_CONNECT RESP ::: ${response.body}");
       yield response; // Yield the response to the stream
     } catch (error) {
       // Handle errors by adding an error to the stream
@@ -876,5 +900,39 @@ class APIService {
           "Authorization": "Bearer " + accessToken,
         },
         body: jsonEncode(payload));
+  }
+
+  Future<http.Response> initPayment({
+    required String accessToken,
+    required String email,
+    required String transactionType,
+    required var payload,
+  }) async {
+    return await client.post(
+      Uri.parse(
+          '${Constants.baseURL}/api/payment/init/$email?transactionType=$transactionType'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+      body: jsonEncode(payload),
+    );
+  }
+
+  Future<http.Response> verifyPayment({
+    required String accessToken,
+    required String email,
+    required String transactionType,
+    required var payload,
+  }) async {
+    return await client.post(
+      Uri.parse(
+          '${Constants.baseURL}/api/payment/init/$email?transactionType=$transactionType'),
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + accessToken,
+      },
+      body: jsonEncode(payload),
+    );
   }
 }

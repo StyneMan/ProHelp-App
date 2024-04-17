@@ -5,12 +5,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
 import 'package:prohelp_app/components/dialog/custom_dialog.dart';
 import 'package:prohelp_app/components/inputfield/lineddatefield.dart';
 import 'package:prohelp_app/components/inputfield/lineddropdown2.dart';
 import 'package:prohelp_app/components/inputfield/llinedtextfield.dart';
 import 'package:prohelp_app/components/inputfield/state_lineddropdown.dart';
+import 'package:prohelp_app/components/picker/img_picker.dart';
 import 'package:prohelp_app/components/text_components.dart';
 import 'package:prohelp_app/data/state/statesAndCities.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
@@ -40,6 +42,9 @@ class _PersonalState extends State<Personal> {
   final _addressController = TextEditingController();
   final _zipController = TextEditingController();
   final _ninController = TextEditingController();
+
+  bool _isImagePicked = false;
+  var _croppedFile;
 
   List<String> _cities = [];
 
@@ -107,6 +112,14 @@ class _PersonalState extends State<Personal> {
     });
   }
 
+  _onImageSelected(var file) {
+    setState(() {
+      _isImagePicked = true;
+      _croppedFile = file;
+    });
+    debugPrint("VALUIE::: :: $file");
+  }
+
   @override
   void initState() {
     super.initState();
@@ -117,12 +130,12 @@ class _PersonalState extends State<Personal> {
               .capitalize ??
           widget.manager.getUser()['bio']['firstname'].toString().capitalize ??
           "Not set";
-          _mnameController.text = _controller.userData.value['bio']['middlename']
+      _mnameController.text = _controller.userData.value['bio']['middlename']
               .toString()
               .capitalize ??
           widget.manager.getUser()['bio']['middlename'].toString().capitalize ??
           "Not set";
-          _lnameController.text = _controller.userData.value['bio']['lastname']
+      _lnameController.text = _controller.userData.value['bio']['lastname']
               .toString()
               .capitalize ??
           widget.manager.getUser()['bio']['lastname'].toString().capitalize ??
@@ -378,6 +391,122 @@ class _PersonalState extends State<Personal> {
       key: _formKey,
       child: ListView(
         children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    ClipOval(
+                      child: _isImagePicked
+                          ? Container(
+                              height: 120,
+                              width: 120,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(60),
+                              ),
+                              child: Image.file(
+                                File(_croppedFile),
+                                errorBuilder: (context, error, stackTrace) =>
+                                    ClipOval(
+                                  child: SvgPicture.asset(
+                                    "assets/images/personal.svg",
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : Container(
+                              height: 128,
+                              width: 128,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(64),
+                              ),
+                              child: Image.network(
+                                "${widget.manager.getUser()['bio']['image']}",
+                                errorBuilder: (context, error, stackTrace) =>
+                                    ClipOval(
+                                  child: SvgPicture.asset(
+                                    "assets/images/personal.svg",
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                    ),
+                    Positioned(
+                      bottom: 12,
+                      right: -3,
+                      child: CircleAvatar(
+                        backgroundColor: Constants.primaryColor,
+                        child: IconButton(
+                          onPressed: () {
+                            showBarModalBottomSheet(
+                              expand: false,
+                              context: context,
+                              topControl: ClipOval(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(
+                                        16,
+                                      ),
+                                    ),
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.close,
+                                        size: 24,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              backgroundColor: Colors.white,
+                              builder: (context) => SizedBox(
+                                height: 175,
+                                child: ImgPicker(
+                                  onCropped: _onImageSelected,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.add_a_photo_outlined,
+                            color: Constants.secondaryColor,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 10.0,
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: TextPoppins(
+                    text: "Fill out the form below to change your password.",
+                    fontSize: 14,
+                    align: TextAlign.center,
+                  ),
+                )
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 18.0,
+          ),
           LinedTextField(
             label: "First Name",
             onChanged: (val) {

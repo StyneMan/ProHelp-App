@@ -44,113 +44,45 @@ class _NOKState extends State<NOK> {
   onSelected(val) {
     setState(() {
       _selectedRelationship = val;
+      _shouldEdit = true;
     });
   }
 
   @override
   void initState() {
     super.initState();
+    print("GURANTOR ::: ${_controller.userData.value}");
 
-    setState(() {
-      _nameController.text = _controller.userData.value['guarantor']['name']
-              .toString()
-              .capitalize ??
-          widget.manager.getUser()['guarantor']['name'].toString().capitalize ??
-          "Not set";
-      _phoneController.text = _controller.userData.value['guarantor']
-              ['phone'] ??
-          widget.manager.getUser()['guarantor']['phone'] ??
-          "Not set";
-      _addressController.text = _controller
-              .userData.value['guarantor']['address']
-              .toString()
-              .capitalize ??
-          widget.manager
-              .getUser()['guarantor']['address']
-              .toString()
-              .capitalize ??
-          "Not set";
-      _emailController.text = _controller.userData.value['guarantor']
-              ['email'] ??
-          widget.manager.getUser()['guarantor']['email'] ??
-          "Not set";
+    if (_controller.userData.value.isNotEmpty) {
+      if (_controller.userData.value['guarantor'] != null) {
+        setState(() {
+          _nameController.text = _controller.userData.value['guarantor']['name']
+                  .toString()
+                  .capitalize ??
+              widget.manager
+                  .getUser()['guarantor']['name']
+                  .toString()
+                  .capitalize ??
+              "Not set";
+          _phoneController.text =
+              widget.manager.getUser()['guarantor']['phone'] ?? "Not set";
+          _addressController.text = widget.manager
+                  .getUser()['guarantor']['address']
+                  .toString()
+                  .capitalize ??
+              "Not set";
+          _emailController.text =
+              widget.manager.getUser()['guarantor']['email'] ?? "Not set";
 
-      _relationshipLabel = _controller
-              .userData.value['guarantor']['relationship']
-              .toString()
-              .capitalize ??
-          widget.manager
-              .getUser()['guarantor']['relationship']
-              .toString()
-              .capitalize ??
-          "Select";
-    });
+          _relationshipLabel = widget.manager
+                  .getUser()['guarantor']['relationship']
+                  .toString()
+                  .capitalize ??
+              "Select";
+        });
+      }
+    }
   }
-
-  showStatusDialog() => showDialog(
-        context: context,
-        builder: (BuildContext context) => SizedBox(
-          height: MediaQuery.of(context).size.height * 0.4,
-          width: MediaQuery.of(context).size.width * 0.98,
-          child: CustomDialog(
-            ripple: SvgPicture.asset(
-              "assets/images/check_effect.svg",
-              width: (Constants.avatarRadius + 20),
-              height: (Constants.avatarRadius + 20),
-            ),
-            avtrBg: Colors.transparent,
-            avtrChild: Image.asset(
-              "assets/images/checked.png",
-            ), //const Icon(CupertinoIcons.check_mark, size: 50,),
-            body: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 16.0,
-                horizontal: 36.0,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  TextPoppins(
-                    text: "Profile Update",
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  const SizedBox(
-                    height: 5.0,
-                  ),
-                  TextPoppins(
-                    text: "Updated successfully",
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  const SizedBox(
-                    height: 21,
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.36,
-                    child: RoundedButton(
-                      bgColor: Constants.primaryColor,
-                      child: TextPoppins(
-                        text: "CLOSE",
-                        fontSize: 14,
-                        fontWeight: FontWeight.w300,
-                      ),
-                      borderColor: Colors.transparent,
-                      foreColor: Colors.white,
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      variant: "Filled",
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
 
   _updateProfile() async {
     _controller.setLoading(true);
@@ -158,7 +90,6 @@ class _NOKState extends State<NOK> {
     if (_controller.croppedPic.value.isEmpty) {
       Map _payload = {
         "guarantor": {
-          ...widget.manager.getUser()['bio'],
           "name": _nameController.text.toLowerCase(),
           "phone": _phoneController.text,
           "address": _addressController.text,
@@ -184,6 +115,7 @@ class _NOKState extends State<NOK> {
           //Refresh user profile
           String userData = jsonEncode(map['data']);
           widget.manager.setUserData(userData);
+          _controller.setUserData(map['data']);
 
           setState(() {
             _nameController.text = map['data']['guarantor']['name'];
@@ -193,7 +125,7 @@ class _NOKState extends State<NOK> {
             _shouldEdit = false;
           });
 
-          showStatusDialog();
+          Constants.showStatusDialog(context: context);
         } else {
           Map<String, dynamic> map = jsonDecode(resp.body);
           Constants.toast(map['message']);
@@ -256,7 +188,7 @@ class _NOKState extends State<NOK> {
 
           _controller.croppedPic.value = "";
 
-          showStatusDialog();
+          Constants.showStatusDialog(context: context);
         } else {
           Map<String, dynamic> map = jsonDecode(resp.body);
           Constants.toast(map['message']);
@@ -275,9 +207,77 @@ class _NOKState extends State<NOK> {
       key: _formKey,
       child: ListView(
         children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    ClipOval(
+                      child: Container(
+                        height: 128,
+                        width: 128,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(64),
+                        ),
+                        child: Image.network(
+                          "${widget.manager.getUser()['bio']}",
+                          errorBuilder: (context, error, stackTrace) =>
+                              ClipOval(
+                            child: SvgPicture.asset(
+                              "assets/images/personal.svg",
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 6,
+                      right: -24,
+                      child: Chip(
+                        label: TextInter(
+                          text: widget.manager.getUser()['isGuarantorVerified']
+                              ? "Verified"
+                              : "Not verified",
+                          fontSize: 12,
+                        ),
+                        backgroundColor:
+                            widget.manager.getUser()['isGuarantorVerified']
+                                ? Colors.green
+                                : Colors.amber,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 10.0,
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: TextPoppins(
+                    text:
+                        "Provide accurate information about your gurantor in the form below",
+                    fontSize: 14,
+                    align: TextAlign.center,
+                  ),
+                )
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 18.0,
+          ),
           LinedTextField(
             label: "Name",
-            onChanged: (val) {},
+            onChanged: (val) {
+              setState(() {
+                _shouldEdit = true;
+              });
+            },
             controller: _nameController,
             validator: (value) {
               if (value.toString().isEmpty || value == null) {
@@ -296,7 +296,11 @@ class _NOKState extends State<NOK> {
           ),
           LinedTextField(
             label: "Email",
-            onChanged: (val) {},
+            onChanged: (val) {
+              setState(() {
+                _shouldEdit = true;
+              });
+            },
             controller: _emailController,
             validator: (value) {
               if (value.toString().isEmpty || value == null) {
@@ -304,7 +308,7 @@ class _NOKState extends State<NOK> {
               }
               return null;
             },
-            inputType: TextInputType.name,
+            inputType: TextInputType.emailAddress,
             capitalization: TextCapitalization.words,
           ),
           const Divider(
@@ -315,7 +319,11 @@ class _NOKState extends State<NOK> {
           ),
           LinedTextField(
             label: "Phone ",
-            onChanged: (val) {},
+            onChanged: (val) {
+              setState(() {
+                _shouldEdit = true;
+              });
+            },
             controller: _phoneController,
             validator: (value) {
               if (value.toString().isEmpty || value == null) {
@@ -346,7 +354,11 @@ class _NOKState extends State<NOK> {
           ),
           LinedTextField(
             label: "Address",
-            onChanged: (val) {},
+            onChanged: (val) {
+              setState(() {
+                _shouldEdit = true;
+              });
+            },
             controller: _addressController,
             validator: (value) {
               if (value.toString().isEmpty || value == null) {
@@ -369,7 +381,7 @@ class _NOKState extends State<NOK> {
             child: const TextInter(text: "SAVE CHANGES", fontSize: 16),
             borderColor: Colors.transparent,
             foreColor: Colors.white,
-            onPressed: !_shouldEdit && _controller.croppedPic.value.isEmpty
+            onPressed: !_shouldEdit
                 ? null
                 : () {
                     if (_formKey.currentState!.validate()) {
