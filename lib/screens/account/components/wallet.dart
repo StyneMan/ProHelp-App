@@ -95,15 +95,15 @@ class MyWallet extends StatelessWidget {
                         manager: manager,
                       ),
                       const SizedBox(height: 16),
-                      TextPoppins(
-                        text: "Transactions",
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      const SizedBox(height: 2.0),
-                      TransactionList(
-                        manager: manager,
-                      ),
+                      // TextPoppins(
+                      //   text: "Transactions",
+                      //   fontSize: 17,
+                      //   fontWeight: FontWeight.w600,
+                      // ),
+                      // const SizedBox(height: 2.0),
+                      // TransactionList(
+                      //   manager: manager,
+                      // ),
                     ],
                   ),
           ),

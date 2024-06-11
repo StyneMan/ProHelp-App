@@ -55,10 +55,12 @@ class _SetupProfileState extends State<SetupProfile> {
   Map _step2Payload = {};
   Map _step3Payload = {};
   Map _step4Payload = {};
+  String _gurantorIDUrl = "";
 
   List<String> _downloadURLs = [];
   bool _isImagePicked = false;
   String _croppedFile = "";
+  bool _isNotPicked = true;
 
   final socket = SocketManager().socket;
 
@@ -89,66 +91,97 @@ class _SetupProfileState extends State<SetupProfile> {
     }
   }
 
+  Future<void> _uploadGurantorID() async {
+    try {
+      final file = File(_step2Payload['pickedFile'].path);
+      final storageRef = FirebaseStorage.instance.ref();
+
+      final uploadTask = storageRef
+          .child("gurantors")
+          .child(
+              "${widget.manager.getUser()['id']}_gurantor${_step2Payload['pickedFile']?.extension}")
+          .putFile(file);
+
+      uploadTask.then((p0) async {
+        final _url = await p0.ref.getDownloadURL();
+
+        debugPrint("DOWNLOAD URLS AT >>>>> $_url}");
+
+        setState(() {
+          _gurantorIDUrl = _url;
+        });
+      });
+    } on FirebaseException catch (e) {
+      _controller.setLoading(true);
+      debugPrint(e.toString());
+    }
+  }
+
   _saveProfile(context, url) async {
     _controller.setLoading(true);
-    Map _payload = {
-      "accountType": "professional",
-      "bio": {
-        "firstname": _step1Payload['firstname'].toLowerCase() ??
-            _controller.firstname.value.toLowerCase(),
-        "lastname": _step1Payload['lastname'].toLowerCase() ??
-            _controller.middlename.value.toLowerCase(),
-        "middlename": _step1Payload['middlename'].toLowerCase() ??
-            _controller.lastname.value.toLowerCase(),
-        "phone": _step1Payload['phone'] ?? _controller.phone.value,
-        "gender": _step1Payload['gender'].toLowerCase() ??
-            _controller.gender.value.toLowerCase(),
-        "maritalStatus": _step1Payload['maritalStatus'].toLowerCase() ??
-            _controller.maritalStatus.value.toLowerCase(),
-        "dob": _step1Payload['dob'],
-        "image": url
-      },
-      "address": {
-        "street": _step1Payload['address'].toLowerCase() ??
-            _controller.address.value.toLowerCase(),
-        "city": _step1Payload['city'] ?? _controller.city.value.toLowerCase(),
-        "country":
-            "nigeria", //_step1Payload['country'].toString().toLowerCase(),
-        "state": _step1Payload['state'].toLowerCase() ??
-            _controller.state.value.toLowerCase(),
-      },
-      "profession": _step1Payload['profession'].toLowerCase() ??
-          _controller.profession.value.toLowerCase(),
-      "experienceYears": _step1Payload['experienceYears'].toLowerCase() ??
-          _controller.experience.value.toLowerCase(),
-      "guarantor": {
-        "name": _step2Payload['nokName'].toLowerCase() ??
-            _controller.nokName.value.toLowerCase(),
-        "address": _step2Payload['nokAddress'].toLowerCase() ??
-            _controller.nokAddress.value.toLowerCase(),
-        "email": _step2Payload['nokEmail'] ?? _controller.nokEmail.value,
-        "phone": _step2Payload['nokPhone'] ?? _controller.nokPhone.value,
-        "relationship": _step2Payload['relationship'].toLowerCase() ??
-            _controller.nokRelationship.value.toLowerCase(),
-      },
-      "hasProfile": true,
-      "education": [
-        {
-          "school": "${_step3Payload['school']}".toLowerCase(),
-          "degree": "${_step3Payload['degree']}".toLowerCase(),
-          "course": "${_step3Payload['fieldStudy']}"?.toLowerCase() ??
-              _controller.fieldStudy.value?.toLowerCase(),
-          "schoolLogo": "",
-          "endate": "${_step3Payload['dateGraduated']}",
-          "stillSchooling": false
-        },
-      ],
-      "disability": _step4Payload['disability'] ?? "none",
-      "languagesSpoken": _controller.languagesSpoken.value,
-      "languagesWriteSpeak": _controller.languagesSpeakWrite.value,
-    };
 
     try {
+      await _uploadGurantorID();
+
+      Map _payload = {
+        "accountType": "professional",
+        "bio": {
+          "firstname": _step1Payload['firstname'].toLowerCase() ??
+              _controller.firstname.value.toLowerCase(),
+          "lastname": _step1Payload['lastname'].toLowerCase() ??
+              _controller.middlename.value.toLowerCase(),
+          "middlename": _step1Payload['middlename'].toLowerCase() ??
+              _controller.lastname.value.toLowerCase(),
+          "phone": _step1Payload['phone'] ?? _controller.phone.value,
+          "gender": _step1Payload['gender'].toLowerCase() ??
+              _controller.gender.value.toLowerCase(),
+          "maritalStatus": _step1Payload['maritalStatus'].toLowerCase() ??
+              _controller.maritalStatus.value.toLowerCase(),
+          "dob": _step1Payload['dob'],
+          "image": url
+        },
+        "address": {
+          "street": _step1Payload['address'].toLowerCase() ??
+              _controller.address.value.toLowerCase(),
+          "city": _step1Payload['city'] ?? _controller.city.value.toLowerCase(),
+          "country":
+              "nigeria", //_step1Payload['country'].toString().toLowerCase(),
+          "state": _step1Payload['state'].toLowerCase() ??
+              _controller.state.value.toLowerCase(),
+        },
+        "profession": _step1Payload['profession'].toLowerCase() ??
+            _controller.profession.value.toLowerCase(),
+        "experienceYears": _step1Payload['experienceYears'].toLowerCase() ??
+            _controller.experience.value.toLowerCase(),
+        "guarantor": {
+          "name": _step2Payload['nokName'].toLowerCase() ??
+              _controller.nokName.value.toLowerCase(),
+          "address": _step2Payload['nokAddress'].toLowerCase() ??
+              _controller.nokAddress.value.toLowerCase(),
+          "email": _step2Payload['nokEmail'] ?? _controller.nokEmail.value,
+          "phone": _step2Payload['nokPhone'] ?? _controller.nokPhone.value,
+          "meansOfID": _step2Payload['idMeans'] ?? _controller.nokIdType.value,
+          "idCard": _gurantorIDUrl,
+          "relationship": _step2Payload['relationship'].toLowerCase() ??
+              _controller.nokRelationship.value.toLowerCase(),
+        },
+        "hasProfile": true,
+        "education": [
+          {
+            "school": "${_step3Payload['school']}".toLowerCase(),
+            "degree": "${_step3Payload['degree']}".toLowerCase(),
+            "course": "${_step3Payload['fieldStudy']}"?.toLowerCase() ??
+                _controller.fieldStudy.value?.toLowerCase(),
+            "schoolLogo": "",
+            "endate": "${_step3Payload['dateGraduated']}",
+            "stillSchooling": false
+          },
+        ],
+        "disability": _step4Payload['disability'] ?? "none",
+        "languagesSpoken": _controller.languagesSpoken.value,
+        "languagesWriteSpeak": _controller.languagesSpeakWrite.value,
+      };
+
       final _prefs = await SharedPreferences.getInstance();
       var _token = _prefs.getString("accessToken") ?? "";
       // widget.manager.setIsLoggedIn(true);
@@ -209,7 +242,14 @@ class _SetupProfileState extends State<SetupProfile> {
     debugPrint("STEP TWO DATA >> $data");
     // setState(() {
     _step2Payload = data;
-    // });
+
+    if (data.isEmpty) {
+      setState(() => _isNotPicked = true);
+    } else {
+      if (data['pickedFile'] != null) {
+        setState(() => _isNotPicked = false);
+      }
+    }
   }
 
   _onStep3Completed(Map data) {
@@ -252,6 +292,7 @@ class _SetupProfileState extends State<SetupProfile> {
             ? "0${_step2Payload['nokPhone'].toString().substring(4)}"
             : "${_step2Payload['nokPhone']}";
     _controller.nokRelationship.value = _step2Payload['relationship'];
+    _controller.nokIdType.value = _step2Payload['idMeans'];
   }
 
   _saveStep3ToState() {
@@ -392,6 +433,7 @@ class _SetupProfileState extends State<SetupProfile> {
                               : _controller.currentProfileStep.value == 1
                                   ? SetupStep2(
                                       onStep2Completed: _onStep2Completed,
+                                      isError: _isNotPicked,
                                     )
                                   : _controller.currentProfileStep.value == 2
                                       ? SetupStep3(
@@ -453,6 +495,13 @@ class _SetupProfileState extends State<SetupProfile> {
                                   } else if (_controller
                                           .currentProfileStep.value ==
                                       1) {
+                                    if (_formKey.currentState!.validate() &&
+                                        !_isNotPicked &&
+                                        _step2Payload['fileSize'] < 2048.0) {
+                                      // _saveStep2ToState();
+                                      _controller
+                                          .currentApplicationStep.value += 1;
+                                    }
                                     if (_step2Payload['relationship']
                                         .toString()
                                         .isNotEmpty) {

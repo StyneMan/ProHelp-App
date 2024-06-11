@@ -114,6 +114,7 @@ class StateController extends GetxController {
   var nokPhone = "".obs;
   var nokAddress = "".obs;
   var nokRelationship = "".obs;
+  var nokIdType = "".obs;
 
   // ****** PROFILE SETUP STEP THREE *******
   var school = "".obs;
@@ -346,6 +347,7 @@ class StateController extends GetxController {
     degree.value = "";
     school.value = "";
     nokRelationship.value = "";
+    nokIdType.value = "";
     nokAddress.value = "";
     nokPhone.value = "";
     nokEmail.value = "";

@@ -101,7 +101,7 @@ class Messages extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 48.0),
                       child: TextInter(
                         text:
-                            "No chats found. Connect with ${manager.getUser()['accountType'] == "recruiter" ? "professionals" : "job recruiters"} and start chatting!",
+                            "No chats found. Connect with ${manager.getUser()['accountType'] == "recruiter" ? "Service providers" : "job recruiters"} and start chatting!",
                         fontSize: 16,
                         align: TextAlign.center,
                       ),

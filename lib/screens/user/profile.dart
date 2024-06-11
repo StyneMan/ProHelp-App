@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +18,6 @@ import 'package:prohelp_app/helper/socket/socket_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/connections/connection.dart';
 import 'package:prohelp_app/screens/reviews/reviews.dart';
-import 'package:prohelp_app/screens/connections/manage_connections.dart';
 
 import 'components/block_report.dart';
 import 'components/conectedinfo.dart';

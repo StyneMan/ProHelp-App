@@ -135,13 +135,6 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-// List _socketEvents = [
-//   "-notification-created",
-//   "-booking-updated",
-//   "-chat-alert",
-//   "-profile-updated",
-// ];
-
 class _MyAppState extends State<MyApp> {
   final _controller = Get.put(StateController());
   Widget? component;
@@ -265,6 +258,7 @@ class _MyAppState extends State<MyApp> {
           "job-posted",
           (data) {
             debugPrint("JOB POSTED NOW!! >> $data");
+            Constants.toast("JUST POSTED NEW JOB !!!");
             _controller.onInit();
           },
         );
@@ -449,7 +443,9 @@ class _MyAppState extends State<MyApp> {
         "FromAPI",
         (data) => debugPrint("DATA FROM SERVER >> $data"),
       );
-    } catch (e) {}
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   @override

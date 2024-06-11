@@ -110,7 +110,7 @@ class _ViewCategoryState extends State<ViewCategory> {
                             children: [
                               Image.asset('assets/images/empty.png'),
                               const Text(
-                                "No professionals found",
+                                "No service providers found",
                                 textAlign: TextAlign.center,
                               ),
                             ],
@@ -136,7 +136,7 @@ class _ViewCategoryState extends State<ViewCategory> {
                             ),
                             Image.asset('assets/images/empty.png'),
                             const Text(
-                              "No professionals found",
+                              "No service providers found",
                               textAlign: TextAlign.center,
                             ),
                           ],

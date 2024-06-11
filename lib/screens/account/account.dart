@@ -76,17 +76,18 @@ class Account extends StatelessWidget {
         centerTitle: true,
         actions: [
           _controller.userData.isEmpty
-                ? const SizedBox() : IconButton(
-            onPressed: () {
-              if (!_scaffoldKey.currentState!.isEndDrawerOpen) {
-                _scaffoldKey.currentState!.openEndDrawer();
-              }
-            },
-            icon: SvgPicture.asset(
-              'assets/images/menu_icon.svg',
-              color: Constants.secondaryColor,
-            ),
-          ),
+              ? const SizedBox()
+              : IconButton(
+                  onPressed: () {
+                    if (!_scaffoldKey.currentState!.isEndDrawerOpen) {
+                      _scaffoldKey.currentState!.openEndDrawer();
+                    }
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/images/menu_icon.svg',
+                    color: Constants.secondaryColor,
+                  ),
+                ),
         ],
       ),
       endDrawer: SizedBox(
@@ -135,8 +136,8 @@ class Account extends StatelessWidget {
                         height: 1.0,
                       ),
                       TextPoppins(
-                        text: manager.getUser()['accountType'] == "freelancer"
-                            ? "Professional".toUpperCase()
+                        text: manager.getUser()['accountType'] == "professional"
+                            ? "Service Provider".toUpperCase()
                             : manager
                                 .getUser()['accountType']
                                 .toString()

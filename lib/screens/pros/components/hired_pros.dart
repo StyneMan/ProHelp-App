@@ -30,7 +30,7 @@ class HiredProfessionals extends StatelessWidget {
                 children: [
                   Image.asset('assets/images/empty.png'),
                   const Text(
-                    "No professionals found",
+                    "No service providers found",
                     textAlign: TextAlign.center,
                   ),
                 ],

@@ -381,7 +381,7 @@ class _JobsState extends State<Jobs> with SingleTickerProviderStateMixin {
                                       Image.asset("assets/images/coin_gold.png",
                                           width: 40),
                                       Text(
-                                        "${Constants.formatMoney(_controller.userData.value['wallet']['balance'] ?? 0)}",
+                                        Constants.formatMoney(_controller.userData.value['wallet']['balance'] ?? 0),
                                         style: const TextStyle(
                                           fontWeight: FontWeight.w600,
                                           fontSize: 21,
@@ -415,7 +415,7 @@ class _JobsState extends State<Jobs> with SingleTickerProviderStateMixin {
                                         width: 40,
                                       ),
                                       Text(
-                                        "${Constants.formatMoney(_controller.userData.value['wallet']['prevBalance'] ?? 0)}",
+                                        Constants.formatMoney(_controller.userData.value['wallet']['prevBalance'] ?? 0),
                                         style: const TextStyle(
                                           fontWeight: FontWeight.w600,
                                           fontSize: 21,

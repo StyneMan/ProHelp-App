@@ -30,7 +30,7 @@ class SavedProfessionals extends StatelessWidget {
                 children: [
                   Image.asset('assets/images/empty.png'),
                   const Text(
-                    "No saved professionals found",
+                    "No saved service providers found",
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -75,7 +75,7 @@ class SavedProfessionals extends StatelessWidget {
                       children: [
                         Image.asset('assets/images/empty.png'),
                         const Text(
-                          "No saved professionals found",
+                          "No saved service providers found",
                           textAlign: TextAlign.center,
                         ),
                       ],
