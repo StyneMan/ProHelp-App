@@ -47,21 +47,19 @@ class Account extends StatelessWidget {
             const SizedBox(
               width: 16.0,
             ),
-            _controller.userData.isEmpty
-                ? const SizedBox()
-                : ClipOval(
-                    child: Image.network(
-                      "${_controller.userData.value['bio']['image'] ?? ""}",
-                      errorBuilder: (context, error, stackTrace) => const Icon(
-                        CupertinoIcons.person_alt,
-                        size: 21,
-                        color: Colors.white,
-                      ),
-                      width: 36,
-                      height: 36,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+            ClipOval(
+              child: Image.network(
+                manager.getUser()['bio']['image'] ?? "",
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  CupertinoIcons.person_alt,
+                  size: 21,
+                  color: Colors.white,
+                ),
+                width: 36,
+                height: 36,
+                fit: BoxFit.cover,
+              ),
+            ),
             const SizedBox(
               width: 4.0,
             ),
@@ -104,7 +102,9 @@ class Account extends StatelessWidget {
                 Center(
                   child: ClipOval(
                     child: Image.network(
-                      _controller.userData.value['bio']['image'],
+                      manager.getUser()['bio']['image'] ??
+                          _controller.userData.value['bio']['image'] ??
+                          "",
                       errorBuilder: (context, error, stackTrace) =>
                           SvgPicture.asset(
                         "assets/images/personal.svg",

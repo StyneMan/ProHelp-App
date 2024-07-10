@@ -4,20 +4,19 @@ import 'package:flutter/services.dart';
 
 ThemeData appTheme = ThemeData(
   primaryColor: Constants.primaryColor,
-  primaryColorBrightness: Brightness.dark,
   appBarTheme: const AppBarTheme(
     systemOverlayStyle:
         SystemUiOverlayStyle(statusBarBrightness: Brightness.light),
   ),
   textTheme: const TextTheme(
-    bodyText2: TextStyle(),
+    bodyMedium: TextStyle(),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(elevation: 0.0),
   ),
   checkboxTheme: CheckboxThemeData(
-    checkColor:MaterialStateProperty.all<Color?>(Colors.white),
-    fillColor: MaterialStateProperty.all<Color?>(Constants.primaryColor),
+    checkColor: WidgetStateProperty.all<Color?>(Colors.white),
+    fillColor: WidgetStateProperty.all<Color?>(Constants.primaryColor),
     splashRadius: 1.0,
   ),
   visualDensity: VisualDensity.adaptivePlatformDensity,

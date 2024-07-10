@@ -24,7 +24,7 @@ class _VerificationsContentState extends State<VerificationsContent> {
   ReceivePort _port = ReceivePort();
 
   int _progress = 0, currIndex = 0;
-  bool _isComplete = true; 
+  bool _isComplete = true;
   List<Map> rowMaps = [];
   List<Map> downloadsListMaps = [];
 
@@ -50,7 +50,6 @@ class _VerificationsContentState extends State<VerificationsContent> {
         _port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) {
       String id = data[0];
-      DownloadTaskStatus status = DownloadTaskStatus(data[1]);
       _progress = data[2];
       setState(() {});
     });

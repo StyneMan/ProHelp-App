@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
+// import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -129,7 +129,7 @@ class StateController extends GetxController {
   String _token = "";
   RxString dbItem = 'Awaiting data'.obs;
 
-  final Connectivity _connectivity = Connectivity();
+  // final Connectivity _connectivity = Connectivity();
 
   Future<void> initDao() async {
     // instantiate Dao only if null (i.e. not supplied in constructor)
@@ -272,27 +272,27 @@ class StateController extends GetxController {
     }
   }
 
-  void _updateConnectionStatus(ConnectivityResult connectivityResult) {
-    if (connectivityResult == ConnectivityResult.none) {
-      Get.rawSnackbar(
-          messageText: const Text('PLEASE CONNECT TO THE INTERNET',
-              style: TextStyle(color: Colors.white, fontSize: 14)),
-          isDismissible: false,
-          duration: const Duration(days: 1),
-          backgroundColor: Colors.red[400]!,
-          icon: const Icon(
-            Icons.wifi_off,
-            color: Colors.white,
-            size: 35,
-          ),
-          margin: EdgeInsets.zero,
-          snackStyle: SnackStyle.GROUNDED);
-    } else {
-      if (Get.isSnackbarOpen) {
-        Get.closeCurrentSnackbar();
-      }
-    }
-  }
+  // void _updateConnectionStatus(ConnectivityResult connectivityResult) {
+  //   if (connectivityResult == ConnectivityResult.none) {
+  //     Get.rawSnackbar(
+  //         messageText: const Text('PLEASE CONNECT TO THE INTERNET',
+  //             style: TextStyle(color: Colors.white, fontSize: 14)),
+  //         isDismissible: false,
+  //         duration: const Duration(days: 1),
+  //         backgroundColor: Colors.red[400]!,
+  //         icon: const Icon(
+  //           Icons.wifi_off,
+  //           color: Colors.white,
+  //           size: 35,
+  //         ),
+  //         margin: EdgeInsets.zero,
+  //         snackStyle: SnackStyle.GROUNDED);
+  //   } else {
+  //     if (Get.isSnackbarOpen) {
+  //       Get.closeCurrentSnackbar();
+  //     }
+  //   }
+  // }
 
   Widget currentScreen = const SizedBox();
 

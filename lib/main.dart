@@ -4,14 +4,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:prohelp_app/components/dashboard/dashboard.dart';
 import 'package:prohelp_app/firebase_options.dart';
 import 'package:prohelp_app/helper/constants/constants.dart';
 import 'package:prohelp_app/helper/preference/preference_manager.dart';
-import 'package:prohelp_app/helper/socket/pusher_manager.dart';
 import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/helper/theme/app_theme.dart';
 import 'package:prohelp_app/screens/jobs/applications.dart';
@@ -22,7 +22,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:prohelp_app/screens/welcome/welcome.dart';
-import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
@@ -65,12 +64,10 @@ class AwaitBindings extends Bindings {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  // await initFirebase();
-
-  // FirebaseApp app = await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
-  // print('Initialized default app $app');
+  await FirebaseAppCheck.instance.activate(
+    androidProvider: AndroidProvider.playIntegrity,
+    appleProvider: AppleProvider.appAttest,
+  );
 
   await FlutterDownloader.initialize(
       debug:
@@ -141,7 +138,7 @@ class _MyAppState extends State<MyApp> {
   PreferenceManager? _manager;
   bool _authenticated = false;
 
-  final player = AudioPlayer();
+  // final player = AudioPlayer();
 
   _init() async {
     // print("FROM MAIN DART ::::");
@@ -421,7 +418,7 @@ class _MyAppState extends State<MyApp> {
 
             _refreshChatList();
             //Now play sound here
-            AudioPlayer().play(AssetSource('assets/audio/sound2.mp3'));
+            // AudioPlayer().play(AssetSource('assets/audio/sound2.mp3'));
           },
         );
 
@@ -434,7 +431,7 @@ class _MyAppState extends State<MyApp> {
 
             _refreshChatList();
             //Now play sound here
-            AudioPlayer().play(AssetSource('assets/audio/sound2.mp3'));
+            // AudioPlayer().play(AssetSource('assets/audio/sound2.mp3'));
           },
         );
       }
@@ -458,7 +455,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() async {
-    await player.dispose();
+    // await player.dispose();
     super.dispose();
   }
 

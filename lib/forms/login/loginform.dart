@@ -9,12 +9,11 @@ import 'package:prohelp_app/components/button/roundedbutton.dart';
 import 'package:prohelp_app/components/inputfield/passwordfield.dart';
 import 'package:prohelp_app/components/inputfield/textfield.dart';
 import 'package:prohelp_app/helper/service/api_service.dart';
-import 'package:prohelp_app/helper/socket/pusher_manager.dart';
 import 'package:prohelp_app/helper/socket/socket_manager.dart';
 import 'package:prohelp_app/screens/account/setup_profile.dart';
 import 'package:prohelp_app/screens/account/setup_profile_employer.dart';
 import 'package:prohelp_app/screens/auth/otp/verifyotp.dart';
-import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
+// import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 
 import '../../components/dashboard/dashboard.dart';
 import '../../components/text_components.dart';

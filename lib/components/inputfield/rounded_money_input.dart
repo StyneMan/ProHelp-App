@@ -32,13 +32,13 @@ class RoundedInputMoney extends StatelessWidget {
       controller: controller,
       validator: validator,
       enabled: enabled,
-      inputFormatters: <TextInputFormatter>[
-        CurrencyTextInputFormatter(
-          locale: 'en',
-          decimalDigits: 0,
-          symbol: '₦ ',
-        ),
-      ],
+      // inputFormatters: <TextInputFormatter>[
+      //   CurrencyTextInputFormatter(
+      //     locale: 'en',
+      //     decimalDigits: 0,
+      //     symbol: '₦ ',
+      //   ),
+      // ],
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(

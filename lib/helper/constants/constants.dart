@@ -28,8 +28,8 @@ class Constants {
   static const Color shimmerBaseColor = Color.fromARGB(255, 203, 203, 203);
   static const Color shimmerHighlightColor = Colors.white;
 
-  static const baseURL = "http://162.254.32.113:8082";
-  // "https://my-prohelp-server.vercel.app";
+  static const baseURL = "https://my-prohelp-server.vercel.app";
+  // "http://162.254.32.113:8082";
   // "http://192.168.113.247:8082"; //
 
   static String pstk = "pk_test_40f544aec0415695c9fae0ba0819ee5bebcb6a5e";

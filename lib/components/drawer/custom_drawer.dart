@@ -82,19 +82,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
             icon: Icons.info_outline,
             title: 'About us',
             isAction: true,
-            url: "https://prohelp.ng"
-            // widget: Categories(
-            //   manager: widget.manager,
-            // ),
-            ),
-        // DrawerModel(
-        //   icon: CupertinoIcons.money_dollar_circle,
-        //   title: 'Earnings',
-        //   isAction: false,
-        //   widget: Earnings(
-        //     manager: widget.manager,
-        //   ),
-        // ),
+            url: "https://prohelp.ng"),
+        DrawerModel(
+          icon: CupertinoIcons.person_badge_minus,
+          title: 'Delete Account',
+          isAction: true,
+        ),
       ];
     });
   }
@@ -275,8 +268,28 @@ class _CustomDrawerState extends State<CustomDrawer> {
                               _controller.selectedIndex.value = 2;
                             } else {
                               if (drawerList[i].isAction) {
-                                Navigator.of(context).pop();
-                                _launchInBrowser("${drawerList[i].url}");
+                                if (drawerList[i].title == "Delete Account") {
+                                  Navigator.of(context).pop();
+                                  //  Now show dialog here
+                                  Constants.showConfirmDialog(
+                                    context: context,
+                                    message:
+                                        "Request Account Deletion: \n\nAre you sure you want to delete your account and all your records from our platform? Action cannot be undone once request is approved.",
+                                    onPressed: () {
+                                      Get.back();
+                                      _controller.setLoading(true);
+                                      Future.delayed(const Duration(seconds: 4),
+                                          () {
+                                        _controller.setLoading(false);
+                                        Constants.toast(
+                                            "Request sent successfully");
+                                      });
+                                    },
+                                  );
+                                } else {
+                                  Navigator.of(context).pop();
+                                  _launchInBrowser("${drawerList[i].url}");
+                                }
                               } else {
                                 Navigator.of(context).pop();
                                 Navigator.of(context).push(

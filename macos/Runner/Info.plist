@@ -28,5 +28,24 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>processing</string>
+	</array>
+	
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+ 	<array>
+     	<string>com.prohelpng.app.task1</string>
+   		<string>com.prohelpng.app.task2</string>
+    <!-- Add more task identifiers if needed -->
+	</array>
+
 </dict>
 </plist>
