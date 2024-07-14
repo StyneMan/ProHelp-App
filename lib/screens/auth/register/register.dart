@@ -362,7 +362,6 @@ class _RegisterState extends State<Register> {
 
                               if (map['message'].contains("Account created") ||
                                   resp.statusCode == 200) {
-                                debugPrint("AAA");
                                 //New account so now select user type recruiter or freelancer
                                 Navigator.of(context).pushReplacement(
                                   PageTransition(
