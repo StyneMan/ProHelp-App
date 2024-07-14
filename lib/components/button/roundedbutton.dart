@@ -21,7 +21,7 @@ class RoundedButton extends StatelessWidget {
     required this.onPressed,
     required this.variant,
     this.paddingX = 12.0,
-    this.paddingY = 11.0,
+    this.paddingY = 10.0,
     this.isLoading = false,
   }) : super(key: key);
 
@@ -42,8 +42,9 @@ class RoundedButton extends StatelessWidget {
           child: child,
           onPressed: isLoading ? null : onPressed,
           style: TextButton.styleFrom(
-            padding:
-                EdgeInsets.symmetric(vertical: paddingY, horizontal: paddingX),
+            padding: EdgeInsets.symmetric(
+                vertical: paddingY,
+                horizontal: variant == "Outlined" ? 5.0 : paddingX),
             foregroundColor: foreColor,
             backgroundColor:
                 variant == "Outlined" ? Colors.transparent : bgColor,

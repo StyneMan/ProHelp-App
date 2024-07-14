@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:loading_overlay_pro/loading_overlay_pro.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:prohelp_app/components/button/roundedbutton.dart';
 import 'package:prohelp_app/components/dashboard/dashboard.dart';
 import 'package:prohelp_app/components/dividers/horz_text_divider.dart';
@@ -20,6 +20,7 @@ import 'package:prohelp_app/helper/state/state_manager.dart';
 import 'package:prohelp_app/screens/account/setup_profile.dart';
 import 'package:prohelp_app/screens/account/setup_profile_employer.dart';
 import 'package:prohelp_app/screens/auth/account_type/account_type.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class Login extends StatefulWidget {
@@ -129,6 +130,28 @@ class _LoginState extends State<Login> {
     }
   }
 
+  _signInApple() async {
+    try {
+      SignInWithAppleButton(
+        onPressed: () async {
+          final credential = await SignInWithApple.getAppleIDCredential(
+            scopes: [
+              AppleIDAuthorizationScopes.email,
+              AppleIDAuthorizationScopes.fullName,
+            ],
+          );
+
+          print(credential);
+
+          // Now send the credential (especially `credential.authorizationCode`) to your server to create a session
+          // after they have been validated with Apple (see `Integration` section for more information on how to do this)
+        },
+      );
+    } catch (e) {
+      debugPrint("HJEH :: ${e}");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(
@@ -141,8 +164,8 @@ class _LoginState extends State<Login> {
             clipBehavior: Clip.none,
             children: [
               SlidingUpPanel(
-                maxHeight: MediaQuery.of(context).size.height * 0.64,
-                minHeight: MediaQuery.of(context).size.height * 0.64,
+                maxHeight: MediaQuery.of(context).size.height * 0.68,
+                minHeight: MediaQuery.of(context).size.height * 0.68,
                 parallaxEnabled: true,
                 defaultPanelState: PanelState.OPEN,
                 renderPanelSheet: true,
@@ -213,7 +236,7 @@ class _LoginState extends State<Login> {
               right: 0,
               child: Container(
                 width: double.infinity,
-                height: 60,
+                height: 56,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.5),
                   image: const DecorationImage(
@@ -267,7 +290,64 @@ class _LoginState extends State<Login> {
                     _signInWithGoogle();
                   },
                   variant: "Filled",
-                )
+                ),
+                const SizedBox(height: 10.0),
+                Platform.isIOS
+                    ? RoundedButton(
+                        bgColor: Colors.transparent,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              "assets/images/apple_logo.svg",
+                              width: 21,
+                              color: Constants.primaryColor,
+                            ),
+                            const SizedBox(
+                              width: 8.0,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: TextPoppins(
+                                text: "Sign up with Apple",
+                                fontSize: 15,
+                                color: Constants.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        borderColor: Constants.primaryColor,
+                        foreColor: Constants.primaryColor,
+                        onPressed: () async {
+                          try {
+                            final credential =
+                                await SignInWithApple.getAppleIDCredential(
+                              scopes: [
+                                AppleIDAuthorizationScopes.email,
+                                AppleIDAuthorizationScopes.fullName,
+                              ],
+                            );
+
+                            print(
+                                "APPLE LOGIN CREDENTIAL ::: ${credential.authorizationCode}");
+                            print(
+                                "APPLE LOGIN CREDENTIAL 2 ::: ${credential.email}");
+                            print(
+                                "APPLE LOGIN CREDENTIAL 3 ::: ${credential.familyName}");
+                            print(
+                                "APPLE LOGIN CREDENTIAL 4 ::: ${credential.givenName}");
+                            print(
+                                "APPLE LOGIN CREDENTIAL 5 ::: ${credential.identityToken}");
+                            print(
+                                "APPLE LOGIN CREDENTIAL 6 ::: ${credential.userIdentifier}");
+                          } catch (e) {
+                            debugPrint(e.toString());
+                          }
+                        },
+                        variant: "Outlined",
+                      )
+                    : const SizedBox(),
               ],
             ),
           ],

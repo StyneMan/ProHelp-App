@@ -76,8 +76,8 @@ class CustomTextField extends StatelessWidget {
         ),
         labelStyle: const TextStyle(
           fontFamily: "Poppins",
-          fontWeight: FontWeight.w500,
-          fontSize: 18,
+          fontWeight: FontWeight.w400,
+          fontSize: 16,
         ),
         suffixIcon: endIcon,
       ),

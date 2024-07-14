@@ -43,53 +43,49 @@ class _PasswordFieldState extends State<PasswordField> {
       validator: widget.validator,
       keyboardType: TextInputType.visiblePassword,
       decoration: InputDecoration(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
-      border:  OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(widget.borderRadius),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(widget.borderRadius),
+            ),
+            gapPadding: 1.0,
           ),
-          gapPadding: 1.0,
-        ),
-        enabledBorder:  OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(widget.borderRadius),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(widget.borderRadius),
+            ),
+            gapPadding: 1.0,
           ),
-          gapPadding: 1.0,
-        ),
-        focusedBorder:  OutlineInputBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(widget.borderRadius),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(widget.borderRadius),
+            ),
+            gapPadding: 1.0,
           ),
-          gapPadding: 1.0,
-        ),
-        filled: false,
-        focusColor: Constants.accentColor,
-        hintStyle: const TextStyle(
-          fontFamily: "Poppins",
-          fontWeight: FontWeight.w400,
-          color: Colors.black54,
-          fontSize: 14
-        ),
-        labelStyle: const TextStyle(
-          fontFamily: "Poppins",
-          fontWeight: FontWeight.w500,
-          fontSize: 18
-        ),
-        isDense: true,
-        hintText: widget.hint ?? "Password",
-        labelText: widget.hint ?? "Password",
-        suffix: InkWell(
-          onTap: () => _togglePass(),
-          child: Icon(
-            _obscureText
-                ? CupertinoIcons.eye_slash_fill
-                : CupertinoIcons.eye,
+          filled: false,
+          focusColor: Constants.accentColor,
+          hintStyle: const TextStyle(
+            fontFamily: "Poppins",
+            fontWeight: FontWeight.w400,
             color: Colors.black54,
+            fontSize: 14,
           ),
-        ),
-        suffixStyle: const TextStyle(color: Colors.black54)
-        // border: InputBorder.none,
-      ),
+          labelStyle: const TextStyle(
+              fontFamily: "Poppins", fontWeight: FontWeight.w400, fontSize: 16),
+          isDense: true,
+          hintText: widget.hint ?? "Password",
+          labelText: widget.hint ?? "Password",
+          suffix: InkWell(
+            onTap: () => _togglePass(),
+            child: Icon(
+              _obscureText ? CupertinoIcons.eye_slash_fill : CupertinoIcons.eye,
+              color: Colors.black54,
+            ),
+          ),
+          suffixStyle: const TextStyle(color: Colors.black54)
+          // border: InputBorder.none,
+          ),
     );
   }
 }

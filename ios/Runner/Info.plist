@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key></key>
+	<string></string>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.prohelpng.app.task1</string>
@@ -78,6 +80,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.964741321159-8kponhleh5thordpkib5n2ahuk0vtuks</string>
+				<string>com.prohelpng.app</string>
 			</array>
 		</dict>
 	</array>

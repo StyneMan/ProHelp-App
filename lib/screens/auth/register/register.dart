@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ import 'package:prohelp_app/screens/account/setup_profile.dart';
 import 'package:prohelp_app/screens/account/setup_profile_employer.dart';
 import 'package:prohelp_app/screens/auth/account_type/account_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../../../components/text_components.dart';
@@ -41,6 +43,28 @@ class _RegisterState extends State<Register> {
   void initState() {
     super.initState();
     _manager = PreferenceManager(context);
+  }
+
+  _signInApple() async {
+    try {
+      SignInWithAppleButton(
+        onPressed: () async {
+          final credential = await SignInWithApple.getAppleIDCredential(
+            scopes: [
+              AppleIDAuthorizationScopes.email,
+              AppleIDAuthorizationScopes.fullName,
+            ],
+          );
+
+          print(credential);
+
+          // Now send the credential (especially `credential.authorizationCode`) to your server to create a session
+          // after they have been validated with Apple (see `Integration` section for more information on how to do this)
+        },
+      );
+    } catch (e) {
+      debugPrint("HJEH :: ${e}");
+    }
   }
 
   _signInWithGoogle() async {
@@ -275,7 +299,131 @@ class _RegisterState extends State<Register> {
                     _signInWithGoogle();
                   },
                   variant: "Filled",
-                )
+                ),
+                const SizedBox(height: 10.0),
+                Platform.isIOS
+                    ? RoundedButton(
+                        bgColor: Colors.transparent,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              "assets/images/apple_logo.svg",
+                              width: 21,
+                              color: Constants.primaryColor,
+                            ),
+                            const SizedBox(
+                              width: 8.0,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: TextPoppins(
+                                text: "Sign up with Apple",
+                                fontSize: 15,
+                                color: Constants.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        borderColor: Constants.primaryColor,
+                        foreColor: Constants.primaryColor,
+                        onPressed: () async {
+                          try {
+                            final credential =
+                                await SignInWithApple.getAppleIDCredential(
+                              scopes: [
+                                AppleIDAuthorizationScopes.email,
+                                AppleIDAuthorizationScopes.fullName,
+                              ],
+                            );
+
+                            // print(
+                            // "APPLE REGISTER CREDENTIAL ::: ${credential}");
+
+                            if ("${credential.identityToken}".isNotEmpty) {
+                              final resp = await APIService()
+                                  .appleAuth("${credential.identityToken}");
+
+                              debugPrint(
+                                  "Apple Server Respone >> ${resp.body}");
+                              final _prefs =
+                                  await SharedPreferences.getInstance();
+
+                              Map<String, dynamic> map = jsonDecode(resp.body);
+
+                              _prefs.setString(
+                                  'accessToken', "${map['token']}");
+                              // _manager!.saveAccessToken(map['token']);
+                              _controller.firstname.value =
+                                  "${map['data']['bio']['firstname']}";
+                              _controller.lastname.value =
+                                  "${map['data']['bio']['lastname']}";
+
+                              if (map['message'].contains("Account created") ||
+                                  resp.statusCode == 200) {
+                                debugPrint("AAA");
+                                //New account so now select user type recruiter or freelancer
+                                Navigator.of(context).pushReplacement(
+                                  PageTransition(
+                                    type: PageTransitionType.size,
+                                    alignment: Alignment.bottomCenter,
+                                    child: AccountType(
+                                      isSocial: true,
+                                      email: map['data']['email'],
+                                      name:
+                                          "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                debugPrint("BBB");
+                                if (!map['data']["hasProfile"]) {
+                                  debugPrint("BBB1");
+                                  Get.off(
+                                    map['data']["accountType"]
+                                                ?.toString()
+                                                .toLowerCase() ==
+                                            "professional"
+                                        ? SetupProfile(
+                                            manager: _manager!,
+                                            isSocial: true,
+                                            email: map['data']['email'],
+                                            name:
+                                                "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
+                                          )
+                                        : SetupProfileEmployer(
+                                            manager: _manager!,
+                                            isSocial: true,
+                                            email: map['data']['email'],
+                                            name:
+                                                "${map['data']['bio']['firstname']} ${map['data']['bio']['lastname']}",
+                                          ),
+                                    transition: Transition.cupertino,
+                                  );
+                                } else {
+                                  debugPrint("BBB2");
+                                  String userData = jsonEncode(map['data']);
+                                  _manager!.setUserData(userData);
+                                  _manager!.setIsLoggedIn(true);
+                                  _controller.setUserData(map['data']);
+
+                                  Get.off(
+                                    Dashboard(
+                                      manager: _manager!,
+                                    ),
+                                    transition: Transition.cupertino,
+                                  );
+                                }
+                              }
+                            }
+                          } catch (e) {
+                            debugPrint(e.toString());
+                          }
+                        },
+                        variant: "Outlined",
+                      )
+                    : const SizedBox(),
               ],
             ),
           ],

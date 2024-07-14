@@ -86,6 +86,26 @@ class APIService {
     );
   }
 
+  Future<http.Response> googleAuth(Map payload) async {
+    return await http.post(
+      Uri.parse('${Constants.baseURL}/api/auth/google/web'),
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: jsonEncode(payload),
+    );
+  }
+
+  Future<http.Response> appleAuth(String token) async {
+    return await http.post(
+      Uri.parse('${Constants.baseURL}/api/auth/apple'),
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: jsonEncode({"token": token}),
+    );
+  }
+
   Future<http.Response> getProfile(String accessToken, String email) async {
     return await client.get(
       Uri.parse('${Constants.baseURL}/api/user/$email'),
@@ -287,16 +307,6 @@ class APIService {
       headers: {
         "Content-type": "application/json",
       },
-    );
-  }
-
-  Future<http.Response> googleAuth(Map payload) async {
-    return await http.post(
-      Uri.parse('${Constants.baseURL}/api/auth/google/web'),
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: jsonEncode(payload),
     );
   }
 
